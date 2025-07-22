@@ -1,0 +1,365 @@
+ticker,sector,industry,next_earnings,marketCap,shortName,longName
+MMM,Industrials,Conglomerates,2025-04-28,84214636544,3M Company,3M Company
+AOS,Industrials,Specialty Industrial Machinery,2025-04-23,9541808128,A.O. Smith Corporation,A. O. Smith Corporation
+ABT,Healthcare,Medical Devices,2025-04-15,239353495552,Abbott Laboratories,Abbott Laboratories
+ABBV,Healthcare,Drug Manufacturers - General,2025-04-24,369011097600,AbbVie Inc.,AbbVie Inc.
+ACN,Technology,Information Technology Services,2025-03-20,217979781120,Accenture plc,Accenture plc
+ADBE,Technology,Software - Application,2025-03-12,190905171968,Adobe Inc.,Adobe Inc.
+AMD,Technology,Semiconductors,2025-04-28,161821130752,"Advanced Micro Devices, Inc.","Advanced Micro Devices, Inc."
+AES,Utilities,Utilities - Diversified,2025-04-30,8241347584,The AES Corporation,The AES Corporation
+AFL,Financial Services,Insurance - Life,2025-04-29,59834990592,AFLAC Incorporated,Aflac Incorporated
+A,Healthcare,Diagnostics & Research,2025-05-27,36486877184,"Agilent Technologies, Inc.","Agilent Technologies, Inc."
+APD,Basic Materials,Specialty Chemicals,2025-04-28,70335782912,"Air Products and Chemicals, Inc","Air Products and Chemicals, Inc."
+ABNB,Consumer Cyclical,Travel Services,2025-05-06,86285484032,"Airbnb, Inc.","Airbnb, Inc."
+AKAM,Technology,Software - Infrastructure,2025-05-07,12127655936,"Akamai Technologies, Inc.","Akamai Technologies, Inc."
+ALB,Basic Materials,Specialty Chemicals,2025-04-29,9056648192,Albemarle Corporation,Albemarle Corporation
+ARE,Real Estate,REIT - Office,2025-04-28,17700388864,Alexandria Real Estate Equities,"Alexandria Real Estate Equities, Inc."
+ALGN,Healthcare,Medical Instruments & Supplies,2025-04-30,13764959232,"Align Technology, Inc.","Align Technology, Inc."
+ALLE,Industrials,Security & Protection Services,2025-04-23,11106438144,Allegion plc,Allegion plc
+LNT,Utilities,Utilities - Regulated Electric,2025-04-30,16564334592,Alliant Energy Corporation,Alliant Energy Corporation
+ALL,Financial Services,Insurance - Property & Casualty,2025-04-29,52779925504,Allstate Corporation (The),The Allstate Corporation
+GOOGL,Communication Services,Internet Content & Information,2025-04-23,2086372769792,Alphabet Inc.,Alphabet Inc.
+GOOG,Communication Services,Internet Content & Information,2025-04-23,2086376439808,Alphabet Inc.,Alphabet Inc.
+MO,Consumer Defensive,Tobacco,2025-04-29,94423359488,"Altria Group, Inc.","Altria Group, Inc."
+AMZN,Consumer Cyclical,Internet Retail,2025-04-28,2249679699968,"Amazon.com, Inc.","Amazon.com, Inc."
+AMCR,Consumer Cyclical,Packaging & Containers,2025-04-28,14626840576,Amcor plc,Amcor plc
+AEE,Utilities,Utilities - Regulated Electric,2025-04-30,27411650560,Ameren Corporation,Ameren Corporation
+AEP,Utilities,Utilities - Regulated Electric,2025-04-28,56547028992,American Electric Power Company,"American Electric Power Company, Inc."
+AXP,Financial Services,Credit Services,2025-04-17,211434012672,American Express Company,American Express Company
+AIG,Financial Services,Insurance - Diversified,2025-04-29,49211039744,"American International Group, I","American International Group, Inc."
+AMT,Real Estate,REIT - Specialty,2025-04-28,96118505472,American Tower Corporation (REI,American Tower Corporation
+AWK,Utilities,Utilities - Regulated Water,2025-04-30,26506944512,"American Water Works Company, I","American Water Works Company, Inc."
+AMP,Financial Services,Asset Management,2025-04-21,53886353408,"Ameriprise Financial, Inc.","Ameriprise Financial, Inc."
+AME,Industrials,Specialty Industrial Machinery,2025-04-30,43663749120,"AMETEK, Inc.","AMETEK, Inc."
+AMGN,Healthcare,Drug Manufacturers - General,2025-04-30,165491376128,Amgen Inc.,Amgen Inc.
+APH,Technology,Electronic Components,2025-04-22,80657924096,Amphenol Corporation,Amphenol Corporation
+ADI,Technology,Semiconductors,2025-05-20,114104238080,"Analog Devices, Inc.","Analog Devices, Inc."
+ANSS,Technology,Software - Application,2025-04-29,29209962496,"ANSYS, Inc.","ANSYS, Inc."
+AON,Financial Services,Insurance Brokers,2025-04-24,88370323456,Aon plc,Aon plc
+APA,Energy,Oil & Gas E&P,2025-04-29,7555500032,APA Corporation,APA Corporation
+APO,Financial Services,Asset Management,2025-04-30,85155553280,"Apollo Global Management, Inc. ","Apollo Global Management, Inc."
+AAPL,Technology,Consumer Electronics,2025-04-30,3632944644096,Apple Inc.,Apple Inc.
+AMAT,Technology,Semiconductor Equipment & Materials,2025-05-14,128422559744,"Applied Materials, Inc.","Applied Materials, Inc."
+APTV,Consumer Cyclical,Auto Parts,2025-02-06,14941523968,Aptiv PLC,Aptiv PLC
+ACGL,Financial Services,Insurance - Diversified,2025-04-28,34874421248,Arch Capital Group Ltd.,Arch Capital Group Ltd.
+ADM,Consumer Defensive,Farm Products,2025-04-28,22642171904,Archer-Daniels-Midland Company,Archer-Daniels-Midland Company
+ANET,Technology,Computer Hardware,2025-05-05,117347221504,"Arista Networks, Inc.",Arista Networks Inc
+AJG,Financial Services,Insurance Brokers,2025-04-23,86022373376,Arthur J. Gallagher & Co.,Arthur J. Gallagher & Co.
+AIZ,Financial Services,Insurance - Property & Casualty,2025-05-05,10559127552,"Assurant, Inc.","Assurant, Inc."
+T,Communication Services,Telecom Services,2025-04-22,196753915904,AT&T Inc.,AT&T Inc.
+ATO,Utilities,Utilities - Regulated Gas,2025-05-06,24147292160,Atmos Energy Corporation,Atmos Energy Corporation
+ADSK,Technology,Software - Application,2025-02-27,59094720512,"Autodesk, Inc.","Autodesk, Inc."
+ADP,Technology,Software - Application,2025-04-29,128237600768,"Automatic Data Processing, Inc.","Automatic Data Processing, Inc."
+AZO,Consumer Cyclical,Specialty Retail,2025-03-04,58620391424,"AutoZone, Inc.","AutoZone, Inc."
+AVB,Real Estate,REIT - Residential,2025-04-23,32175237120,"AvalonBay Communities, Inc.","AvalonBay Communities, Inc."
+AVY,Consumer Cyclical,Packaging & Containers,2025-04-22,14848615424,Avery Dennison Corporation,Avery Dennison Corporation
+AXON,Industrials,Aerospace & Defense,2025-05-05,40296849408,"Axon Enterprise, Inc.","Axon Enterprise, Inc."
+BKR,Energy,Oil & Gas Equipment & Services,2025-04-21,44149092352,Baker Hughes Company,Baker Hughes Company
+BALL,Consumer Cyclical,Packaging & Containers,2025-04-24,14901944320,Ball Corporation,Ball Corporation
+BAC,Financial Services,Banks - Diversified,2025-04-15,350575755264,Bank of America Corporation,Bank of America Corporation
+BAX,Healthcare,Medical Instruments & Supplies,2025-04-30,17656176640,Baxter International Inc.,Baxter International Inc.
+BDX,Healthcare,Medical Instruments & Supplies,2025-05-01,64757559296,"Becton, Dickinson and Company","Becton, Dickinson and Company"
+BBY,Consumer Cyclical,Specialty Retail,2025-03-04,19222398976,"Best Buy Co., Inc.","Best Buy Co., Inc."
+TECH,Healthcare,Biotechnology,2025-04-29,9761934336,Bio-Techne Corp,Bio-Techne Corporation
+BIIB,Healthcare,Drug Manufacturers - General,2025-04-22,20565688320,Biogen Inc.,Biogen Inc.
+BLK,Financial Services,Asset Management,2025-01-15,151803281408,"BlackRock, Inc.","BlackRock, Inc."
+BX,Financial Services,Asset Management,2025-04-16,196803772416,Blackstone Inc.,Blackstone Inc.
+BK,Financial Services,Banks - Diversified,2025-04-11,63716753408,The Bank of New York Mellon Cor,The Bank of New York Mellon Corporation
+BA,Industrials,Aerospace & Defense,2025-04-22,130985426944,Boeing Company (The),The Boeing Company
+BKNG,Consumer Cyclical,Travel Services,2025-04-30,164601364480,Booking Holdings Inc. Common St,Booking Holdings Inc.
+BWA,Consumer Cyclical,Auto Parts,2025-04-30,6510222848,BorgWarner Inc.,BorgWarner Inc.
+BSX,Healthcare,Medical Devices,2025-04-22,153171197952,Boston Scientific Corporation,Boston Scientific Corporation
+BMY,Healthcare,Drug Manufacturers - General,2025-04-24,120987459584,Bristol-Myers Squibb Company,Bristol-Myers Squibb Company
+AVGO,Technology,Semiconductors,2025-03-06,934800195584,Broadcom Inc.,Broadcom Inc.
+BR,Technology,Information Technology Services,2025-05-06,28227323904,"Broadridge Financial Solutions,","Broadridge Financial Solutions, Inc."
+BRO,Financial Services,Insurance Brokers,2025-04-21,33894379520,"Brown & Brown, Inc.","Brown & Brown, Inc."
+BLDR,Industrials,Building Products & Equipment,2025-05-05,15792183296,"Builders FirstSource, Inc.","Builders FirstSource, Inc."
+BG,Consumer Defensive,Farm Products,2025-04-22,9939086336,Bunge Limited,Bunge Global SA
+BXP,Real Estate,REIT - Office,2025-04-28,12517088256,"BXP, Inc.","BXP, Inc."
+CHRW,Industrials,Integrated Freight & Logistics,2025-04-29,12062904320,"C.H. Robinson Worldwide, Inc.","C.H. Robinson Worldwide, Inc."
+CDNS,Technology,Software - Application,2025-04-21,68664053760,"Cadence Design Systems, Inc.","Cadence Design Systems, Inc."
+CZR,Consumer Cyclical,Resorts & Casinos,2025-04-28,7043072000,"Caesars Entertainment, Inc.","Caesars Entertainment, Inc."
+CPT,Real Estate,REIT - Residential,2025-04-30,13244273664,Camden Property Trust,Camden Property Trust
+CPB,Consumer Defensive,Packaged Foods,2025-03-05,11942246400,The Campbell's Company,The Campbell's Company
+COF,Financial Services,Credit Services,2025-04-23,76475334656,Capital One Financial Corporati,Capital One Financial Corporation
+CAH,Healthcare,Medical Distribution,2025-04-30,31278223360,"Cardinal Health, Inc.","Cardinal Health, Inc."
+KMX,Consumer Cyclical,Auto & Truck Dealerships,2025-04-09,12760785920,CarMax Inc,"CarMax, Inc."
+CCL,Consumer Cyclical,Travel Services,2025-03-25,32350730240,Carnival Corporation,Carnival Corporation & plc
+CARR,Industrials,Building Products & Equipment,2025-04-23,55986421760,Carrier Global Corporation,Carrier Global Corporation
+CAT,Industrials,Farm & Heavy Construction Machinery,2025-04-23,164384718848,"Caterpillar, Inc.",Caterpillar Inc.
+CBOE,Financial Services,Financial Data & Stock Exchanges,2025-05-01,22071181312,"Cboe Global Markets, Inc.","Cboe Global Markets, Inc."
+CBRE,Real Estate,Real Estate Services,2025-05-01,42587250688,CBRE Group Inc,"CBRE Group, Inc."
+CDW,Technology,Information Technology Services,2025-04-29,23610073088,CDW Corporation,CDW Corporation
+CE,Basic Materials,Chemicals,2025-05-06,5569372160,Celanese Corporation,Celanese Corporation
+COR,Healthcare,Medical Distribution,2025-04-29,49113989120,"Cencora, Inc.","Cencora, Inc."
+CNC,Healthcare,Healthcare Plans,2025-04-25,28849917952,Centene Corporation,Centene Corporation
+CNP,Utilities,Utilities - Regulated Electric,2025-04-28,22406445056,"CenterPoint Energy, Inc (Holdin","CenterPoint Energy, Inc."
+CF,Basic Materials,Agricultural Inputs,2025-05-07,13735886848,"CF Industries Holdings, Inc.","CF Industries Holdings, Inc."
+CRL,Healthcare,Diagnostics & Research,2025-05-07,8454217728,Charles River Laboratories Inte,"Charles River Laboratories International, Inc."
+SCHW,Financial Services,Capital Markets,2025-04-15,144233218048,Charles Schwab Corporation (The,The Charles Schwab Corporation
+CHTR,Communication Services,Telecom Services,2025-04-24,51608035328,"Charter Communications, Inc.","Charter Communications, Inc."
+CVX,Energy,Oil & Gas Integrated,2025-04-24,279266361344,Chevron Corporation,Chevron Corporation
+CMG,Consumer Cyclical,Restaurants,2025-04-22,73147703296,"Chipotle Mexican Grill, Inc.","Chipotle Mexican Grill, Inc."
+CB,Financial Services,Insurance - Property & Casualty,2025-04-21,114309619712,Chubb Limited,Chubb Limited
+CHD,Consumer Defensive,Household & Personal Products,2025-04-30,27351863296,"Church & Dwight Company, Inc.","Church & Dwight Co., Inc."
+CI,Healthcare,Healthcare Plans,2025-04-30,84525457408,The Cigna Group,The Cigna Group
+CINF,Financial Services,Insurance - Property & Casualty,2025-04-23,23135811584,Cincinnati Financial Corporatio,Cincinnati Financial Corporation
+CTAS,Industrials,Specialty Business Services,2025-03-25,83735379968,Cintas Corporation,Cintas Corporation
+CSCO,Technology,Communication Equipment,2025-05-13,255048171520,"Cisco Systems, Inc.","Cisco Systems, Inc."
+C,Financial Services,Banks - Diversified,2025-04-15,150664167424,"Citigroup, Inc.",Citigroup Inc.
+CFG,Financial Services,Banks - Regional,2025-04-16,20007759872,"Citizens Financial Group, Inc.","Citizens Financial Group, Inc."
+CLX,Consumer Defensive,Household & Personal Products,2025-04-28,19265683456,Clorox Company (The),The Clorox Company
+CME,Financial Services,Financial Data & Stock Exchanges,2025-04-22,91447795712,CME Group Inc.,CME Group Inc.
+CMS,Utilities,Utilities - Regulated Electric,2025-04-23,21826975744,CMS Energy Corporation,CMS Energy Corporation
+KO,Consumer Defensive,Beverages - Non-Alcoholic,2025-04-28,306274205696,Coca-Cola Company (The),The Coca-Cola Company
+CTSH,Technology,Information Technology Services,2025-04-29,41216352256,Cognizant Technology Solutions ,Cognizant Technology Solutions Corporation
+CL,Consumer Defensive,Household & Personal Products,2025-04-25,73987735552,Colgate-Palmolive Company,Colgate-Palmolive Company
+CMCSA,Communication Services,Telecom Services,2025-04-23,135663001600,Comcast Corporation,Comcast Corporation
+CAG,Consumer Defensive,Packaged Foods,2025-04-02,12190752768,"ConAgra Brands, Inc.","Conagra Brands, Inc."
+COP,Energy,Oil & Gas E&P,2025-04-30,126156480512,ConocoPhillips,ConocoPhillips
+ED,Utilities,Utilities - Regulated Electric,2025-04-30,35198201856,"Consolidated Edison, Inc.","Consolidated Edison, Inc."
+STZ,Consumer Defensive,Beverages - Brewers,2025-04-09,31722678272,"Constellation Brands, Inc.","Constellation Brands, Inc."
+CEG,Utilities,Utilities - Renewable,2025-02-18,78382252032,Constellation Energy Corporatio,Constellation Energy Corporation
+COO,Healthcare,Medical Instruments & Supplies,2025-03-06,18072113152,"The Cooper Companies, Inc.","The Cooper Companies, Inc."
+CPRT,Industrials,Specialty Business Services,2025-05-14,52941893632,"Copart, Inc.","Copart, Inc."
+GLW,Technology,Electronic Components,2025-04-28,42956685312,Corning Incorporated,Corning Incorporated
+CPAY,Technology,Software - Infrastructure,2025-05-06,25785227264,"Corpay, Inc.","Corpay, Inc."
+CTVA,Basic Materials,Agricultural Inputs,2025-04-29,43176312832,"Corteva, Inc.","Corteva, Inc."
+CSGP,Real Estate,Real Estate Services,2025-04-21,31272108032,"CoStar Group, Inc.","CoStar Group, Inc."
+COST,Consumer Defensive,Discount Stores,2025-03-06,465476943872,Costco Wholesale Corporation,Costco Wholesale Corporation
+CTRA,Energy,Oil & Gas E&P,2025-04-30,20624435200,Coterra Energy Inc.,Coterra Energy Inc.
+CRWD,Technology,Software - Infrastructure,2025-03-04,95977545728,"CrowdStrike Holdings, Inc.","CrowdStrike Holdings, Inc."
+CCI,Real Estate,REIT - Specialty,2025-03-12,40895672320,Crown Castle Inc.,Crown Castle Inc.
+CSX,Industrials,Railroads,2025-04-15,60646785024,CSX Corporation,CSX Corporation
+CMI,Industrials,Specialty Industrial Machinery,2025-04-30,50617749504,Cummins Inc.,Cummins Inc.
+CVS,Healthcare,Healthcare Plans,2025-04-29,82859778048,CVS Health Corporation,CVS Health Corporation
+DHR,Healthcare,Diagnostics & Research,2025-04-21,148488142848,Danaher Corporation,Danaher Corporation
+DRI,Consumer Cyclical,Restaurants,2025-03-20,23483287552,"Darden Restaurants, Inc.","Darden Restaurants, Inc."
+DVA,Healthcare,Medical Care Facilities,2025-04-30,11830400000,DaVita Inc.,DaVita Inc.
+DAY,Technology,Software - Application,2025-04-29,9856410624,"Dayforce, Inc.",Dayforce Inc
+DECK,Consumer Cyclical,Footwear & Accessories,2025-05-21,21151223808,Deckers Outdoor Corporation,Deckers Outdoor Corporation
+DE,Industrials,Farm & Heavy Construction Machinery,2025-05-14,130493145088,Deere & Company,Deere & Company
+DELL,Technology,Computer Hardware,2025-05-28,71696171008,Dell Technologies Inc.,Dell Technologies Inc.
+DAL,Industrials,Airlines,2025-04-08,38835232768,"Delta Air Lines, Inc.","Delta Air Lines, Inc."
+DVN,Energy,Oil & Gas E&P,2025-04-29,23490625536,Devon Energy Corporation,Devon Energy Corporation
+DXCM,Healthcare,Medical Devices,2025-04-23,34532524032,"DexCom, Inc.","DexCom, Inc."
+FANG,Energy,Oil & Gas E&P,2025-04-28,46009540608,"Diamondback Energy, Inc.","Diamondback Energy, Inc."
+DLR,Real Estate,REIT - Specialty,2025-04-30,53583216640,"Digital Realty Trust, Inc.","Digital Realty Trust, Inc."
+DFS,Financial Services,Credit Services,2025-04-15,49110585344,Discover Financial Services,Discover Financial Services
+DG,Consumer Defensive,Discount Stores,2025-03-13,16314110976,Dollar General Corporation,Dollar General Corporation
+DLTR,Consumer Defensive,Discount Stores,2025-03-11,15667742720,"Dollar Tree, Inc.","Dollar Tree, Inc."
+D,Utilities,Utilities - Regulated Electric,2025-04-30,48243068928,"Dominion Energy, Inc.","Dominion Energy, Inc."
+DPZ,Consumer Cyclical,Restaurants,2025-04-28,16795437056,Domino's Pizza Inc,"Domino's Pizza, Inc."
+DOV,Industrials,Specialty Industrial Machinery,2025-04-23,27276212224,Dover Corporation,Dover Corporation
+DOW,Basic Materials,Chemicals,2025-04-24,26823036928,Dow Inc.,Dow Inc.
+DHI,Consumer Cyclical,Residential Construction,2025-04-17,40684322816,"D.R. Horton, Inc.","D.R. Horton, Inc."
+DTE,Utilities,Utilities - Regulated Electric,2025-04-23,27708254208,DTE Energy Company,DTE Energy Company
+DUK,Utilities,Utilities - Regulated Electric,2025-05-05,91226398720,Duke Energy Corporation (Holdin,Duke Energy Corporation
+DD,Basic Materials,Specialty Chemicals,2025-04-29,34183864320,"DuPont de Nemours, Inc.","DuPont de Nemours, Inc."
+EMN,Basic Materials,Specialty Chemicals,2025-04-23,11269188608,Eastman Chemical Company,Eastman Chemical Company
+ETN,Industrials,Specialty Industrial Machinery,2025-04-28,115920068608,"Eaton Corporation, PLC",Eaton Corporation plc
+EBAY,Consumer Cyclical,Internet Retail,2025-04-29,30168838144,eBay Inc.,eBay Inc.
+ECL,Basic Materials,Specialty Chemicals,2025-04-28,76129026048,Ecolab Inc.,Ecolab Inc.
+EIX,Utilities,Utilities - Regulated Electric,2025-04-28,20960706560,Edison International,Edison International
+EW,Healthcare,Medical Devices,2025-04-23,42241478656,Edwards Lifesciences Corporatio,Edwards Lifesciences Corporation
+EA,Communication Services,Electronic Gaming & Multimedia,2025-05-06,33650995200,Electronic Arts Inc.,Electronic Arts Inc.
+ELV,Healthcare,Healthcare Plans,2025-04-16,90231463936,"Elevance Health, Inc.","Elevance Health, Inc."
+EMR,Industrials,Specialty Industrial Machinery,2025-05-06,68575883264,Emerson Electric Company,Emerson Electric Co.
+ENPH,Technology,Solar,2025-04-21,7594562560,"Enphase Energy, Inc.","Enphase Energy, Inc."
+ETR,Utilities,Utilities - Regulated Electric,2025-04-22,37579358208,Entergy Corporation,Entergy Corporation
+EOG,Energy,Oil & Gas E&P,2025-04-30,71397400576,"EOG Resources, Inc.","EOG Resources, Inc."
+EPAM,Technology,Information Technology Services,2025-05-07,11726912512,"EPAM Systems, Inc.","EPAM Systems, Inc."
+EQT,Energy,Oil & Gas E&P,2025-04-21,28778733568,EQT Corporation,EQT Corporation
+EFX,Industrials,Consulting Services,2025-04-15,30410684416,"Equifax, Inc.",Equifax Inc.
+EQIX,Real Estate,REIT - Specialty,2025-05-06,88048476160,"Equinix, Inc.","Equinix, Inc."
+EQR,Real Estate,REIT - Residential,2025-04-21,29027837952,Equity Residential,Equity Residential
+ERIE,Financial Services,Insurance Brokers,2025-04-23,22383738880,Erie Indemnity Company,Erie Indemnity Company
+ESS,Real Estate,REIT - Residential,2025-04-28,21495060480,"Essex Property Trust, Inc.","Essex Property Trust, Inc."
+EL,Consumer Defensive,Household & Personal Products,2025-05-01,25867108352,"Estee Lauder Companies, Inc. (T",The Estée Lauder Companies Inc.
+EG,Financial Services,Insurance - Reinsurance,2025-04-28,15165182976,"Everest Group, Ltd.","Everest Group, Ltd."
+EVRG,Utilities,Utilities - Regulated Electric,2025-05-07,15849920512,"Evergy, Inc.","Evergy, Inc."
+ES,Utilities,Utilities - Regulated Electric,2025-04-29,23111120896,Eversource Energy (D/B/A),Eversource Energy
+EXC,Utilities,Utilities - Regulated Electric,2025-04-30,44430725120,Exelon Corporation,Exelon Corporation
+EXPE,Consumer Cyclical,Travel Services,2025-04-30,25508532224,"Expedia Group, Inc.","Expedia Group, Inc."
+EXPD,Industrials,Integrated Freight & Logistics,2025-05-06,16199435264,Expeditors International of Was,"Expeditors International of Washington, Inc."
+EXR,Real Estate,REIT - Industrial,2025-04-28,33650614272,Extra Space Storage Inc,Extra Space Storage Inc.
+XOM,Energy,Oil & Gas Integrated,2025-04-01,483076472832,Exxon Mobil Corporation,Exxon Mobil Corporation
+FFIV,Technology,Software - Infrastructure,2025-04-28,16859261952,"F5, Inc.","F5, Inc."
+FDS,Financial Services,Financial Data & Stock Exchanges,2025-03-20,17559971840,FactSet Research Systems Inc.,FactSet Research Systems Inc.
+FICO,Technology,Software - Application,2025-04-23,46061080576,Fair Isaac Corporation,Fair Isaac Corporation
+FAST,Industrials,Industrial Distribution,2025-04-11,43427446784,Fastenal Company,Fastenal Company
+FRT,Real Estate,REIT - Retail,2025-02-13,9096586240,Federal Realty Investment Trust,Federal Realty Investment Trust
+FDX,Industrials,Integrated Freight & Logistics,2025-03-20,63319728128,FedEx Corporation,FedEx Corporation
+FIS,Technology,Information Technology Services,2025-05-05,37671698432,Fidelity National Information S,"Fidelity National Information Services, Inc."
+FITB,Financial Services,Banks - Regional,2025-04-17,28934414336,Fifth Third Bancorp,Fifth Third Bancorp
+FSLR,Technology,Solar,2025-04-29,14579702784,"First Solar, Inc.","First Solar, Inc."
+FE,Utilities,Utilities - Regulated Electric,2025-04-23,22358544384,FirstEnergy Corp.,FirstEnergy Corp.
+FI,Technology,Information Technology Services,2025-04-21,132290207744,"Fiserv, Inc.","Fiserv, Inc."
+FMC,Basic Materials,Agricultural Inputs,2025-05-05,4606448640,FMC Corporation,FMC Corporation
+F,Consumer Cyclical,Auto Manufacturers,2025-04-22,37850947584,Ford Motor Company,Ford Motor Company
+FTNT,Technology,Software - Infrastructure,2025-04-30,83056885760,"Fortinet, Inc.","Fortinet, Inc."
+FTV,Technology,Scientific & Technical Instruments,2025-04-22,27066664960,Fortive Corporation,Fortive Corporation
+FOXA,Communication Services,Entertainment,2025-05-06,25285824512,Fox Corporation,Fox Corporation
+FOX,Communication Services,Entertainment,2025-05-06,25285834752,Fox Corporation,Fox Corporation
+BEN,Financial Services,Asset Management,2025-04-28,10639309824,"Franklin Resources, Inc.","Franklin Resources, Inc."
+FCX,Basic Materials,Copper,2025-04-21,53042249728,"Freeport-McMoRan, Inc.",Freeport-McMoRan Inc.
+GRMN,Technology,Scientific & Technical Instruments,2025-04-29,44047044608,Garmin Ltd.,Garmin Ltd.
+IT,Technology,Information Technology Services,2025-04-28,38280044544,"Gartner, Inc.","Gartner, Inc."
+GE,Industrials,Aerospace & Defense,2025-04-22,222149558272,GE Aerospace,GE Aerospace
+GEHC,Healthcare,Health Information Services,2025-04-30,39944978432,GE HealthCare Technologies Inc.,GE HealthCare Technologies Inc.
+GEV,Utilities,Utilities - Renewable,2025-01-22,92476489728,GE Vernova Inc.,GE Vernova Inc.
+GEN,Technology,Software - Infrastructure,2025-05-07,16843505664,Gen Digital Inc.,Gen Digital Inc.
+GNRC,Industrials,Specialty Industrial Machinery,2025-04-28,8116445696,Generac Holdlings Inc.,Generac Holdings Inc.
+GD,Industrials,Aerospace & Defense,2025-04-22,68290666496,General Dynamics Corporation,General Dynamics Corporation
+GIS,Consumer Defensive,Packaged Foods,2025-03-19,33415620608,"General Mills, Inc.","General Mills, Inc."
+GM,Consumer Cyclical,Auto Manufacturers,2025-04-29,48884449280,General Motors Company,General Motors Company
+GPC,Consumer Cyclical,Auto Parts,2025-04-16,17331095552,Genuine Parts Company,Genuine Parts Company
+GILD,Healthcare,Drug Manufacturers - General,2025-04-24,142461108224,"Gilead Sciences, Inc.","Gilead Sciences, Inc."
+GPN,Industrials,Specialty Business Services,2025-04-29,26069012480,Global Payments Inc.,Global Payments Inc.
+GL,Financial Services,Insurance - Life,2025-04-21,10684802048,Globe Life Inc.,Globe Life Inc.
+GDDY,Technology,Software - Infrastructure,2025-04-30,25373401088,GoDaddy Inc.,GoDaddy Inc.
+GS,Financial Services,Capital Markets,2025-04-14,194178744320,"Goldman Sachs Group, Inc. (The)","The Goldman Sachs Group, Inc."
+HAL,Energy,Oil & Gas Equipment & Services,2025-04-21,22891587584,Halliburton Company,Halliburton Company
+HIG,Financial Services,Insurance - Property & Casualty,2025-04-23,33755574272,"The Hartford Insurance Group, I","The Hartford Insurance Group, Inc."
+HAS,Consumer Cyclical,Leisure,2025-04-22,9084864512,"Hasbro, Inc.","Hasbro, Inc."
+HCA,Healthcare,Medical Care Facilities,2025-04-24,76067151872,"HCA Healthcare, Inc.","HCA Healthcare, Inc."
+DOC,Real Estate,REIT - Healthcare Facilities,2025-04-23,14313119744,"Healthpeak Properties, Inc.","Healthpeak Properties, Inc."
+HSIC,Healthcare,Medical Distribution,2025-05-05,8961853440,"Henry Schein, Inc.","Henry Schein, Inc."
+HSY,Consumer Defensive,Confectioners,2025-05-01,34958405632,The Hershey Company,The Hershey Company
+HES,Energy,Oil & Gas E&P,2025-04-23,45917011968,Hess Corporation,Hess Corporation
+HPE,Technology,Communication Equipment,2025-03-06,26018652160,Hewlett Packard Enterprise Comp,Hewlett Packard Enterprise Company
+HLT,Consumer Cyclical,Lodging,2025-04-22,63748575232,Hilton Worldwide Holdings Inc.,Hilton Worldwide Holdings Inc.
+HOLX,Healthcare,Medical Instruments & Supplies,2025-04-30,14224081920,"Hologic, Inc.","Hologic, Inc."
+HD,Consumer Cyclical,Home Improvement Retail,2025-05-20,393967763456,"Home Depot, Inc. (The)","The Home Depot, Inc."
+HON,Industrials,Conglomerates,2025-04-23,138361257984,Honeywell International Inc.,Honeywell International Inc.
+HRL,Consumer Defensive,Packaged Foods,2025-05-28,15744009216,Hormel Foods Corporation,Hormel Foods Corporation
+HST,Real Estate,REIT - Hotel & Motel,2025-04-29,11428185088,"Host Hotels & Resorts, Inc.","Host Hotels & Resorts, Inc."
+HWM,Industrials,Aerospace & Defense,2025-04-30,55326146560,Howmet Aerospace Inc.,Howmet Aerospace Inc.
+HPQ,Technology,Computer Hardware,2025-05-27,29101242368,HP Inc.,HP Inc.
+HUBB,Industrials,Electrical Equipment & Parts,2025-04-28,19942379520,Hubbell Inc,Hubbell Incorporated
+HUM,Healthcare,Healthcare Plans,2025-04-22,32624822272,Humana Inc.,Humana Inc.
+HBAN,Financial Services,Banks - Regional,2025-04-17,23943426048,Huntington Bancshares Incorpora,Huntington Bancshares Incorporated
+HII,Industrials,Aerospace & Defense,2025-04-30,6870480384,"Huntington Ingalls Industries, ","Huntington Ingalls Industries, Inc."
+IBM,Technology,Information Technology Services,2025-04-23,234078519296,International Business Machines,International Business Machines Corporation
+IEX,Industrials,Specialty Industrial Machinery,2025-04-21,14727104512,IDEX Corporation,IDEX Corporation
+IDXX,Healthcare,Diagnostics & Research,2025-05-01,35549368320,"IDEXX Laboratories, Inc.","IDEXX Laboratories, Inc."
+ITW,Industrials,Specialty Industrial Machinery,2025-04-28,77478133760,Illinois Tool Works Inc.,Illinois Tool Works Inc.
+INCY,Healthcare,Biotechnology,2025-04-28,14224014336,Incyte Corporation,Incyte Corporation
+IR,Industrials,Specialty Industrial Machinery,2025-04-30,34173376512,Ingersoll Rand Inc.,Ingersoll Rand Inc.
+PODD,Healthcare,Medical Devices,2025-05-07,19120457728,Insulet Corporation,Insulet Corporation
+INTC,Technology,Semiconductors,2025-04-23,102750896128,Intel Corporation,Intel Corporation
+ICE,Financial Services,Financial Data & Stock Exchanges,2025-04-30,99531890688,Intercontinental Exchange Inc.,"Intercontinental Exchange, Inc."
+IFF,Basic Materials,Specialty Chemicals,2025-05-05,20917344256,International Flavors & Fragran,International Flavors & Fragrances Inc.
+IP,Consumer Cyclical,Packaging & Containers,2025-04-30,29647200256,International Paper Company,International Paper Company
+IPG,Communication Services,Advertising Agencies,2025-04-22,10210582528,"Interpublic Group of Companies,","The Interpublic Group of Companies, Inc."
+INTU,Technology,Software - Application,2025-05-21,171606343680,Intuit Inc.,Intuit Inc.
+ISRG,Healthcare,Medical Instruments & Supplies,2025-04-16,204417957888,"Intuitive Surgical, Inc.","Intuitive Surgical, Inc."
+IVZ,Financial Services,Asset Management,2025-04-21,7783798272,Invesco Ltd,Invesco Ltd.
+INVH,Real Estate,REIT - Residential,2025-04-28,20837584896,Invitation Homes Inc.,Invitation Homes Inc.
+IQV,Healthcare,Diagnostics & Research,2025-04-30,33247680512,"IQVIA Holdings, Inc.",IQVIA Holdings Inc.
+IRM,Real Estate,REIT - Specialty,2025-04-30,27367847936,Iron Mountain Incorporated (Del,Iron Mountain Incorporated
+JBHT,Industrials,Integrated Freight & Logistics,2025-04-14,16120289280,"J.B. Hunt Transport Services, I","J.B. Hunt Transport Services, Inc."
+JBL,Technology,Electronic Components,2025-03-13,16969161728,Jabil Inc.,Jabil Inc.
+JKHY,Technology,Information Technology Services,2025-05-05,12654310400,"Jack Henry & Associates, Inc.","Jack Henry & Associates, Inc."
+J,Industrials,Engineering & Construction,2025-05-05,15699111936,Jacobs Solutions Inc.,Jacobs Solutions Inc.
+JNJ,Healthcare,Drug Manufacturers - General,2025-04-15,397305479168,Johnson & Johnson,Johnson & Johnson
+JCI,Industrials,Building Products & Equipment,2025-02-05,56547508224,Johnson Controls International ,Johnson Controls International plc
+JPM,Financial Services,Banks - Diversified,2025-04-11,739990503424,JP Morgan Chase & Co.,JPMorgan Chase & Co.
+JNPR,Technology,Communication Equipment,2025-04-23,12061478912,"Juniper Networks, Inc.","Juniper Networks, Inc."
+K,Consumer Defensive,Packaged Foods,2025-04-30,28618407936,Kellanova,Kellanova
+KVUE,Consumer Defensive,Household & Personal Products,2025-05-05,45105262592,Kenvue Inc.,Kenvue Inc.
+KDP,Consumer Defensive,Beverages - Non-Alcoholic,2025-04-23,45478260736,Keurig Dr Pepper Inc.,Keurig Dr Pepper Inc.
+KEY,Financial Services,Banks - Regional,2025-04-17,19140677632,KeyCorp,KeyCorp
+KEYS,Technology,Scientific & Technical Instruments,2025-05-19,27614642176,Keysight Technologies Inc.,"Keysight Technologies, Inc."
+KMB,Consumer Defensive,Household & Personal Products,2025-04-21,47102582784,Kimberly-Clark Corporation,Kimberly-Clark Corporation
+KIM,Real Estate,REIT - Retail,2025-02-07,15016552448,Kimco Realty Corporation (HC),Kimco Realty Corporation
+KMI,Energy,Oil & Gas Midstream,2025-04-15,60215115776,"Kinder Morgan, Inc.","Kinder Morgan, Inc."
+KKR,Financial Services,Asset Management,2025-04-29,125122584576,KKR & Co. Inc.,KKR & Co. Inc.
+KLAC,Technology,Semiconductor Equipment & Materials,2025-04-23,94195621888,KLA Corporation,KLA Corporation
+KHC,Consumer Defensive,Packaged Foods,2025-04-29,36698140672,The Kraft Heinz Company,The Kraft Heinz Company
+KR,Consumer Defensive,Grocery Stores,2025-03-06,46904139776,Kroger Company (The),The Kroger Co.
+LHX,Industrials,Aerospace & Defense,2025-04-23,38813396992,"L3Harris Technologies, Inc.","L3Harris Technologies, Inc."
+LH,Healthcare,Diagnostics & Research,2025-02-06,21012047872,Labcorp Holdings Inc.,Labcorp Holdings Inc.
+LRCX,Technology,Semiconductor Equipment & Materials,2025-04-22,98508070912,Lam Research Corporation,Lam Research Corporation
+LW,Consumer Defensive,Packaged Foods,2025-04-02,7398788096,"Lamb Weston Holdings, Inc.","Lamb Weston Holdings, Inc."
+LVS,Consumer Cyclical,Resorts & Casinos,2025-04-15,32009451520,Las Vegas Sands Corp.,Las Vegas Sands Corp.
+LDOS,Technology,Information Technology Services,2025-04-28,17047775232,"Leidos Holdings, Inc.","Leidos Holdings, Inc."
+LEN,Consumer Cyclical,Residential Construction,2025-03-11,31499296768,Lennar Corporation,Lennar Corporation
+LII,Industrials,Building Products & Equipment,2025-04-22,21385179136,"Lennox International, Inc.",Lennox International Inc.
+LLY,Healthcare,Drug Manufacturers - General,2025-05-01,826882260992,Eli Lilly and Company,Eli Lilly and Company
+LIN,Basic Materials,Specialty Chemicals,2025-04-30,220873539584,Linde plc,Linde plc
+LYV,Communication Services,Entertainment,2025-04-30,33132359680,"Live Nation Entertainment, Inc.","Live Nation Entertainment, Inc."
+LKQ,Consumer Cyclical,Auto Parts,2025-04-21,10933749760,LKQ Corporation,LKQ Corporation
+LMT,Industrials,Aerospace & Defense,2025-04-21,106010787840,Lockheed Martin Corporation,Lockheed Martin Corporation
+L,Financial Services,Insurance - Property & Casualty,2025-05-05,18283988992,Loews Corporation,Loews Corporation
+LOW,Consumer Cyclical,Home Improvement Retail,2025-05-21,139238391808,"Lowe's Companies, Inc.","Lowe's Companies, Inc."
+LULU,Consumer Cyclical,Apparel Retail,2025-03-19,44525445120,lululemon athletica inc.,Lululemon Athletica Inc.
+LYB,Basic Materials,Specialty Chemicals,2025-04-24,24850358272,LyondellBasell Industries NV,LyondellBasell Industries N.V.
+MTB,Financial Services,Banks - Regional,2025-04-14,31505922048,M&T Bank Corporation,M&T Bank Corporation
+MPC,Energy,Oil & Gas Refining & Marketing,2025-04-28,46942662656,Marathon Petroleum Corporation,Marathon Petroleum Corporation
+MKTX,Financial Services,Capital Markets,2025-05-05,7266871808,"MarketAxess Holdings, Inc.",MarketAxess Holdings Inc.
+MAR,Consumer Cyclical,Lodging,2025-04-29,77318668288,Marriott International,"Marriott International, Inc."
+MMC,Financial Services,Insurance Brokers,2025-04-16,116810596352,"Marsh & McLennan Companies, Inc","Marsh & McLennan Companies, Inc."
+MLM,Basic Materials,Building Materials,2025-04-28,29459027968,"Martin Marietta Materials, Inc.","Martin Marietta Materials, Inc."
+MAS,Industrials,Building Products & Equipment,2025-04-22,15936882688,Masco Corporation,Masco Corporation
+MA,Financial Services,Credit Services,2025-04-29,525426458624,Mastercard Incorporated,Mastercard Incorporated
+MTCH,Communication Services,Internet Content & Information,2025-05-05,7941103104,"Match Group, Inc.","Match Group, Inc."
+MKC,Consumer Defensive,Packaged Foods,2025-03-25,22149062656,"McCormick & Company, Incorporat","McCormick & Company, Incorporated"
+MCD,Consumer Cyclical,Restaurants,2025-04-28,220289744896,McDonald's Corporation,McDonald's Corporation
+MCK,Healthcare,Medical Distribution,2025-05-05,80241229824,McKesson Corporation,McKesson Corporation
+MDT,Healthcare,Medical Devices,2025-05-21,118019325952,Medtronic plc.,Medtronic plc
+MRK,Healthcare,Drug Manufacturers - General,2025-04-24,233027190784,"Merck & Company, Inc.","Merck & Co., Inc."
+META,Communication Services,Internet Content & Information,2025-04-22,1692991619072,"Meta Platforms, Inc.","Meta Platforms, Inc."
+MET,Financial Services,Insurance - Life,2025-04-29,58708230144,"MetLife, Inc.","MetLife, Inc."
+MTD,Healthcare,Diagnostics & Research,2025-05-07,26620848128,"Mettler-Toledo International, I",Mettler-Toledo International Inc.
+MGM,Consumer Cyclical,Resorts & Casinos,2025-04-29,9925752832,MGM Resorts International,MGM Resorts International
+MCHP,Technology,Semiconductors,2025-05-05,31656028160,Microchip Technology Incorporat,Microchip Technology Incorporated
+MU,Technology,Semiconductors,2025-03-20,104319729664,"Micron Technology, Inc.","Micron Technology, Inc."
+MSFT,Technology,Software - Infrastructure,2025-04-23,2951215579136,Microsoft Corporation,Microsoft Corporation
+MAA,Real Estate,REIT - Residential,2025-04-29,20170532864,Mid-America Apartment Communiti,"Mid-America Apartment Communities, Inc."
+MRNA,Healthcare,Biotechnology,2025-04-30,11944862720,"Moderna, Inc.","Moderna, Inc."
+MHK,Consumer Cyclical,"Furnishings, Fixtures & Appliances",2025-04-23,7359628800,"Mohawk Industries, Inc.","Mohawk Industries, Inc."
+MOH,Healthcare,Healthcare Plans,2025-04-22,16712159232,Molina Healthcare Inc,"Molina Healthcare, Inc."
+TAP,Consumer Defensive,Beverages - Brewers,2025-04-28,12415025152,Molson Coors Beverage Company,Molson Coors Beverage Company
+MDLZ,Consumer Defensive,Confectioners,2025-04-28,83083436032,"Mondelez International, Inc.","Mondelez International, Inc."
+MPWR,Technology,Semiconductors,2025-04-29,29220331520,"Monolithic Power Systems, Inc.","Monolithic Power Systems, Inc."
+MNST,Consumer Defensive,Beverages - Non-Alcoholic,2025-04-30,53178769408,Monster Beverage Corporation,Monster Beverage Corporation
+MCO,Financial Services,Financial Data & Stock Exchanges,2025-04-30,90864910336,Moody's Corporation,Moody's Corporation
+MS,Financial Services,Capital Markets,2025-04-11,214687793152,Morgan Stanley,Morgan Stanley
+MOS,Basic Materials,Agricultural Inputs,2025-04-29,7581013504,Mosaic Company (The),The Mosaic Company
+MSI,Technology,Communication Equipment,2025-04-30,73489006592,"Motorola Solutions, Inc.","Motorola Solutions, Inc."
+MSCI,Financial Services,Financial Data & Stock Exchanges,2025-04-21,45854281728,MSCI Inc.,MSCI Inc.
+NDAQ,Financial Services,Financial Data & Stock Exchanges,2025-04-23,47610503168,"Nasdaq, Inc.","Nasdaq, Inc."
+NTAP,Technology,Computer Hardware,2025-05-29,20302551040,"NetApp, Inc.","NetApp, Inc."
+NFLX,Communication Services,Entertainment,2025-04-16,419441410048,"Netflix, Inc.","Netflix, Inc."
+NEM,Basic Materials,Gold,2025-04-23,48274685952,Newmont Corporation,Newmont Corporation
+NWSA,Communication Services,Entertainment,2025-05-06,16917138432,News Corporation,News Corporation
+NWS,Communication Services,Entertainment,2025-05-06,16928954368,News Corporation,News Corporation
+NEE,Utilities,Utilities - Regulated Electric,2025-04-21,144341794816,"NextEra Energy, Inc.","NextEra Energy, Inc."
+NKE,Consumer Cyclical,Footwear & Accessories,2025-03-20,117487296512,"Nike, Inc.","NIKE, Inc."
+NI,Utilities,Utilities - Regulated Gas,2025-05-06,19178252288,NiSource Inc,NiSource Inc.
+NDSN,Industrials,Specialty Industrial Machinery,2025-05-19,11967961088,Nordson Corporation,Nordson Corporation
+NSC,Industrials,Railroads,2025-04-22,55646154752,Norfolk Southern Corporation,Norfolk Southern Corporation
+NTRS,Financial Services,Asset Management,2025-04-22,21569832960,Northern Trust Corporation,Northern Trust Corporation
+NOC,Industrials,Aerospace & Defense,2025-04-23,66839633920,Northrop Grumman Corporation,Northrop Grumman Corporation
+NCLH,Consumer Cyclical,Travel Services,2025-04-29,9995549696,Norwegian Cruise Line Holdings ,Norwegian Cruise Line Holdings Ltd.
+NRG,Utilities,Utilities - Independent Power Producers,2025-05-05,20994428928,"NRG Energy, Inc.","NRG Energy, Inc."
+NUE,Basic Materials,Steel,2025-04-21,31691784192,Nucor Corporation,Nucor Corporation
+NVDA,Technology,Semiconductors,2025-05-20,3048047902720,NVIDIA Corporation,NVIDIA Corporation
+NVR,Consumer Cyclical,Residential Construction,2025-04-21,20894441472,"NVR, Inc.","NVR, Inc."
+NXPI,Technology,Semiconductors,2025-04-28,54677934080,NXP Semiconductors N.V.,NXP Semiconductors N.V.
+ORLY,Consumer Cyclical,Specialty Retail,2025-04-22,78822490112,"O'Reilly Automotive, Inc.","O'Reilly Automotive, Inc."
+OXY,Energy,Oil & Gas E&P,2025-05-05,45836390400,Occidental Petroleum Corporatio,Occidental Petroleum Corporation
+ODFL,Industrials,Trucking,2025-04-22,37514190848,"Old Dominion Freight Line, Inc.","Old Dominion Freight Line, Inc."
+OMC,Communication Services,Advertising Agencies,2025-04-14,16261596160,Omnicom Group Inc.,Omnicom Group Inc.
+ON,Technology,Semiconductors,2025-04-28,19827857408,ON Semiconductor Corporation,ON Semiconductor Corporation
+OKE,Energy,Oil & Gas Midstream,2025-04-28,62677487616,"ONEOK, Inc.","ONEOK, Inc."
+ORCL,Technology,Software - Infrastructure,2025-03-10,464463167488,Oracle Corporation,Oracle Corporation
+OTIS,Industrials,Specialty Industrial Machinery,2025-04-22,39564664832,Otis Worldwide Corporation,Otis Worldwide Corporation
+PCAR,Industrials,Farm & Heavy Construction Machinery,2025-04-28,56279871488,PACCAR Inc.,PACCAR Inc
+PKG,Consumer Cyclical,Packaging & Containers,2025-04-21,19135737856,Packaging Corporation of Americ,Packaging Corporation of America
+PLTR,Technology,Software - Infrastructure,2025-05-05,199167950848,Palantir Technologies Inc.,Palantir Technologies Inc.
+PANW,Technology,Software - Infrastructure,2025-05-19,126083694592,"Palo Alto Networks, Inc.","Palo Alto Networks, Inc."
+PARA,Communication Services,Entertainment,2025-04-28,8080424960,Paramount Global,Paramount Global
+PH,Industrials,Specialty Industrial Machinery,2025-05-01,86080692224,Parker-Hannifin Corporation,Parker-Hannifin Corporation
+PAYX,Technology,Software - Application,2025-03-31,54610755584,"Paychex, Inc.","Paychex, Inc."

@@ -1,0 +1,40 @@
+ticker,error
+BSLKW,index 0 is out of bounds for axis 0 with size 0
+CLNNW,index 0 is out of bounds for axis 0 with size 0
+CNFRZ,index 0 is out of bounds for axis 0 with size 0
+CSLRW,index 0 is out of bounds for axis 0 with size 0
+DISTW,index 0 is out of bounds for axis 0 with size 0
+FAX,index 0 is out of bounds for axis 0 with size 0
+FORLW,index 0 is out of bounds for axis 0 with size 0
+GBBKW,index 0 is out of bounds for axis 0 with size 0
+GECCZ,index 0 is out of bounds for axis 0 with size 0
+GPATW,index 0 is out of bounds for axis 0 with size 0
+HSCSW,index 0 is out of bounds for axis 0 with size 0
+HSPOW,index 0 is out of bounds for axis 0 with size 0
+IROHW,index 0 is out of bounds for axis 0 with size 0
+IVCAW,index 0 is out of bounds for axis 0 with size 0
+LUCYW,'NoneType' object has no attribute 'update'
+MSPRZ,index 0 is out of bounds for axis 0 with size 0
+,'float' object has no attribute 'upper'
+NOEMW,index 0 is out of bounds for axis 0 with size 0
+OPP,index 0 is out of bounds for axis 0 with size 0
+PLMKW,index 0 is out of bounds for axis 0 with size 0
+RDACR,index 0 is out of bounds for axis 0 with size 0
+RELIW,index 0 is out of bounds for axis 0 with size 0
+RMCOW,index 0 is out of bounds for axis 0 with size 0
+STSSW,index 0 is out of bounds for axis 0 with size 0
+SWVLW,index 0 is out of bounds for axis 0 with size 0
+TNONW,index 0 is out of bounds for axis 0 with size 0
+VEEAW,index 0 is out of bounds for axis 0 with size 0
+YHNAU,index 0 is out of bounds for axis 0 with size 0
+AGR,index 0 is out of bounds for axis 0 with size 0
+BRK.B,index 0 is out of bounds for axis 0 with size 0
+BF.A,index 0 is out of bounds for axis 0 with size 0
+BF.B,index 0 is out of bounds for axis 0 with size 0
+CWEN.A,index 0 is out of bounds for axis 0 with size 0
+HCP,index 0 is out of bounds for axis 0 with size 0
+HEI.A,index 0 is out of bounds for axis 0 with size 0
+LEN.B,index 0 is out of bounds for axis 0 with size 0
+SMAR,index 0 is out of bounds for axis 0 with size 0
+TPX,list index out of range
+UHAL.B,index 0 is out of bounds for axis 0 with size 0

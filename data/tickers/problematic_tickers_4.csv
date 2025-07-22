@@ -1,0 +1,8 @@
+ticker,error
+BRK.B,index 0 is out of bounds for axis 0 with size 0
+BF.A,index 0 is out of bounds for axis 0 with size 0
+BF.B,index 0 is out of bounds for axis 0 with size 0
+CWEN.A,index 0 is out of bounds for axis 0 with size 0
+HEI.A,index 0 is out of bounds for axis 0 with size 0
+LEN.B,index 0 is out of bounds for axis 0 with size 0
+UHAL.B,index 0 is out of bounds for axis 0 with size 0
