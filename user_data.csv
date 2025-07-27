@@ -17,3 +17,5 @@
         16: ['indexes_tickers.csv'],,,
 Introduce your choice:,,,
 2,,,
+Write info file?,,,
+TRUE,,,

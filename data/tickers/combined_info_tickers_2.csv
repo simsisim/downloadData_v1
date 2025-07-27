@@ -1,107 +1,107 @@
 ticker,sector,industry,next_earnings,marketCap,shortName,longName,exchange1,exchange2
-ADBE,Technology,Software - Application,2025-09-10,158126915584,Adobe Inc.,Adobe Inc.,NasdaqGS,Nasdaq Real Time Price
-AMD,Technology,Semiconductors,2025-08-05,250311753728,"Advanced Micro Devices, Inc.","Advanced Micro Devices, Inc.",NasdaqGS,Nasdaq Real Time Price
-ABNB,Consumer Cyclical,Travel Services,2025-08-04,86348095488,"Airbnb, Inc.","Airbnb, Inc.",NasdaqGS,Nasdaq Real Time Price
-GOOGL,Communication Services,Internet Content & Information,2025-07-23,2323495780352,Alphabet Inc.,Alphabet Inc.,NasdaqGS,Nasdaq Real Time Price
-GOOG,Communication Services,Internet Content & Information,2025-07-23,2323196936192,Alphabet Inc.,Alphabet Inc.,NasdaqGS,Nasdaq Real Time Price
-AMZN,Consumer Cyclical,Internet Retail,2025-07-31,2416133537792,"Amazon.com, Inc.","Amazon.com, Inc.",NasdaqGS,Nasdaq Real Time Price
-AEP,Utilities,Utilities - Regulated Electric,2025-07-30,58665295872,American Electric Power Company,"American Electric Power Company, Inc.",NasdaqGS,Nasdaq Real Time Price
-AMGN,Healthcare,Drug Manufacturers - General,2025-08-05,162618408960,Amgen Inc.,Amgen Inc.,NasdaqGS,Nasdaq Real Time Price
-ADI,Technology,Semiconductors,2025-08-19,117203845120,"Analog Devices, Inc.","Analog Devices, Inc.",NasdaqGS,Nasdaq Real Time Price
-AAPL,Technology,Consumer Electronics,2025-07-31,3198538743808,Apple Inc.,Apple Inc.,NasdaqGS,Nasdaq Real Time Price
-AMAT,Technology,Semiconductor Equipment & Materials,2025-08-13,149184364544,"Applied Materials, Inc.","Applied Materials, Inc.",NasdaqGS,Nasdaq Real Time Price
-APP,Communication Services,Advertising Agencies,2025-08-06,117186805760,Applovin Corporation,AppLovin Corporation,NasdaqGS,Nasdaq Real Time Price
-ARM,Technology,Semiconductors,2025-07-30,164990337024,Arm Holdings plc,Arm Holdings plc,NasdaqGS,Nasdaq Real Time Price
-ASML,Technology,Semiconductor Equipment & Materials,2025-10-15,282665680896,ASML Holding N.V. - New York Re,ASML Holding N.V.,NasdaqGS,Nasdaq Real Time Price
-AZN,Healthcare,Drug Manufacturers - General,2025-07-29,219389444096,Astrazeneca PLC,AstraZeneca PLC,NasdaqGS,Nasdaq Real Time Price
-TEAM,Technology,Software - Application,2025-08-07,52406697984,Atlassian Corporation,Atlassian Corporation,NasdaqGS,Nasdaq Real Time Price
-ADSK,Technology,Software - Application,2025-08-27,64061546496,"Autodesk, Inc.","Autodesk, Inc.",NasdaqGS,Nasdaq Real Time Price
-ADP,Technology,Software - Application,2025-07-30,122950025216,"Automatic Data Processing, Inc.","Automatic Data Processing, Inc.",NasdaqGS,Nasdaq Real Time Price
-AXON,Industrials,Aerospace & Defense,2025-08-04,56919445504,"Axon Enterprise, Inc.","Axon Enterprise, Inc.",NasdaqGS,Nasdaq Real Time Price
-BKR,Energy,Oil & Gas Equipment & Services,2025-07-22,39630000128,Baker Hughes Company,Baker Hughes Company,NasdaqGS,Nasdaq Real Time Price
-BIIB,Healthcare,Drug Manufacturers - General,2025-07-31,18559236096,Biogen Inc.,Biogen Inc.,NasdaqGS,Nasdaq Real Time Price
-BKNG,Consumer Cyclical,Travel Services,2025-07-29,187123957760,Booking Holdings Inc. Common St,Booking Holdings Inc.,NasdaqGS,Nasdaq Real Time Price
-AVGO,Technology,Semiconductors,2025-09-03,1317724225536,Broadcom Inc.,Broadcom Inc.,NasdaqGS,Nasdaq Real Time Price
-CDNS,Technology,Software - Application,2025-07-28,87116775424,"Cadence Design Systems, Inc.","Cadence Design Systems, Inc.",NasdaqGS,Nasdaq Real Time Price
-CDW,Technology,Information Technology Services,2025-07-29,23683547136,CDW Corporation,CDW Corporation,NasdaqGS,Nasdaq Real Time Price
-CHTR,Communication Services,Telecom Services,2025-07-25,53410619392,"Charter Communications, Inc.","Charter Communications, Inc.",NasdaqGS,Nasdaq Real Time Price
-CTAS,Industrials,Specialty Business Services,2025-09-24,88821825536,Cintas Corporation,Cintas Corporation,NasdaqGS,Nasdaq Real Time Price
-CSCO,Technology,Communication Equipment,2025-08-12,271042199552,"Cisco Systems, Inc.","Cisco Systems, Inc.",NasdaqGS,Nasdaq Real Time Price
-CCEP,Consumer Defensive,Beverages - Non-Alcoholic,2025-08-06,44994179072,Coca-Cola Europacific Partners ,Coca-Cola Europacific Partners PLC,NasdaqGS,Nasdaq Real Time Price
-CTSH,Technology,Information Technology Services,2025-07-30,37690347520,Cognizant Technology Solutions ,Cognizant Technology Solutions Corporation,NasdaqGS,Nasdaq Real Time Price
-CMCSA,Communication Services,Telecom Services,2025-07-31,131370246144,Comcast Corporation,Comcast Corporation,NasdaqGS,Nasdaq Real Time Price
-CEG,Utilities,Utilities - Renewable,2025-08-07,99428401152,Constellation Energy Corporatio,Constellation Energy Corporation,NasdaqGS,Nasdaq Real Time Price
-CPRT,Industrials,Specialty Business Services,2025-09-02,44735295488,"Copart, Inc.","Copart, Inc.",NasdaqGS,Nasdaq Real Time Price
-CSGP,Real Estate,Real Estate Services,2025-07-22,35965865984,"CoStar Group, Inc.","CoStar Group, Inc.",NasdaqGS,Nasdaq Real Time Price
-COST,Consumer Defensive,Discount Stores,2025-05-29,420052533248,Costco Wholesale Corporation,Costco Wholesale Corporation,NasdaqGS,Nasdaq Real Time Price
-CRWD,Technology,Software - Infrastructure,2025-08-26,118431432704,"CrowdStrike Holdings, Inc.","CrowdStrike Holdings, Inc.",NasdaqGS,Nasdaq Real Time Price
-CSX,Industrials,Railroads,2025-07-23,65608355840,CSX Corporation,CSX Corporation,NasdaqGS,Nasdaq Real Time Price
-DDOG,Technology,Software - Application,2025-08-07,50026106880,"Datadog, Inc.","Datadog, Inc.",NasdaqGS,Nasdaq Real Time Price
-DXCM,Healthcare,Medical Devices,2025-07-30,33340858368,"DexCom, Inc.","DexCom, Inc.",NasdaqGS,Nasdaq Real Time Price
-FANG,Energy,Oil & Gas E&P,2025-08-04,41445347328,"Diamondback Energy, Inc.","Diamondback Energy, Inc.",NasdaqGS,Nasdaq Real Time Price
-DASH,Consumer Cyclical,Internet Retail,2025-08-06,101529067520,"DoorDash, Inc.","DoorDash, Inc.",NasdaqGS,Nasdaq Real Time Price
-EA,Communication Services,Electronic Gaming & Multimedia,2025-07-29,39560265728,Electronic Arts Inc.,Electronic Arts Inc.,NasdaqGS,Nasdaq Real Time Price
-EXC,Utilities,Utilities - Regulated Electric,2025-07-31,44697382912,Exelon Corporation,Exelon Corporation,NasdaqGS,Nasdaq Real Time Price
-FAST,Industrials,Industrial Distribution,2025-10-13,53636907008,Fastenal Company,Fastenal Company,NasdaqGS,Nasdaq Real Time Price
-FTNT,Technology,Software - Infrastructure,2025-08-04,80563093504,"Fortinet, Inc.","Fortinet, Inc.",NasdaqGS,Nasdaq Real Time Price
-GEHC,Healthcare,Health Information Services,2025-07-30,34909151232,GE HealthCare Technologies Inc.,GE HealthCare Technologies Inc.,NasdaqGS,Nasdaq Real Time Price
-GILD,Healthcare,Drug Manufacturers - General,2025-08-06,137441820672,"Gilead Sciences, Inc.","Gilead Sciences, Inc.",NasdaqGS,Nasdaq Real Time Price
-GFS,Technology,Semiconductors,2025-08-05,22268698624,GlobalFoundries Inc.,GlobalFoundries Inc.,NasdaqGS,Nasdaq Real Time Price
-HON,Industrials,Conglomerates,2025-07-24,152130289664,Honeywell International Inc.,Honeywell International Inc.,NasdaqGS,Nasdaq Real Time Price
-IDXX,Healthcare,Diagnostics & Research,2025-08-04,42556051456,"IDEXX Laboratories, Inc.","IDEXX Laboratories, Inc.",NasdaqGS,Nasdaq Real Time Price
-INTC,Technology,Semiconductors,2025-07-24,101394694144,Intel Corporation,Intel Corporation,NasdaqGS,Nasdaq Real Time Price
-INTU,Technology,Software - Application,2025-08-20,212680359936,Intuit Inc.,Intuit Inc.,NasdaqGS,Nasdaq Real Time Price
-ISRG,Healthcare,Medical Instruments & Supplies,2025-07-22,183940120576,"Intuitive Surgical, Inc.","Intuitive Surgical, Inc.",NasdaqGS,Nasdaq Real Time Price
-KDP,Consumer Defensive,Beverages - Non-Alcoholic,2025-07-24,45682716672,Keurig Dr Pepper Inc.,Keurig Dr Pepper Inc.,NasdaqGS,Nasdaq Real Time Price
-KLAC,Technology,Semiconductor Equipment & Materials,2025-07-31,118647947264,KLA Corporation,KLA Corporation,NasdaqGS,Nasdaq Real Time Price
-KHC,Consumer Defensive,Packaged Foods,2025-07-30,33784147968,The Kraft Heinz Company,The Kraft Heinz Company,NasdaqGS,Nasdaq Real Time Price
-LRCX,Technology,Semiconductor Equipment & Materials,2025-07-30,124650242048,Lam Research Corporation,Lam Research Corporation,NasdaqGS,Nasdaq Real Time Price
-LIN,Basic Materials,Specialty Chemicals,2025-08-01,222266458112,Linde plc,Linde plc,NasdaqGS,Nasdaq Real Time Price
-LULU,Consumer Cyclical,Apparel Retail,2025-08-27,26943703040,lululemon athletica inc.,lululemon athletica inc.,NasdaqGS,Nasdaq Real Time Price
-MAR,Consumer Cyclical,Lodging,2025-08-05,74297032704,Marriott International,"Marriott International, Inc.",NasdaqGS,Nasdaq Real Time Price
-MRVL,Technology,Semiconductors,2025-08-27,62250835968,"Marvell Technology, Inc.","Marvell Technology, Inc.",NasdaqGS,Nasdaq Real Time Price
-MELI,Consumer Cyclical,Internet Retail,2025-08-04,121882132480,"MercadoLibre, Inc.","MercadoLibre, Inc.",NasdaqGS,Nasdaq Real Time Price
-META,Communication Services,Internet Content & Information,2025-07-30,1771772968960,"Meta Platforms, Inc.","Meta Platforms, Inc.",NasdaqGS,Nasdaq Real Time Price
-MCHP,Technology,Semiconductors,2025-08-07,40508006400,Microchip Technology Incorporat,Microchip Technology Incorporated,NasdaqGS,Nasdaq Real Time Price
-MU,Technology,Semiconductors,2025-09-24,121302499328,"Micron Technology, Inc.","Micron Technology, Inc.",NasdaqGS,Nasdaq Real Time Price
-MSFT,Technology,Software - Infrastructure,2025-07-30,3771196768256,Microsoft Corporation,Microsoft Corporation,NasdaqGS,Nasdaq Real Time Price
-MSTR,Technology,Software - Application,2025-07-31,118533799936,MicroStrategy Incorporated,Strategy Incorporated,NasdaqGS,Nasdaq Real Time Price
-MDLZ,Consumer Defensive,Confectioners,2025-07-29,91317182464,"Mondelez International, Inc.","Mondelez International, Inc.",NasdaqGS,Nasdaq Real Time Price
-MNST,Consumer Defensive,Beverages - Non-Alcoholic,2025-08-05,58036887552,Monster Beverage Corporation,Monster Beverage Corporation,NasdaqGS,Nasdaq Real Time Price
-NFLX,Communication Services,Entertainment,2025-10-16,509516021760,"Netflix, Inc.","Netflix, Inc.",NasdaqGS,Nasdaq Real Time Price
-NVDA,Technology,Semiconductors,2025-08-27,4101140643840,NVIDIA Corporation,NVIDIA Corporation,NasdaqGS,Nasdaq Real Time Price
-NXPI,Technology,Semiconductors,2025-07-21,57442783232,NXP Semiconductors N.V.,NXP Semiconductors N.V.,NasdaqGS,Nasdaq Real Time Price
-ORLY,Consumer Cyclical,Auto Parts,2025-07-23,81043292160,"O'Reilly Automotive, Inc.","O'Reilly Automotive, Inc.",NasdaqGS,Nasdaq Real Time Price
-ODFL,Industrials,Trucking,2025-07-30,35105308672,"Old Dominion Freight Line, Inc.","Old Dominion Freight Line, Inc.",NasdaqGS,Nasdaq Real Time Price
-ON,Technology,Semiconductors,2025-08-04,26176315392,ON Semiconductor Corporation,ON Semiconductor Corporation,NasdaqGS,Nasdaq Real Time Price
-PCAR,Industrials,Farm & Heavy Construction Machinery,2025-07-22,50802909184,PACCAR Inc.,PACCAR Inc,NasdaqGS,Nasdaq Real Time Price
-PLTR,Technology,Software - Infrastructure,2025-08-04,350566481920,Palantir Technologies Inc.,Palantir Technologies Inc.,NasdaqGS,Nasdaq Real Time Price
-PANW,Technology,Software - Infrastructure,2025-08-18,131479617536,"Palo Alto Networks, Inc.","Palo Alto Networks, Inc.",NasdaqGS,Nasdaq Real Time Price
-PAYX,Technology,Software - Application,2025-06-24,51792281600,"Paychex, Inc.","Paychex, Inc.",NasdaqGS,Nasdaq Real Time Price
-PYPL,Financial Services,Credit Services,2025-07-29,73532825600,"PayPal Holdings, Inc.","PayPal Holdings, Inc.",NasdaqGS,Nasdaq Real Time Price
-PDD,Consumer Cyclical,Internet Retail,2025-08-25,163103588352,PDD Holdings Inc.,PDD Holdings Inc.,NasdaqGS,Nasdaq Real Time Price
-PEP,Consumer Defensive,Beverages - Non-Alcoholic,2025-10-07,198858883072,"Pepsico, Inc.","PepsiCo, Inc.",NasdaqGS,Nasdaq Real Time Price
-QCOM,Technology,Semiconductors,2025-07-30,173210271744,QUALCOMM Incorporated,QUALCOMM Incorporated,NasdaqGS,Nasdaq Real Time Price
-REGN,Healthcare,Biotechnology,2025-08-01,60078206976,"Regeneron Pharmaceuticals, Inc.","Regeneron Pharmaceuticals, Inc.",NasdaqGS,Nasdaq Real Time Price
-ROP,Technology,Software - Application,2025-07-21,60325593088,"Roper Technologies, Inc.","Roper Technologies, Inc.",NasdaqGS,Nasdaq Real Time Price
-ROST,Consumer Cyclical,Apparel Retail,2025-08-20,44043382784,"Ross Stores, Inc.","Ross Stores, Inc.",NasdaqGS,Nasdaq Real Time Price
-SHOP,Technology,Software - Application,2025-08-06,160418906112,Shopify Inc.,Shopify Inc.,NasdaqGS,Nasdaq Real Time Price
-SBUX,Consumer Cyclical,Restaurants,2025-07-29,108605751296,Starbucks Corporation,Starbucks Corporation,NasdaqGS,Nasdaq Real Time Price
-SNPS,Technology,Software - Infrastructure,2025-08-19,112048775168,"Synopsys, Inc.","Synopsys, Inc.",NasdaqGS,Nasdaq Real Time Price
-TTWO,Communication Services,Electronic Gaming & Multimedia,2025-08-07,42208489472,"Take-Two Interactive Software, ","Take-Two Interactive Software, Inc.",NasdaqGS,Nasdaq Real Time Price
-TMUS,Communication Services,Telecom Services,2025-07-23,265161637888,"T-Mobile US, Inc.","T-Mobile US, Inc.",NasdaqGS,Nasdaq Real Time Price
-TSLA,Consumer Cyclical,Auto Manufacturers,2025-07-21,1067941494784,"Tesla, Inc.","Tesla, Inc.",NasdaqGS,Nasdaq Real Time Price
-TXN,Technology,Semiconductors,2025-07-22,193958772736,Texas Instruments Incorporated,Texas Instruments Incorporated,NasdaqGS,Nasdaq Real Time Price
-TTD,Communication Services,Advertising Agencies,2025-08-05,40008245248,"The Trade Desk, Inc.","The Trade Desk, Inc.",NasdaqGM,Nasdaq Real Time Price
-VRSK,Industrials,Consulting Services,2025-07-30,41544146944,"Verisk Analytics, Inc.","Verisk Analytics, Inc.",NasdaqGS,Nasdaq Real Time Price
-VRTX,Healthcare,Biotechnology,2025-08-04,120392851456,Vertex Pharmaceuticals Incorpor,Vertex Pharmaceuticals Incorporated,NasdaqGS,Nasdaq Real Time Price
-WBD,Communication Services,Entertainment,2025-08-07,32051576832,"Warner Bros. Discovery, Inc. - ","Warner Bros. Discovery, Inc.",NasdaqGS,Nasdaq Real Time Price
-WDAY,Technology,Software - Application,2025-08-20,63753768960,"Workday, Inc.","Workday, Inc.",NasdaqGS,Nasdaq Real Time Price
-XEL,Utilities,Utilities - Regulated Electric,2025-07-31,41947832320,Xcel Energy Inc.,Xcel Energy Inc.,NasdaqGS,Nasdaq Real Time Price
-ZS,Technology,Software - Infrastructure,2025-09-01,44738465792,"Zscaler, Inc.","Zscaler, Inc.",NasdaqGS,Nasdaq Real Time Price
-^GSPC,N/A,N/A,N/A,N/A,S&P 500,S&P 500,SNP,Free Realtime Quote
-^DJI,N/A,N/A,N/A,N/A,Dow Jones Industrial Average,Dow Jones Industrial Average,DJI,Free Realtime Quote
-^IXIC,N/A,N/A,N/A,N/A,NASDAQ Composite,NASDAQ Composite,Nasdaq GIDS,Free Realtime Quote
+ADBE,Technology,Software - Application,2025-09-10,157267902464,Adobe Inc.,Adobe Inc.,NasdaqGS,Delayed Quote
+AMD,Technology,Semiconductors,2025-08-05,269914472448,"Advanced Micro Devices, Inc.","Advanced Micro Devices, Inc.",NasdaqGS,Nasdaq Real Time Price
+ABNB,Consumer Cyclical,Travel Services,2025-08-06,87218364416,"Airbnb, Inc.","Airbnb, Inc.",NasdaqGS,Nasdaq Real Time Price
+GOOGL,Communication Services,Internet Content & Information,2025-07-23,2341206228992,Alphabet Inc.,Alphabet Inc.,NasdaqGS,Nasdaq Real Time Price
+GOOG,Communication Services,Internet Content & Information,2025-07-23,2341206491136,Alphabet Inc.,Alphabet Inc.,NasdaqGS,Nasdaq Real Time Price
+AMZN,Consumer Cyclical,Internet Retail,2025-07-31,2457059721216,"Amazon.com, Inc.","Amazon.com, Inc.",NasdaqGS,Nasdaq Real Time Price
+AEP,Utilities,Utilities - Regulated Electric,2025-07-30,58649272320,American Electric Power Company,"American Electric Power Company, Inc.",NasdaqGS,Nasdaq Real Time Price
+AMGN,Healthcare,Drug Manufacturers - General,2025-08-05,164849893376,Amgen Inc.,Amgen Inc.,NasdaqGS,Nasdaq Real Time Price
+ADI,Technology,Semiconductors,2025-08-20,113055219712,"Analog Devices, Inc.","Analog Devices, Inc.",NasdaqGS,Delayed Quote
+AAPL,Technology,Consumer Electronics,2025-07-31,3194468958208,Apple Inc.,Apple Inc.,NasdaqGS,Delayed Quote
+AMAT,Technology,Semiconductor Equipment & Materials,2025-08-14,149015855104,"Applied Materials, Inc.","Applied Materials, Inc.",NasdaqGS,Nasdaq Real Time Price
+APP,Communication Services,Advertising Agencies,2025-08-06,123220246528,Applovin Corporation,AppLovin Corporation,NasdaqGS,Delayed Quote
+ARM,Technology,Semiconductors,2025-07-30,172839452672,Arm Holdings plc,Arm Holdings plc,NasdaqGS,Delayed Quote
+ASML,Technology,Semiconductor Equipment & Materials,2025-10-15,285113122816,ASML Holding N.V. - New York Re,ASML Holding N.V.,NasdaqGS,Nasdaq Real Time Price
+AZN,Healthcare,Drug Manufacturers - General,2025-07-29,229578014720,Astrazeneca PLC,AstraZeneca PLC,NasdaqGS,Delayed Quote
+TEAM,Technology,Software - Application,2025-08-07,53288718336,Atlassian Corporation,Atlassian Corporation,NasdaqGS,Nasdaq Real Time Price
+ADSK,Technology,Software - Application,2025-08-27,64885235712,"Autodesk, Inc.","Autodesk, Inc.",NasdaqGS,Nasdaq Real Time Price
+ADP,Technology,Software - Application,2025-07-30,125280018432,"Automatic Data Processing, Inc.","Automatic Data Processing, Inc.",NasdaqGS,Nasdaq Real Time Price
+AXON,Industrials,Aerospace & Defense,2025-08-04,57221115904,"Axon Enterprise, Inc.","Axon Enterprise, Inc.",NasdaqGS,Delayed Quote
+BKR,Energy,Oil & Gas Equipment & Services,2025-10-21,45399728128,Baker Hughes Company,Baker Hughes Company,NasdaqGS,Nasdaq Real Time Price
+BIIB,Healthcare,Drug Manufacturers - General,2025-07-31,19271362560,Biogen Inc.,Biogen Inc.,NasdaqGS,Delayed Quote
+BKNG,Consumer Cyclical,Travel Services,2025-07-29,183275749376,Booking Holdings Inc. Common St,Booking Holdings Inc.,NasdaqGS,Nasdaq Real Time Price
+AVGO,Technology,Semiconductors,2025-09-03,1364852867072,Broadcom Inc.,Broadcom Inc.,NasdaqGS,Nasdaq Real Time Price
+CDNS,Technology,Software - Application,2025-07-28,90701815808,"Cadence Design Systems, Inc.","Cadence Design Systems, Inc.",NasdaqGS,Nasdaq Real Time Price
+CDW,Technology,Information Technology Services,2025-08-06,23853420544,CDW Corporation,CDW Corporation,NasdaqGS,Delayed Quote
+CHTR,Communication Services,Telecom Services,2025-07-25,42309066752,"Charter Communications, Inc.","Charter Communications, Inc.",NasdaqGS,Nasdaq Real Time Price
+CTAS,Industrials,Specialty Business Services,2025-09-24,90083057664,Cintas Corporation,Cintas Corporation,NasdaqGS,Nasdaq Real Time Price
+CSCO,Technology,Communication Equipment,2025-08-12,272012410880,"Cisco Systems, Inc.","Cisco Systems, Inc.",NasdaqGS,Nasdaq Real Time Price
+CCEP,Consumer Defensive,Beverages - Non-Alcoholic,2025-08-06,45909958656,Coca-Cola Europacific Partners ,Coca-Cola Europacific Partners PLC,NasdaqGS,Delayed Quote
+CTSH,Technology,Information Technology Services,2025-07-30,37793861632,Cognizant Technology Solutions ,Cognizant Technology Solutions Corporation,NasdaqGS,Delayed Quote
+CMCSA,Communication Services,Telecom Services,2025-07-31,125751017472,Comcast Corporation,Comcast Corporation,NasdaqGS,Nasdaq Real Time Price
+CEG,Utilities,Utilities - Renewable,2025-08-07,102597050368,Constellation Energy Corporatio,Constellation Energy Corporation,NasdaqGS,Nasdaq Real Time Price
+CPRT,Industrials,Specialty Business Services,2025-09-02,45146238976,"Copart, Inc.","Copart, Inc.",NasdaqGS,Nasdaq Real Time Price
+CSGP,Real Estate,Real Estate Services,2025-07-22,39386738688,"CoStar Group, Inc.","CoStar Group, Inc.",NasdaqGS,Delayed Quote
+COST,Consumer Defensive,Discount Stores,2025-05-29,414863851520,Costco Wholesale Corporation,Costco Wholesale Corporation,NasdaqGS,Nasdaq Real Time Price
+CRWD,Technology,Software - Infrastructure,2025-08-26,116628127744,"CrowdStrike Holdings, Inc.","CrowdStrike Holdings, Inc.",NasdaqGS,Delayed Quote
+CSX,Industrials,Railroads,2025-10-15,66666651648,CSX Corporation,CSX Corporation,NasdaqGS,Delayed Quote
+DDOG,Technology,Software - Application,2025-08-07,51747692544,"Datadog, Inc.","Datadog, Inc.",NasdaqGS,Nasdaq Real Time Price
+DXCM,Healthcare,Medical Devices,2025-07-30,34893602816,"DexCom, Inc.","DexCom, Inc.",NasdaqGS,Delayed Quote
+FANG,Energy,Oil & Gas E&P,2025-08-04,42250416128,"Diamondback Energy, Inc.","Diamondback Energy, Inc.",NasdaqGS,Delayed Quote
+DASH,Consumer Cyclical,Internet Retail,2025-08-06,105902096384,"DoorDash, Inc.","DoorDash, Inc.",NasdaqGS,Delayed Quote
+EA,Communication Services,Electronic Gaming & Multimedia,2025-07-29,38112935936,Electronic Arts Inc.,Electronic Arts Inc.,NasdaqGS,Nasdaq Real Time Price
+EXC,Utilities,Utilities - Regulated Electric,2025-07-31,44409663488,Exelon Corporation,Exelon Corporation,NasdaqGS,Nasdaq Real Time Price
+FAST,Industrials,Industrial Distribution,2025-10-13,54799814656,Fastenal Company,Fastenal Company,NasdaqGS,Nasdaq Real Time Price
+FTNT,Technology,Software - Infrastructure,2025-08-04,80230907904,"Fortinet, Inc.","Fortinet, Inc.",NasdaqGS,Delayed Quote
+GEHC,Healthcare,Health Information Services,2025-07-30,35536453632,GE HealthCare Technologies Inc.,GE HealthCare Technologies Inc.,NasdaqGS,Nasdaq Real Time Price
+GILD,Healthcare,Drug Manufacturers - General,2025-08-07,144544661504,"Gilead Sciences, Inc.","Gilead Sciences, Inc.",NasdaqGS,Delayed Quote
+GFS,Technology,Semiconductors,2025-08-05,22185461760,GlobalFoundries Inc.,GlobalFoundries Inc.,NasdaqGS,Nasdaq Real Time Price
+HON,Industrials,Conglomerates,2025-07-24,142369308672,Honeywell International Inc.,Honeywell International Inc.,NasdaqGS,Nasdaq Real Time Price
+IDXX,Healthcare,Diagnostics & Research,2025-08-04,45453656064,"IDEXX Laboratories, Inc.","IDEXX Laboratories, Inc.",NasdaqGS,Delayed Quote
+INTC,Technology,Semiconductors,2025-07-24,90603905024,Intel Corporation,Intel Corporation,NasdaqGS,Nasdaq Real Time Price
+INTU,Technology,Software - Application,2025-08-20,219238400000,Intuit Inc.,Intuit Inc.,NasdaqGS,Delayed Quote
+ISRG,Healthcare,Medical Instruments & Supplies,2025-10-16,177754390528,"Intuitive Surgical, Inc.","Intuitive Surgical, Inc.",NasdaqGS,Nasdaq Real Time Price
+KDP,Consumer Defensive,Beverages - Non-Alcoholic,2025-10-23,45195296768,Keurig Dr Pepper Inc.,Keurig Dr Pepper Inc.,NasdaqGS,Nasdaq Real Time Price
+KLAC,Technology,Semiconductor Equipment & Materials,2025-07-31,119293288448,KLA Corporation,KLA Corporation,NasdaqGS,Nasdaq Real Time Price
+KHC,Consumer Defensive,Packaged Foods,2025-07-30,33943926784,The Kraft Heinz Company,The Kraft Heinz Company,NasdaqGS,Nasdaq Real Time Price
+LRCX,Technology,Semiconductor Equipment & Materials,2025-07-30,124023472128,Lam Research Corporation,Lam Research Corporation,NasdaqGS,Nasdaq Real Time Price
+LIN,Basic Materials,Specialty Chemicals,2025-08-01,222600675328,Linde plc,Linde plc,NasdaqGS,Nasdaq Real Time Price
+LULU,Consumer Cyclical,Apparel Retail,2025-08-27,26298904576,lululemon athletica inc.,lululemon athletica inc.,NasdaqGS,Nasdaq Real Time Price
+MAR,Consumer Cyclical,Lodging,2025-08-05,76447105024,Marriott International,"Marriott International, Inc.",NasdaqGS,Delayed Quote
+MRVL,Technology,Semiconductors,2025-08-27,63983861760,"Marvell Technology, Inc.","Marvell Technology, Inc.",NasdaqGS,Nasdaq Real Time Price
+MELI,Consumer Cyclical,Internet Retail,2025-08-04,119775649792,"MercadoLibre, Inc.","MercadoLibre, Inc.",NasdaqGS,Nasdaq Real Time Price
+META,Communication Services,Internet Content & Information,2025-07-30,1791912706048,"Meta Platforms, Inc.","Meta Platforms, Inc.",NasdaqGS,Nasdaq Real Time Price
+MCHP,Technology,Semiconductors,2025-08-07,37350907904,Microchip Technology Incorporat,Microchip Technology Incorporated,NasdaqGS,Nasdaq Real Time Price
+MU,Technology,Semiconductors,2025-09-24,124514402304,"Micron Technology, Inc.","Micron Technology, Inc.",NasdaqGS,Nasdaq Real Time Price
+MSFT,Technology,Software - Infrastructure,2025-07-30,3818170351616,Microsoft Corporation,Microsoft Corporation,NasdaqGS,Nasdaq Real Time Price
+MSTR,Technology,Software - Application,2025-07-31,115091324928,MicroStrategy Incorporated,Strategy Incorporated,NasdaqGS,Delayed Quote
+MDLZ,Consumer Defensive,Confectioners,2025-07-29,91388395520,"Mondelez International, Inc.","Mondelez International, Inc.",NasdaqGS,Delayed Quote
+MNST,Consumer Defensive,Beverages - Non-Alcoholic,2025-08-05,59158421504,Monster Beverage Corporation,Monster Beverage Corporation,NasdaqGS,Nasdaq Real Time Price
+NFLX,Communication Services,Entertainment,2025-10-16,501620899840,"Netflix, Inc.","Netflix, Inc.",NasdaqGS,Nasdaq Real Time Price
+NVDA,Technology,Semiconductors,2025-08-27,4231248740352,NVIDIA Corporation,NVIDIA Corporation,NasdaqGS,Nasdaq Real Time Price
+NXPI,Technology,Semiconductors,2025-07-21,56294760448,NXP Semiconductors N.V.,NXP Semiconductors N.V.,NasdaqGS,Nasdaq Real Time Price
+ORLY,Consumer Cyclical,Auto Parts,2025-10-22,83065790464,"O'Reilly Automotive, Inc.","O'Reilly Automotive, Inc.",NasdaqGS,Nasdaq Real Time Price
+ODFL,Industrials,Trucking,2025-07-30,35310292992,"Old Dominion Freight Line, Inc.","Old Dominion Freight Line, Inc.",NasdaqGS,Nasdaq Real Time Price
+ON,Technology,Semiconductors,2025-08-04,23786012672,ON Semiconductor Corporation,ON Semiconductor Corporation,NasdaqGS,Nasdaq Real Time Price
+PCAR,Industrials,Farm & Heavy Construction Machinery,2025-10-21,53320085504,PACCAR Inc.,PACCAR Inc,NasdaqGS,Nasdaq Real Time Price
+PLTR,Technology,Software - Infrastructure,2025-08-04,374753689600,Palantir Technologies Inc.,Palantir Technologies Inc.,NasdaqGS,Nasdaq Real Time Price
+PANW,Technology,Software - Infrastructure,2025-08-18,135540441088,"Palo Alto Networks, Inc.","Palo Alto Networks, Inc.",NasdaqGS,Delayed Quote
+PAYX,Technology,Software - Application,2025-06-24,53312512000,"Paychex, Inc.","Paychex, Inc.",NasdaqGS,Nasdaq Real Time Price
+PYPL,Financial Services,Credit Services,2025-07-29,75838128128,"PayPal Holdings, Inc.","PayPal Holdings, Inc.",NasdaqGS,Delayed Quote
+PDD,Consumer Cyclical,Internet Retail,2025-08-25,168157544448,PDD Holdings Inc.,PDD Holdings Inc.,NasdaqGS,Nasdaq Real Time Price
+PEP,Consumer Defensive,Beverages - Non-Alcoholic,2025-10-07,196394532864,"Pepsico, Inc.","PepsiCo, Inc.",NasdaqGS,Nasdaq Real Time Price
+QCOM,Technology,Semiconductors,2025-07-30,173923188736,QUALCOMM Incorporated,QUALCOMM Incorporated,NasdaqGS,Nasdaq Real Time Price
+REGN,Healthcare,Biotechnology,2025-08-01,60795088896,"Regeneron Pharmaceuticals, Inc.","Regeneron Pharmaceuticals, Inc.",NasdaqGS,Nasdaq Real Time Price
+ROP,Technology,Software - Application,2025-10-22,60534173696,"Roper Technologies, Inc.","Roper Technologies, Inc.",NasdaqGS,Nasdaq Real Time Price
+ROST,Consumer Cyclical,Apparel Retail,2025-08-20,45243731968,"Ross Stores, Inc.","Ross Stores, Inc.",NasdaqGS,Nasdaq Real Time Price
+SHOP,Technology,Software - Application,2025-08-06,162252996608,Shopify Inc.,Shopify Inc.,NasdaqGS,Nasdaq Real Time Price
+SBUX,Consumer Cyclical,Restaurants,2025-07-29,107298889728,Starbucks Corporation,Starbucks Corporation,NasdaqGS,Nasdaq Real Time Price
+SNPS,Technology,Software - Infrastructure,2025-08-19,111313215488,"Synopsys, Inc.","Synopsys, Inc.",NasdaqGS,Nasdaq Real Time Price
+TTWO,Communication Services,Electronic Gaming & Multimedia,2025-08-07,41103855616,"Take-Two Interactive Software, ","Take-Two Interactive Software, Inc.",NasdaqGS,Nasdaq Real Time Price
+TMUS,Communication Services,Telecom Services,2025-10-22,274096046080,"T-Mobile US, Inc.","T-Mobile US, Inc.",NasdaqGS,Nasdaq Real Time Price
+TSLA,Consumer Cyclical,Auto Manufacturers,2025-10-22,1019435745280,"Tesla, Inc.","Tesla, Inc.",NasdaqGS,Nasdaq Real Time Price
+TXN,Technology,Semiconductors,2025-10-21,168155922432,Texas Instruments Incorporated,Texas Instruments Incorporated,NasdaqGS,Nasdaq Real Time Price
+TTD,Communication Services,Advertising Agencies,2025-08-07,42115997696,"The Trade Desk, Inc.","The Trade Desk, Inc.",NasdaqGM,Nasdaq Real Time Price
+VRSK,Industrials,Consulting Services,2025-07-30,41679835136,"Verisk Analytics, Inc.","Verisk Analytics, Inc.",NasdaqGS,Nasdaq Real Time Price
+VRTX,Healthcare,Biotechnology,2025-08-04,120604704768,Vertex Pharmaceuticals Incorpor,Vertex Pharmaceuticals Incorporated,NasdaqGS,Nasdaq Real Time Price
+WBD,Communication Services,Entertainment,2025-08-07,33375203328,"Warner Bros. Discovery, Inc. - ","Warner Bros. Discovery, Inc.",NasdaqGS,Nasdaq Real Time Price
+WDAY,Technology,Software - Application,2025-08-20,64446918656,"Workday, Inc.","Workday, Inc.",NasdaqGS,Nasdaq Real Time Price
+XEL,Utilities,Utilities - Regulated Electric,2025-07-31,41907458048,Xcel Energy Inc.,Xcel Energy Inc.,NasdaqGS,Nasdaq Real Time Price
+ZS,Technology,Software - Infrastructure,2025-09-01,44557860864,"Zscaler, Inc.","Zscaler, Inc.",NasdaqGS,Nasdaq Real Time Price
+^GSPC,N/A,N/A,N/A,N/A,S&P 500,S&P 500,SNP,Delayed Quote
+^DJI,N/A,N/A,N/A,N/A,Dow Jones Industrial Average,Dow Jones Industrial Average,DJI,Delayed Quote
+^IXIC,N/A,N/A,N/A,N/A,NASDAQ Composite,NASDAQ Composite,Nasdaq GIDS,Delayed Quote
 ^NYA,N/A,N/A,N/A,N/A,NYSE Composite Index,NYSE Composite Index,NYSE,Delayed Quote
 ^XAX,N/A,N/A,N/A,N/A,NYSE American Composite Index,NYSE American Composite Index,NYSE,Delayed Quote
 ^BUK100P,N/A,N/A,N/A,N/A,^BUK100P,^BUK100P,Stuttgart,Delayed Quote
@@ -115,23 +115,23 @@ ZS,Technology,Software - Infrastructure,2025-09-01,44738465792,"Zscaler, Inc.","
 ^BFX,N/A,N/A,N/A,N/A,BEL 20,BEL 20,Brussels,Delayed Quote
 ^HSI,N/A,N/A,N/A,N/A,HANG SENG INDEX,HANG SENG INDEX,HKSE,Delayed Quote
 ^STI,N/A,N/A,N/A,N/A,STI Index,STI Index,SES,Delayed Quote
-QQQ,N/A,N/A,N/A,220727623680,"Invesco QQQ Trust, Series 1",Invesco QQQ Trust,NasdaqGM,Nasdaq Real Time Price
-SPY,N/A,N/A,N/A,576995786752,SPDR S&P 500,SPDR S&P 500 ETF,NYSEArca,Nasdaq Real Time Price
-IWM,N/A,N/A,N/A,62626369536,iShares Russell 2000 ETF,iShares Russell 2000 ETF,NYSEArca,Nasdaq Real Time Price
-MAGS,N/A,N/A,N/A,N/A,Roundhill Magnificent Seven ETF,Roundhill Magnificent Seven ETF,Cboe US,Nasdaq Real Time Price
-XLK,N/A,N/A,N/A,70459777024,SPDR Select Sector Fund - Techn,The Technology Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
+QQQ,N/A,N/A,N/A,222640046080,"Invesco QQQ Trust, Series 1",Invesco QQQ Trust,NasdaqGM,Nasdaq Real Time Price
+SPY,N/A,N/A,N/A,584718876672,SPDR S&P 500,SPDR S&P 500 ETF,NYSEArca,Nasdaq Real Time Price
+IWM,N/A,N/A,N/A,63061995520,iShares Russell 2000 ETF,iShares Russell 2000 ETF,NYSEArca,Delayed Quote
+MAGS,N/A,N/A,N/A,N/A,Roundhill Magnificent Seven ETF,Roundhill Magnificent Seven ETF,Cboe US,Delayed Quote
+XLK,N/A,N/A,N/A,71275945984,SPDR Select Sector Fund - Techn,The Technology Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
 XLC,N/A,N/A,N/A,N/A,The Communication Services Sele,The Communication Services Select Sector SPDR ETF Fund,NYSEArca,Nasdaq Real Time Price
-XLY,N/A,N/A,N/A,27013031936,SPDR Select Sector Fund - Consu,The Consumer Discretionary Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
-XLP,N/A,N/A,N/A,17122713600,SPDR Select Sector Fund - Consu,The Consumer Staples Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
-XLE,N/A,N/A,N/A,15949505536,SPDR Select Sector Fund - Energ,The Energy Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
-XLF,N/A,N/A,N/A,46508961792,SPDR Select Sector Fund - Finan,The Financial Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
-XLV,N/A,N/A,N/A,26269028352,SPDR Select Sector Fund - Healt,The Health Care Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
-XLI,N/A,N/A,N/A,20605249536,SPDR Select Sector Fund - Indus,The Industrial Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
-XLB,N/A,N/A,N/A,6585333248,Materials Select Sector SPDR,The Materials Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
+XLY,N/A,N/A,N/A,27041292288,SPDR Select Sector Fund - Consu,The Consumer Discretionary Select Sector SPDR Fund,NYSEArca,Delayed Quote
+XLP,N/A,N/A,N/A,17129018368,SPDR Select Sector Fund - Consu,The Consumer Staples Select Sector SPDR Fund,NYSEArca,Delayed Quote
+XLE,N/A,N/A,N/A,16237530112,SPDR Select Sector Fund - Energ,The Energy Select Sector SPDR Fund,NYSEArca,Delayed Quote
+XLF,N/A,N/A,N/A,47211298816,SPDR Select Sector Fund - Finan,The Financial Select Sector SPDR Fund,NYSEArca,Delayed Quote
+XLV,N/A,N/A,N/A,26943199232,SPDR Select Sector Fund - Healt,The Health Care Select Sector SPDR Fund,NYSEArca,Delayed Quote
+XLI,N/A,N/A,N/A,21175664640,SPDR Select Sector Fund - Indus,The Industrial Select Sector SPDR Fund,NYSEArca,Delayed Quote
+XLB,N/A,N/A,N/A,6643592192,Materials Select Sector SPDR,The Materials Select Sector SPDR Fund,NYSEArca,Delayed Quote
 XLRE,N/A,N/A,N/A,N/A,Real Estate Select Sector SPDR ,The Real Estate Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
-XLU,N/A,N/A,N/A,13839920128,SPDR Select Sector Fund - Utili,The Utilities Select Sector SPDR Fund,NYSEArca,Nasdaq Real Time Price
-SMH,N/A,N/A,N/A,3332275200,VanEck Semiconductor ETF,VanEck Semiconductor ETF,NasdaqGM,Nasdaq Real Time Price
-JPM,Financial Services,Banks - Diversified,2025-10-14,804060069888,JP Morgan Chase & Co.,JPMorgan Chase & Co.,NYSE,Nasdaq Real Time Price
-VRT,Industrials,Electrical Equipment & Parts,2025-07-30,47527604224,"Vertiv Holdings, LLC",Vertiv Holdings Co,NYSE,Nasdaq Real Time Price
-NET,Technology,Software - Infrastructure,2025-07-31,66271825920,"Cloudflare, Inc.","Cloudflare, Inc.",NYSE,Nasdaq Real Time Price
-BRK-B,Financial Services,Insurance - Diversified,2025-08-02,1032368029696,Berkshire Hathaway Inc. New,Berkshire Hathaway Inc.,NYSE,Nasdaq Real Time Price
+XLU,N/A,N/A,N/A,13799917568,SPDR Select Sector Fund - Utili,The Utilities Select Sector SPDR Fund,NYSEArca,Delayed Quote
+SMH,N/A,N/A,N/A,3355266816,VanEck Semiconductor ETF,VanEck Semiconductor ETF,NasdaqGM,Nasdaq Real Time Price
+JPM,Financial Services,Banks - Diversified,2025-10-14,821106376704,JP Morgan Chase & Co.,JPMorgan Chase & Co.,NYSE,Nasdaq Real Time Price
+VRT,Industrials,Electrical Equipment & Parts,2025-07-30,52390502400,"Vertiv Holdings, LLC",Vertiv Holdings Co,NYSE,Delayed Quote
+NET,Technology,Software - Infrastructure,2025-07-31,68774354944,"Cloudflare, Inc.","Cloudflare, Inc.",NYSE,Nasdaq Real Time Price
+BRK-B,Financial Services,Insurance - Diversified,2025-08-02,1044361641984,Berkshire Hathaway Inc. New,Berkshire Hathaway Inc.,NYSE,Delayed Quote

@@ -1,0 +1,7 @@
+ticker,sector,industry,next_earnings,marketCap,shortName,longName,exchange1,exchange2
+NVDA,Technology,Semiconductors,2025-08-27,4231248740352,NVIDIA Corporation,NVIDIA Corporation,NasdaqGS,Nasdaq Real Time Price
+TSLA,Consumer Cyclical,Auto Manufacturers,2025-10-22,1019435745280,"Tesla, Inc.","Tesla, Inc.",NasdaqGS,Nasdaq Real Time Price
+ZS,Technology,Software - Infrastructure,2025-09-01,44557860864,"Zscaler, Inc.","Zscaler, Inc.",NasdaqGS,Nasdaq Real Time Price
+JPM,Financial Services,Banks - Diversified,2025-10-14,821106376704,JP Morgan Chase & Co.,JPMorgan Chase & Co.,NYSE,Nasdaq Real Time Price
+VRT,Industrials,Electrical Equipment & Parts,2025-07-30,52390502400,"Vertiv Holdings, LLC",Vertiv Holdings Co,NYSE,Delayed Quote
+NET,Technology,Software - Infrastructure,2025-07-31,68774354944,"Cloudflare, Inc.","Cloudflare, Inc.",NYSE,Nasdaq Real Time Price

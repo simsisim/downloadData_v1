@@ -6,19 +6,23 @@ from src.user_defined_data import read_user_data
 PARAMS_DIR = {
     "DATA_DIR": "data",
     "TICKERS_DIR": os.path.join("data", "tickers"),
-    "MARKET_DATA_DIR": os.path.join("data", "market_data")
+    "MARKET_DATA_DIR_1d": os.path.join("data", "market_data/daily/"),
+    "MARKET_DATA_DIR_1wk": os.path.join("data", "market_data/weekly/")
 }
 
 def setup_directories():
     """Create required directories if they don't exist."""
     os.makedirs(PARAMS_DIR["DATA_DIR"], exist_ok=True)
     os.makedirs(PARAMS_DIR["TICKERS_DIR"], exist_ok=True)
-    os.makedirs(PARAMS_DIR["MARKET_DATA_DIR"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["MARKET_DATA_DIR_1d"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["MARKET_DATA_DIR_1wk"], exist_ok=True)
+    #os.makedirs(PARAMS_DIR["MARKET_DATA_DIR_1wk"], exist_ok=True)
+    
 
 # Generate filenames (example)
 #TICKER_FILE = os.path.join(PARAMS_DIR["TICKERS_DIR"], "combined_tickers.csv")
 
-user_choice = read_user_data()
+user_choice, write_file_info = read_user_data()
 def get_ticker_files():
     """
     Returns a list of ticker files based on the user's choice.
