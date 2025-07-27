@@ -92,7 +92,9 @@ class MarketDataRetriever:
 
     def update_individual_stock_data(self, ticker):
         try:
-            file_path = os.path.join(self.PARAMS_DIR["MARKET_DATA_DIR"], f"{ticker}.csv")
+            interval_str = self.config['interval'].replace("/", "")
+            file_path = os.path.join(self.config['folder'], f"{ticker}.csv")
+            #file_path = os.path.join(self.PARAMS_DIR["MARKET_DATA_DIR"], f"{ticker}.csv")
             ticker_obj = yf.Ticker(ticker)
             latest_yf_date = ticker_obj.history(period="1d").index[0].date()
 
@@ -177,9 +179,13 @@ class MarketDataRetriever:
         
             # Remove duplicates
         ok_full_df = ok_full_df.drop_duplicates(subset=['ticker'])
-
-        ok_file = os.path.join(self.PARAMS_DIR["TICKERS_DIR"], f'combined_info_tickers_clean_{user_choice}.csv')
+        # Save 1-column (ticker-only) clean file
+        ok_file_1col = os.path.join(self.PARAMS_DIR["TICKERS_DIR"], f'combined_tickers_clean_{user_choice}.csv')
+        ok_full_df['ticker'].drop_duplicates().to_csv(ok_file_1col, index=False, header=['ticker'])
+        print(f"Clean single-column tickers file: {ok_file_1col}")
     
+        # Save full info clean file
+        ok_file = os.path.join(self.PARAMS_DIR["TICKERS_DIR"], f'combined_info_tickers_clean_{user_choice}.csv')
         ok_full_df.to_csv(ok_file, index=False)
         print(f"Clean tickers file: {ok_file}")
 
@@ -223,15 +229,42 @@ class MarketDataRetriever:
         print(f"Portfolio clean tickers file: {ok_file}")
 
 
+    # def get_stock_info(self, ticker):
+    #     try:
+    #         ticker_obj = yf.Ticker(ticker)
+    #         info = ticker_obj.info
+
+    #     # Get next earnings date
+    #         earnings_date = ticker_obj.calendar.get('Earnings Date', 'N/A')
+    #         next_earnings = earnings_date[0] if isinstance(earnings_date, list) else earnings_date
+
+    #         return {
+    #             'ticker': ticker,
+    #             'sector': info.get('sector', 'N/A'),
+    #             'industry': info.get('industry', 'N/A'),
+    #             'next_earnings': next_earnings,
+    #             'marketCap': info.get('marketCap', 'N/A'),
+    #             'shortName': info.get('shortName', 'N/A'),
+    #            'longName': info.get('longName', 'N/A'),
+    #            'exchange1': info.get('fullExchangeName', 'N/A'),
+    #            'exchange2': info.get('quoteSourceName', 'N/A'),
+    #         }
+    #     except Exception as e:
+    #         print(f"Error fetching info for {ticker}: {str(e)}")
+    #         return None
+
     def get_stock_info(self, ticker):
         try:
             ticker_obj = yf.Ticker(ticker)
-            info = ticker_obj.info
-
-        # Get next earnings date
-            earnings_date = ticker_obj.calendar.get('Earnings Date', 'N/A')
-            next_earnings = earnings_date[0] if isinstance(earnings_date, list) else earnings_date
-
+            info = ticker_obj.info  # Slow
+    
+            # Only fetch calendar if needed
+            try:
+                earnings_date = ticker_obj.calendar.get('Earnings Date', 'N/A')
+                next_earnings = earnings_date[0] if isinstance(earnings_date, list) else earnings_date
+            except Exception:
+                next_earnings = 'N/A'
+    
             return {
                 'ticker': ticker,
                 'sector': info.get('sector', 'N/A'),
@@ -239,13 +272,14 @@ class MarketDataRetriever:
                 'next_earnings': next_earnings,
                 'marketCap': info.get('marketCap', 'N/A'),
                 'shortName': info.get('shortName', 'N/A'),
-               'longName': info.get('longName', 'N/A'),
-               'exchange1': info.get('fullExchangeName', 'N/A'),
-               'exchange2': info.get('quoteSourceName', 'N/A'),
+                'longName': info.get('longName', 'N/A'),
+                'exchange1': info.get('fullExchangeName', 'N/A'),
+                'exchange2': info.get('quoteSourceName', 'N/A'),
             }
         except Exception as e:
             print(f"Error fetching info for {ticker}: {str(e)}")
             return None
+
 
     def generate_info_file(self):
         info_data = []
@@ -285,27 +319,61 @@ class MarketDataRetriever:
 
     def update_data(self):
         print("Starting to download market data...")
+    
         ticker_count = 0
-        batch_size = 100  # Number of tickers to process before a longer sleep
+        batch_size = 100
+    
         for ticker in self.tickers_list:
-            #print(ticker)
             self.update_individual_stock_data(ticker)
             ticker_count += 1
-            time.sleep(0.2)  # Short sleep after each ticker
-        
+            time.sleep(0.2)
+    
             if ticker_count % batch_size == 0:
                 print(f"Processed {ticker_count} tickers. Taking a longer break...")
-                time.sleep(30)  # 30-second sleep after every 100 tickers
+                time.sleep(30)
     
-        self.generate_info_file()
         self.save_problematic_tickers()
-        self.generate_clean_tickers_file()
-    # Add this line to verify the number of problematic tickers
         print(f"Total problematic tickers: {len(self.problematic_tickers)}")
+        ### NEW BLOCK BEGIN ###
+        interval = self.config.get("interval", "").lower()
+    
+        interval = self.config.get("interval", "").lower()
+        write_file_info = self.config.get("write_file_info", False)
+        
+        if write_file_info and interval == "1d":
 
-def run_market_data_retrieval(config):
+
+            print("Generating metadata info and clean info tickers (daily + flag enabled)...")
+            self.generate_info_file()
+    
+            if hasattr(self, 'info_df') and not self.info_df.empty:
+                self.generate_clean_tickers_file()
+                self.generate_portfolio_clean_tickers_file()
+            else:
+                print("Info file not generated or empty — skipping clean info files.")
+        else:
+            print("Skipping metadata and info file generation (either interval ≠ '1d' or write_file_info is False)")
+    
+        ### THIS SECTION ALWAYS RUNS ###
+        if hasattr(self, 'tickers_list'):
+            # These depend only on successful tickers, already set
+            if hasattr(self, 'successful_tickers') and self.successful_tickers:
+                ok_df = pd.DataFrame(self.successful_tickers, columns=['ticker'])
+    
+                clean_file = os.path.join(self.PARAMS_DIR["TICKERS_DIR"], f'combined_tickers_clean_{user_choice}.csv')
+                ok_df.drop_duplicates().to_csv(clean_file, index=False)
+                print(f"Clean (1-column) tickers file written: {clean_file}")
+            else:
+                print("No successful_tickers found – combined_tickers_clean_<x>.csv not generated.")
+    ### NEW BLOCK END ###
+
+
+
+
+def run_market_data_retrieval(config, run_metadata=True):
     retriever = MarketDataRetriever(config)
     retriever.update_data()
+
 
 #if __name__ == "__main__":
 #    config = {

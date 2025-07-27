@@ -1,0 +1,11 @@
+1, Create a new repository in web page
+
+1. Make Sure You're in Your Project Directory
+
+cd /home/imagda/_invest2024/python/downloadData_v1
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/simsisim/downloadData_v1.git
+git push -u origin master
+
