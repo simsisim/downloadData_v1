@@ -8,11 +8,21 @@ def combine_tickers(file_list, save_location):
     combined_tickers = pd.DataFrame(columns=['ticker'])
     
     for file in file_list:
-        df = pd.read_csv(os.path.join(save_location, file))
-        combined_tickers = pd.concat([combined_tickers, df[['ticker']]], ignore_index=True)
+        file_path = os.path.join(save_location, file)
+        if os.path.exists(file_path):
+            df = pd.read_csv(file_path)
+            if 'ticker' in df.columns:
+                combined_tickers = pd.concat([combined_tickers, df[['ticker']]], ignore_index=True)
+            else:
+                print(f"Warning: 'ticker' column not found in {file}")
+        else:
+            print(f"Warning: Ticker file {file} not found, skipping...")
     
     combined_tickers = combined_tickers.drop_duplicates()
-    combined_file_path = os.path.join(save_location, f'combined_tickers_{user_choice}.csv')
+    
+    # Use sanitized user_choice for filename (replace dashes with underscores)
+    safe_user_choice = str(user_choice).replace('-', '_')
+    combined_file_path = os.path.join(save_location, f'combined_tickers_{safe_user_choice}.csv')
     combined_tickers.to_csv(combined_file_path, index=False)
     
     return combined_file_path

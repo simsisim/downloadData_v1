@@ -1,0 +1,563 @@
+ticker,symbol,description,market_capitalization,market_cap_currency,sector,industry,exchange,analyst_rating,upcoming_earnings_date,recent_earnings_date
+A,A,"Agilent Technologies, Inc.",33604858164.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-08-27,2025-05-28
+AAPL,AAPL,Apple Inc.,3403049714052.0,USD,Electronic technology,Telecommunications equipment,NASDAQ,Buy,2025-10-23,2025-07-31
+ABBV,ABBV,AbbVie Inc.,368080073368.0,USD,Health technology,Pharmaceuticals: major,NYSE,Buy,2025-10-24,2025-07-31
+ABNB,ABNB,"Airbnb, Inc.",78853971955.0,USD,Consumer services,Hotels/Resorts/Cruise lines,NASDAQ,Neutral,2025-10-29,2025-08-06
+ABT,ABT,Abbott Laboratories,229026991380.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-10-15,2025-07-17
+ACGL,ACGL,Arch Capital Group Ltd.,33925723647.0,USD,Finance,Multi-line insurance,NASDAQ,Buy,2025-10-29,2025-07-29
+ACN,ACN,Accenture plc,159089025566.0,USD,Technology services,Information technology services,NYSE,Buy,2025-09-25,2025-06-20
+ADBE,ADBE,Adobe Inc.,150552827886.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-09-10,2025-06-12
+ADI,ADI,"Analog Devices, Inc.",125758572638.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-12-02,2025-08-20
+ADM,ADM,Archer-Daniels-Midland Company,30182778332.0,USD,Process industries,Agricultural commodities/Milling,NYSE,Neutral,2025-10-28,2025-08-05
+ADP,ADP,"Automatic Data Processing, Inc.",122910349375.0,USD,Technology services,Packaged software,NASDAQ,Neutral,2025-10-22,2025-07-30
+ADSK,ADSK,"Autodesk, Inc.",60428636325.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-08-28,2025-05-22
+AEE,AEE,Ameren Corporation,27268134547.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-11-05,2025-07-31
+AEP,AEP,"American Electric Power Company, Inc.",60233929959.0,USD,Utilities,Electric utilities,NASDAQ,Neutral,2025-10-23,2025-07-30
+AES,AES,The AES Corporation,9498741246.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-30,2025-07-31
+AFL,AFL,AFLAC Incorporated,57847375045.0,USD,Finance,Multi-line insurance,NYSE,Neutral,2025-11-04,2025-08-05
+AIG,AIG,"American International Group, Inc. New",45749638552.0,USD,Finance,Multi-line insurance,NYSE,Buy,2025-10-29,2025-08-06
+AIZ,AIZ,"Assurant, Inc.",10810381308.0,USD,Finance,Property/Casualty insurance,NYSE,Buy,2025-11-04,2025-08-05
+AJG,AJG,Arthur J. Gallagher & Co.,76971281298.0,USD,Finance,Insurance brokers/Services,NYSE,Buy,2025-10-23,2025-07-31
+AKAM,AKAM,"Akamai Technologies, Inc.",11032082918.0,USD,Technology services,Data processing services,NASDAQ,Buy,2025-11-11,2025-08-07
+ALB,ALB,Albemarle Corporation,9594689139.0,USD,Process industries,Chemicals: specialty,NYSE,Neutral,2025-10-29,2025-07-30
+ALGN,ALGN,"Align Technology, Inc.",10277116922.0,USD,Health technology,Medical specialties,NASDAQ,Buy,2025-10-29,2025-07-30
+ALL,ALL,Allstate Corporation (The),53539013168.0,USD,Finance,Multi-line insurance,NYSE,Buy,2025-11-05,2025-07-30
+ALLE,ALLE,Allegion plc,14725254689.0,USD,Consumer durables,Tools & hardware,NYSE,Neutral,2025-10-23,2025-07-24
+AMAT,AMAT,"Applied Materials, Inc.",131055646069.0,USD,Producer manufacturing,Industrial machinery,NASDAQ,Buy,2025-11-13,2025-08-14
+AMCR,AMCR,Amcor plc,19480292468.0,USD,Process industries,Containers/Packaging,NYSE,Buy,2025-11-04,2025-08-14
+AMD,AMD,"Advanced Micro Devices, Inc.",270398217701.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-11-04,2025-08-05
+AME,AME,"AMETEK, Inc.",43137578308.0,USD,Producer manufacturing,Electrical products,NYSE,Buy,2025-11-04,2025-07-31
+AMGN,AMGN,Amgen Inc.,155898825241.0,USD,Health technology,Biotechnology,NASDAQ,Buy,2025-10-29,2025-08-05
+AMP,AMP,"Ameriprise Financial, Inc.",48728028375.0,USD,Finance,Investment banks/Brokers,NYSE,Buy,2025-10-28,2025-07-24
+AMT,AMT,American Tower Corporation (REIT),97138714306.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-23,2025-07-29
+AMZN,AMZN,"Amazon.com, Inc.",2439172120138.0,USD,Retail trade,Internet retail,NASDAQ,Strong buy,2025-10-23,2025-07-31
+ANET,ANET,"Arista Networks, Inc.",168759316780.0,USD,Electronic technology,Computer peripherals,NYSE,Strong buy,2025-11-03,2025-08-05
+AON,AON,Aon plc,79566210571.0,USD,Finance,Insurance brokers/Services,NYSE,Buy,2025-10-24,2025-07-25
+AOS,AOS,A.O. Smith Corporation,10142578822.0,USD,Producer manufacturing,Building products,NYSE,Neutral,2025-10-23,2025-07-24
+APA,APA,APA Corporation,7914236984.0,USD,Energy minerals,Integrated oil,NASDAQ,Neutral,2025-10-29,2025-08-06
+APD,APD,"Air Products and Chemicals, Inc.",65424092248.0,USD,Process industries,Chemicals: specialty,NYSE,Buy,2025-11-06,2025-07-31
+APH,APH,Amphenol Corporation,134179235432.0,USD,Electronic technology,Electronic components,NYSE,Buy,2025-10-22,2025-07-23
+APO,APO,"Apollo Global Management, Inc. (New)",76880389477.0,USD,Finance,Investment managers,NYSE,Buy,2025-10-29,2025-08-05
+APTV,APTV,Aptiv PLC,17394653137.0,USD,Producer manufacturing,Electrical products,NYSE,Buy,2025-10-30,2025-07-31
+ARE,ARE,"Alexandria Real Estate Equities, Inc.",13980272557.0,USD,Finance,Real estate investment trusts,NYSE,Neutral,2025-10-27,2025-07-21
+ARKK,ARKK,,,,,,,,,
+ATO,ATO,Atmos Energy Corporation,26648517776.0,USD,Utilities,Gas distributors,NYSE,Neutral,2025-11-05,2025-08-06
+AVB,AVB,"AvalonBay Communities, Inc.",27338961134.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-22,2025-07-30
+AVGO,AVGO,Broadcom Inc.,1401681495683.0,USD,Electronic technology,Semiconductors,NASDAQ,Strong buy,2025-09-04,2025-06-05
+AVY,AVY,Avery Dennison Corporation,13507971162.0,USD,Process industries,Pulp & paper,NYSE,Buy,2025-10-22,2025-07-22
+AWK,AWK,"American Water Works Company, Inc.",29098168710.0,USD,Utilities,Water utilities,NYSE,Neutral,2025-10-29,2025-07-30
+AXON,AXON,"Axon Enterprise, Inc.",60371486219.0,USD,Electronic technology,Aerospace & defense,NASDAQ,Buy,2025-11-06,2025-08-04
+AXP,AXP,American Express Company,223099857824.0,USD,Finance,Finance/Rental/Leasing,NYSE,Buy,2025-10-17,2025-07-18
+AZO,AZO,"AutoZone, Inc.",69928867050.0,USD,Retail trade,Specialty stores,NYSE,Buy,2025-09-23,2025-05-27
+BA,BA,Boeing Company (The),177568517561.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-10-22,2025-07-29
+BAC,BAC,Bank of America Corporation,372199100098.0,USD,Finance,Major banks,NYSE,Buy,2025-10-15,2025-07-16
+BALL,BALL,Ball Corporation,14331360783.0,USD,Process industries,Containers/Packaging,NYSE,Buy,2025-10-30,2025-08-05
+BAX,BAX,Baxter International Inc.,12583715302.0,USD,Health technology,Medical specialties,NYSE,Neutral,2025-10-30,2025-07-31
+BBY,BBY,"Best Buy Co., Inc.",15569910630.0,USD,Retail trade,Electronics/Appliance stores,NYSE,Neutral,2025-08-28,2025-05-29
+BDX,BDX,"Becton, Dickinson and Company",55625795576.0,USD,Health technology,Medical specialties,NYSE,Neutral,2025-11-06,2025-08-07
+BEN,BEN,"Franklin Resources, Inc.",13130454559.0,USD,Finance,Investment managers,NYSE,Neutral,2025-11-04,2025-08-01
+BF-B,BF.B,Brown Forman Inc,14135348330.0,USD,Consumer non-durables,Beverages: alcoholic,NYSE,Neutral,2025-08-28,2025-06-05
+BG,BG,Bunge Limited,16991266716.0,USD,Process industries,Agricultural commodities/Milling,NYSE,Buy,2025-10-23,2025-07-30
+BIIB,BIIB,Biogen Inc.,20045147403.0,USD,Health technology,Pharmaceuticals: major,NASDAQ,Buy,2025-10-22,2025-07-31
+BK,BK,The Bank of New York Mellon Corporation,73761130984.0,USD,Finance,Investment banks/Brokers,NYSE,Buy,2025-10-16,2025-07-15
+BKNG,BKNG,Booking Holdings Inc. Common Stock,184920440663.0,USD,Consumer services,Other consumer services,NASDAQ,Buy,2025-10-29,2025-07-29
+BKR,BKR,Baker Hughes Company,43822328987.0,USD,Industrial services,Contract drilling,NASDAQ,Buy,2025-10-15,2025-07-22
+BLDR,BLDR,"Builders FirstSource, Inc.",15771730073.0,USD,Retail trade,Home improvement chains,NYSE,Buy,2025-10-30,2025-07-31
+BLK,BLK,"BlackRock, Inc.",185999212190.0,USD,Finance,Investment managers,NYSE,Buy,2025-10-10,2025-07-15
+BLOK,BLOK,,,,,,,,,
+BMY,BMY,Bristol-Myers Squibb Company,96092927593.0,USD,Health technology,Pharmaceuticals: major,NYSE,Neutral,2025-10-30,2025-07-31
+BR,BR,"Broadridge Financial Solutions, Inc.",30136203290.0,USD,Technology services,Information technology services,NYSE,Buy,2025-10-29,2025-08-05
+BRK-B,BRK.B,Berkshire Hathaway Inc. New,1061245650144.0,USD,Finance,Property/Casualty insurance,NYSE,Buy,2025-11-03,2025-08-02
+BRO,BRO,"Brown & Brown, Inc.",31681402326.0,USD,Finance,Insurance brokers/Services,NYSE,Neutral,2025-10-27,2025-07-28
+BSX,BSX,Boston Scientific Corporation,157643550427.0,USD,Health technology,Medical specialties,NYSE,Strong buy,2025-10-22,2025-07-23
+BX,BX,Blackstone Inc.,210546539168.0,USD,Finance,Investment managers,NYSE,Buy,2025-10-16,2025-07-24
+BXP,BXP,"BXP, Inc.",11003931578.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-28,2025-07-29
+C,C,"Citigroup, Inc.",176210742262.0,USD,Finance,Major banks,NYSE,Buy,2025-10-14,2025-07-15
+CAG,CAG,"ConAgra Brands, Inc.",8971154279.0,USD,Consumer non-durables,Food: major diversified,NYSE,Neutral,2025-10-02,2025-07-10
+CAH,CAH,"Cardinal Health, Inc.",35219675295.0,USD,Distribution services,Medical distributors,NYSE,Buy,2025-10-31,2025-08-12
+CARR,CARR,Carrier Global Corporation,56576000406.0,USD,Producer manufacturing,Industrial machinery,NYSE,Buy,2025-10-23,2025-07-29
+CAT,CAT,"Caterpillar, Inc.",202036233478.0,USD,Producer manufacturing,Trucks/Construction/Farm machinery,NYSE,Buy,2025-11-04,2025-08-05
+CB,CB,Chubb Limited,108443755371.0,USD,Finance,Property/Casualty insurance,NYSE,Buy,2025-10-28,2025-07-22
+CBRE,CBRE,CBRE Group Inc,48626326640.0,USD,Finance,Real estate development,NYSE,Buy,2025-10-23,2025-07-29
+CCI,CCI,Crown Castle Inc.,44152309346.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-15,2025-07-23
+CCL,CCL,Carnival Corporation,41383621862.0,USD,Consumer services,Hotels/Resorts/Cruise lines,NYSE,Buy,2025-09-26,2025-06-24
+CDNS,CDNS,"Cadence Design Systems, Inc.",93744731008.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-10-27,2025-07-28
+CDW,CDW,CDW Corporation,21450711933.0,USD,Technology services,Information technology services,NASDAQ,Buy,2025-10-29,2025-08-06
+CEG,CEG,Constellation Energy Corporation,98901353882.0,USD,Utilities,Electric utilities,NASDAQ,Buy,2025-11-10,2025-08-07
+CF,CF,"CF Industries Holdings, Inc.",14031715882.0,USD,Process industries,Chemicals: agricultural,NYSE,Neutral,2025-11-05,2025-08-06
+CFG,CFG,"Citizens Financial Group, Inc.",22132517732.0,USD,Finance,Major banks,NYSE,Buy,2025-10-16,2025-07-17
+CHD,CHD,"Church & Dwight Company, Inc.",22504569961.0,USD,Consumer non-durables,Household/Personal care,NYSE,Neutral,2025-10-24,2025-08-01
+CHRW,CHRW,"C.H. Robinson Worldwide, Inc.",14985768846.0,USD,Transportation,Air freight/Couriers,NASDAQ,Buy,2025-10-29,2025-07-30
+CHTR,CHTR,"Charter Communications, Inc.",40652422458.0,USD,Consumer services,Cable/Satellite TV,NASDAQ,Neutral,2025-10-24,2025-07-25
+CI,CI,The Cigna Group,80163839958.0,USD,Finance,Insurance brokers/Services,NYSE,Buy,2025-10-30,2025-07-31
+CIBR,CIBR,,,,,,,,,
+CINF,CINF,Cincinnati Financial Corporation,24017853632.0,USD,Finance,Multi-line insurance,NASDAQ,Buy,2025-10-23,2025-07-28
+CL,CL,Colgate-Palmolive Company,68003699739.0,USD,Consumer non-durables,Household/Personal care,NYSE,Buy,2025-10-31,2025-08-01
+CLX,CLX,Clorox Company (The),14392148960.0,USD,Consumer non-durables,Household/Personal care,NYSE,Neutral,2025-10-29,2025-07-31
+CMCSA,CMCSA,Comcast Corporation,124353518810.0,USD,Consumer services,Cable/Satellite TV,NASDAQ,Buy,2025-10-23,2025-07-31
+CME,CME,CME Group Inc.,97882856138.0,USD,Finance,Investment banks/Brokers,NASDAQ,Neutral,2025-10-22,2025-07-23
+CMG,CMG,"Chipotle Mexican Grill, Inc.",57014431229.0,USD,Consumer services,Restaurants,NYSE,Buy,2025-10-22,2025-07-23
+CMI,CMI,Cummins Inc.,54902218743.0,USD,Producer manufacturing,Auto parts: OEM,NYSE,Buy,2025-11-04,2025-08-05
+CMS,CMS,CMS Energy Corporation,21579093638.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-23,2025-07-31
+CNC,CNC,Centene Corporation,14075871579.0,USD,Health services,Managed health care,NYSE,Neutral,2025-10-28,2025-07-25
+CNP,CNP,"CenterPoint Energy, Inc (Holding Co)",24613006028.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-29,2025-07-24
+COF,COF,Capital One Financial Corporation,143840237589.0,USD,Finance,Major banks,NYSE,Buy,2025-10-23,2025-07-22
+COIN,COIN,"Coinbase Global, Inc.",79260283536.0,USD,Finance,Investment banks/Brokers,NASDAQ,Buy,2025-10-30,2025-07-31
+COO,COO,"The Cooper Companies, Inc.",14696091256.0,USD,Health technology,Medical specialties,NASDAQ,Buy,2025-08-27,2025-05-29
+COP,COP,ConocoPhillips,121209850216.0,USD,Energy minerals,Oil & gas production,NYSE,Buy,2025-10-30,2025-08-07
+COR,COR,"Cencora, Inc.",56166420915.0,USD,Distribution services,Medical distributors,NYSE,Buy,2025-11-06,2025-08-06
+COST,COST,Costco Wholesale Corporation,417462727620.0,USD,Retail trade,Specialty stores,NASDAQ,Buy,2025-09-25,2025-05-29
+CPAY,CPAY,"Corpay, Inc.",22961678855.0,USD,Commercial services,Miscellaneous commercial services,NYSE,Buy,2025-11-06,2025-08-06
+CPB,CPB,The Campbell's Company,9531215076.0,USD,Consumer non-durables,Food: specialty/candy,NASDAQ,Neutral,2025-09-03,2025-06-02
+CPRT,CPRT,"Copart, Inc.",47036609811.0,USD,Retail trade,Specialty stores,NASDAQ,Buy,2025-09-03,2025-05-22
+CPT,CPT,Camden Property Trust,15457557662.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-23,2025-07-31
+CRL,CRL,"Charles River Laboratories International, Inc.",8056853737.0,USD,Commercial services,Miscellaneous commercial services,NYSE,Buy,2025-10-29,2025-08-06
+CRM,CRM,"Salesforce, Inc.",233015445251.0,USD,Technology services,Packaged software,NYSE,Strong buy,2025-09-03,2025-05-28
+CRWD,CRWD,"CrowdStrike Holdings, Inc.",104086036873.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-08-27,2025-06-03
+CSCO,CSCO,"Cisco Systems, Inc.",270824280706.0,USD,Electronic technology,Telecommunications equipment,NASDAQ,Buy,2025-11-12,2025-08-13
+CSGP,CSGP,"CoStar Group, Inc.",37861633846.0,USD,Technology services,Internet software/Services,NASDAQ,Buy,2025-10-28,2025-07-22
+CSX,CSX,CSX Corporation,60421216558.0,USD,Transportation,Railroads,NASDAQ,Buy,2025-10-15,2025-07-23
+CTAS,CTAS,Cintas Corporation,85830272758.0,USD,Consumer services,Other consumer services,NASDAQ,Neutral,2025-09-24,2025-07-17
+CTRA,CTRA,Coterra Energy Inc.,18239046059.0,USD,Energy minerals,Integrated oil,NYSE,Buy,2025-10-30,2025-08-04
+CTSH,CTSH,Cognizant Technology Solutions Corporation,35008220774.0,USD,Technology services,Information technology services,NASDAQ,Buy,2025-10-29,2025-07-30
+CTVA,CTVA,"Corteva, Inc.",50212653853.0,USD,Process industries,Agricultural commodities/Milling,NYSE,Buy,2025-10-30,2025-08-06
+CVS,CVS,CVS Health Corporation,90748758937.0,USD,Retail trade,Drugstore chains,NYSE,Buy,2025-10-29,2025-07-31
+CVX,CVX,Chevron Corporation,322177908642.0,USD,Energy minerals,Integrated oil,NYSE,Buy,2025-10-24,2025-08-01
+CZR,CZR,"Caesars Entertainment, Inc.",5436898503.0,USD,Consumer services,Casinos/Gaming,NASDAQ,Buy,2025-11-04,2025-07-29
+D,D,"Dominion Energy, Inc.",51052400969.0,USD,Utilities,Electric utilities,NYSE,Neutral,2025-10-31,2025-08-01
+DAL,DAL,"Delta Air Lines, Inc.",39927793471.0,USD,Transportation,Airlines,NYSE,Strong buy,2025-10-09,2025-07-10
+DASH,DASH,"DoorDash, Inc.",106281796791.0,USD,Transportation,Air freight/Couriers,NASDAQ,Buy,2025-10-29,2025-08-06
+DAY,DAY,"Dayforce, Inc.",10978209857.0,USD,Technology services,Packaged software,NYSE,Neutral,2025-10-29,2025-08-06
+DD,DD,"DuPont de Nemours, Inc.",32366800240.0,USD,Process industries,Chemicals: major diversified,NYSE,Strong buy,2025-10-29,2025-08-05
+DDOG,DDOG,"Datadog, Inc.",44049998216.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-10-30,2025-08-07
+DE,DE,Deere & Company,132098607911.0,USD,Producer manufacturing,Trucks/Construction/Farm machinery,NYSE,Buy,2025-11-19,2025-08-14
+DECK,DECK,Deckers Outdoor Corporation,16865156196.0,USD,Consumer non-durables,Apparel/Footwear,NYSE,Buy,2025-10-23,2025-07-24
+DELL,DELL,Dell Technologies Inc.,88922494251.0,USD,Electronic technology,Computer processing hardware,NYSE,Buy,2025-08-28,2025-05-29
+DG,DG,Dollar General Corporation,24317801567.0,USD,Retail trade,Discount stores,NYSE,Neutral,2025-08-28,2025-06-03
+DGX,DGX,Quest Diagnostics Incorporated,20168475806.0,USD,Health services,Services to the health industry,NYSE,Buy,2025-10-28,2025-07-22
+DHI,DHI,"D.R. Horton, Inc.",50195058159.0,USD,Consumer durables,Homebuilding,NYSE,Neutral,2025-10-28,2025-07-22
+DHR,DHR,Danaher Corporation,147685637283.0,USD,Health technology,Medical specialties,NYSE,Strong buy,2025-10-28,2025-07-22
+DIA,DIA,,,,,,,,,
+DIS,DIS,Walt Disney Company (The),211526918771.0,USD,Consumer services,Movies/Entertainment,NYSE,Buy,2025-11-05,2025-08-06
+DLR,DLR,"Digital Realty Trust, Inc.",57269190193.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-23,2025-07-24
+DLTR,DLTR,"Dollar Tree, Inc.",23369758181.0,USD,Retail trade,Discount stores,NASDAQ,Buy,2025-09-03,2025-06-04
+DOC,DOC,"Healthpeak Properties, Inc.",12444958775.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-23,2025-07-24
+DOV,DOV,Dover Corporation,24987270959.0,USD,Producer manufacturing,Industrial machinery,NYSE,Buy,2025-10-28,2025-07-24
+DOW,DOW,Dow Inc.,17536803273.0,USD,Process industries,Chemicals: specialty,NYSE,Neutral,2025-10-23,2025-07-24
+DPZ,DPZ,Domino's Pizza Inc,15319873915.0,USD,Consumer services,Restaurants,NASDAQ,Buy,2025-10-09,2025-07-21
+DRI,DRI,"Darden Restaurants, Inc.",24106627543.0,USD,Consumer services,Restaurants,NYSE,Buy,2025-09-18,2025-06-20
+DTE,DTE,DTE Energy Company,28667876319.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-23,2025-07-29
+DUK,DUK,Duke Energy Corporation (Holding Company),95865541331.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-30,2025-08-05
+DVA,DVA,DaVita Inc.,9915619476.0,USD,Health services,Medical/Nursing services,NYSE,Neutral,2025-10-29,2025-08-05
+DVN,DVN,Devon Energy Corporation,22364003279.0,USD,Energy minerals,Integrated oil,NYSE,Buy,2025-11-04,2025-08-05
+DXCM,DXCM,"DexCom, Inc.",29850858168.0,USD,Health technology,Medical specialties,NASDAQ,Strong buy,2025-10-23,2025-07-30
+EA,EA,Electronic Arts Inc.,43093200600.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-10-28,2025-07-29
+EBAY,EBAY,eBay Inc.,43250479721.0,USD,Retail trade,Internet retail,NASDAQ,Neutral,2025-10-29,2025-07-30
+ECL,ECL,Ecolab Inc.,79193747283.0,USD,Process industries,Chemicals: specialty,NYSE,Buy,2025-11-04,2025-07-29
+ED,ED,"Consolidated Edison, Inc.",35964182165.0,USD,Utilities,Electric utilities,NYSE,Neutral,2025-10-30,2025-08-07
+EFX,EFX,"Equifax, Inc.",30652233571.0,USD,Commercial services,Financial publishing/Services,NYSE,Buy,2025-10-15,2025-07-22
+EG,EG,"Everest Group, Ltd.",14207031481.0,USD,Finance,Property/Casualty insurance,NYSE,Buy,2025-10-29,2025-07-30
+EIX,EIX,Edison International,21135083393.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-11-04,2025-07-31
+EL,EL,"Estee Lauder Companies, Inc. (The)",32325270861.0,USD,Consumer non-durables,Household/Personal care,NYSE,Neutral,2025-10-31,2025-08-20
+ELV,ELV,"Elevance Health, Inc.",69812027749.0,USD,Health services,Managed health care,NYSE,Buy,2025-10-15,2025-07-17
+EMN,EMN,Eastman Chemical Company,7841905570.0,USD,Process industries,Chemicals: specialty,NYSE,Buy,2025-10-23,2025-07-31
+EMR,EMR,Emerson Electric Company,75049381807.0,USD,Electronic technology,Electronic equipment/Instruments,NYSE,Buy,2025-11-11,2025-08-06
+ENPH,ENPH,"Enphase Energy, Inc.",4963299421.0,USD,Electronic technology,Semiconductors,NASDAQ,Neutral,2025-10-28,2025-07-22
+EOG,EOG,"EOG Resources, Inc.",66229002081.0,USD,Energy minerals,Integrated oil,NYSE,Buy,2025-10-30,2025-08-07
+EPAM,EPAM,"EPAM Systems, Inc.",9484069913.0,USD,Technology services,Information technology services,NYSE,Buy,2025-10-30,2025-08-07
+EQIX,EQIX,"Equinix, Inc.",76509081240.0,USD,Finance,Real estate investment trusts,NASDAQ,Strong buy,2025-10-29,2025-07-30
+EQR,EQR,Equity Residential,24624788919.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-11-04,2025-08-04
+EQT,EQT,EQT Corporation,32894365975.0,USD,Energy minerals,Integrated oil,NYSE,Buy,2025-10-22,2025-07-22
+ERIE,ERIE,Erie Indemnity Company,16304052986.0,USD,Finance,Property/Casualty insurance,NASDAQ,Buy,2025-10-23,2025-08-07
+ES,ES,Eversource Energy (D/B/A),23792193989.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-29,2025-07-31
+ESS,ESS,"Essex Property Trust, Inc.",17052252255.0,USD,Finance,Real estate investment trusts,NYSE,Neutral,2025-10-22,2025-07-29
+ETN,ETN,"Eaton Corporation, PLC",137041377426.0,USD,Producer manufacturing,Electrical products,NYSE,Buy,2025-11-04,2025-08-05
+ETR,ETR,Entergy Corporation,39993785837.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-29,2025-07-30
+EVRG,EVRG,"Evergy, Inc.",16515946198.0,USD,Utilities,Electric utilities,NASDAQ,Buy,2025-10-30,2025-08-07
+EW,EW,Edwards Lifesciences Corporation,47713613045.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-10-22,2025-07-24
+EXC,EXC,Exelon Corporation,44863634225.0,USD,Utilities,Electric utilities,NASDAQ,Neutral,2025-10-29,2025-07-31
+EXE,EXE,Expand Energy Corporation,22928665362.0,USD,Energy minerals,Integrated oil,NASDAQ,Strong buy,2025-11-04,2025-07-29
+EXPD,EXPD,"Expeditors International of Washington, Inc.",16503371961.0,USD,Transportation,Air freight/Couriers,NYSE,Sell,2025-11-04,2025-08-05
+EXPE,EXPE,"Expedia Group, Inc.",26429360609.0,USD,Consumer services,Other consumer services,NASDAQ,Buy,2025-10-30,2025-08-07
+EXR,EXR,Extra Space Storage Inc,29834367794.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-11-04,2025-07-30
+F,F,Ford Motor Company,47121547468.0,USD,Consumer durables,Motor vehicles,NYSE,Neutral,2025-10-22,2025-07-30
+FANG,FANG,"Diamondback Energy, Inc.",41674422987.0,USD,Energy minerals,Oil & gas production,NASDAQ,Strong buy,2025-11-10,2025-08-04
+FAST,FAST,Fastenal Company,57335923319.0,USD,Distribution services,Wholesale distributors,NASDAQ,Neutral,2025-10-13,2025-07-14
+FCX,FCX,"Freeport-McMoRan, Inc.",63676582245.0,USD,Non-energy minerals,Other metals/Minerals,NYSE,Buy,2025-10-16,2025-07-23
+FDN,FDN,,,,,,,,,
+FDS,FDS,FactSet Research Systems Inc.,14366574173.0,USD,Technology services,Data processing services,NYSE,Neutral,2025-09-18,2025-06-23
+FDX,FDX,FedEx Corporation,54516281977.0,USD,Transportation,Air freight/Couriers,NYSE,Buy,2025-09-18,2025-06-24
+FE,FE,FirstEnergy Corp.,25169037426.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-23,2025-07-30
+FFIV,FFIV,"F5, Inc.",18128603939.0,USD,Technology services,Packaged software,NASDAQ,Neutral,2025-10-28,2025-07-30
+FFTY,FFTY,,,,,,,,,
+FI,FI,"Fiserv, Inc.",74950633165.0,USD,Commercial services,Miscellaneous commercial services,NYSE,Strong buy,2025-10-28,2025-07-23
+FICO,FICO,Fair Isaac Corporation,34088312663.0,USD,Commercial services,Financial publishing/Services,NYSE,Buy,2025-11-05,2025-07-30
+FIS,FIS,"Fidelity National Information Services, Inc.",36566497803.0,USD,Technology services,Packaged software,NYSE,Buy,2025-10-30,2025-08-05
+FITB,FITB,Fifth Third Bancorp,29784927063.0,USD,Finance,Regional banks,NASDAQ,Buy,2025-10-17,2025-07-17
+FOX,FOX,Fox Corporation,25111634722.0,USD,Consumer services,Broadcasting,NASDAQ,Buy,2025-10-29,2025-08-05
+FOXA,FOXA,Fox Corporation,25111634722.0,USD,Consumer services,Broadcasting,NASDAQ,Buy,2025-10-29,2025-08-05
+FRT,FRT,Federal Realty Investment Trust,8579609125.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-30,2025-08-06
+FSLR,FSLR,"First Solar, Inc.",21097757868.0,USD,Electronic technology,Semiconductors,NASDAQ,Strong buy,2025-11-04,2025-07-31
+FTNT,FTNT,"Fortinet, Inc.",59500560126.0,USD,Technology services,Information technology services,NASDAQ,Neutral,2025-10-30,2025-08-06
+FTV,FTV,Fortive Corporation,16412695006.0,USD,Electronic technology,Electronic equipment/Instruments,NYSE,Neutral,2025-10-23,2025-07-30
+GD,GD,General Dynamics Corporation,86664274620.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-10-22,2025-07-23
+GDDY,GDDY,GoDaddy Inc.,20248169231.0,USD,Technology services,Data processing services,NYSE,Buy,2025-10-29,2025-08-07
+GDX,GDX,,,,,,,,,
+GE,GE,GE Aerospace,290496752938.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-10-28,2025-07-17
+GEHC,GEHC,GE HealthCare Technologies Inc.,33826680037.0,USD,Health technology,Medical specialties,NASDAQ,Strong buy,2025-10-29,2025-07-30
+GEN,GEN,Gen Digital Inc.,18950293739.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-10-30,2025-08-07
+GEV,GEV,GE Vernova Inc.,170387677716.0,USD,Producer manufacturing,Electrical products,NYSE,Buy,2025-10-22,2025-07-23
+GILD,GILD,"Gilead Sciences, Inc.",142382590027.0,USD,Health technology,Biotechnology,NASDAQ,Buy,2025-10-23,2025-08-07
+GIS,GIS,"General Mills, Inc.",26714553894.0,USD,Consumer non-durables,Food: major diversified,NYSE,Neutral,2025-09-17,2025-06-25
+GL,GL,Globe Life Inc.,11315384706.0,USD,Finance,Multi-line insurance,NYSE,Buy,2025-10-22,2025-07-23
+GLD,GLD,,,,,,,,,
+GLW,GLW,Corning Incorporated,57736102589.0,USD,Electronic technology,Electronic components,NYSE,Buy,2025-11-04,2025-07-29
+GM,GM,General Motors Company,55982175079.0,USD,Consumer durables,Motor vehicles,NYSE,Buy,2025-10-21,2025-07-22
+GNRC,GNRC,Generac Holdings Inc.,11108531113.0,USD,Producer manufacturing,Electrical products,NYSE,Buy,2025-10-29,2025-07-30
+GOOG,GOOG,Alphabet Inc.,2509549439362.0,USD,Technology services,Internet software/Services,NASDAQ,Strong buy,2025-10-28,2025-07-23
+GOOGL,GOOGL,Alphabet Inc.,2509549439362.0,USD,Technology services,Internet software/Services,NASDAQ,Strong buy,2025-10-28,2025-07-23
+GPC,GPC,Genuine Parts Company,19299056683.0,USD,Distribution services,Wholesale distributors,NYSE,Buy,2025-10-16,2025-07-22
+GPN,GPN,Global Payments Inc.,21405226721.0,USD,Commercial services,Miscellaneous commercial services,NYSE,Buy,2025-11-04,2025-08-06
+GRMN,GRMN,Garmin Ltd.,44774092145.0,USD,Electronic technology,Telecommunications equipment,NYSE,Sell,2025-10-29,2025-07-30
+GS,GS,"Goldman Sachs Group, Inc. (The)",226722971431.0,USD,Finance,Investment banks/Brokers,NYSE,Buy,2025-10-14,2025-07-16
+GWW,GWW,"W.W. Grainger, Inc.",48404315712.0,USD,Distribution services,Wholesale distributors,NYSE,Neutral,2025-10-31,2025-08-01
+HAL,HAL,Halliburton Company,18654933491.0,USD,Industrial services,Oilfield services/Equipment,NYSE,Buy,2025-10-28,2025-07-22
+HAS,HAS,"Hasbro, Inc.",11442975372.0,USD,Consumer durables,Recreational products,NASDAQ,Strong buy,2025-10-23,2025-07-23
+HBAN,HBAN,Huntington Bancshares Incorporated,25638351970.0,USD,Finance,Major banks,NASDAQ,Buy,2025-10-17,2025-07-18
+HCA,HCA,"HCA Healthcare, Inc.",94056025162.0,USD,Health services,Hospital/Nursing management,NYSE,Buy,2025-10-17,2025-07-25
+HD,HD,"Home Depot, Inc. (The)",405472956866.0,USD,Retail trade,Home improvement chains,NYSE,Buy,2025-11-18,2025-08-19
+HIG,HIG,"The Hartford Insurance Group, Inc.",37348032296.0,USD,Finance,Property/Casualty insurance,NYSE,Buy,2025-10-23,2025-07-28
+HII,HII,"Huntington Ingalls Industries, Inc.",10663248713.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-10-30,2025-07-31
+HLT,HLT,Hilton Worldwide Holdings Inc.,64758247944.0,USD,Consumer services,Hotels/Resorts/Cruise lines,NYSE,Buy,2025-10-22,2025-07-23
+HOLX,HOLX,"Hologic, Inc.",14819796083.0,USD,Health technology,Medical specialties,NASDAQ,Buy,2025-11-03,2025-07-30
+HON,HON,Honeywell International Inc.,141302573596.0,USD,Electronic technology,Aerospace & defense,NASDAQ,Buy,2025-10-23,2025-07-24
+HPE,HPE,Hewlett Packard Enterprise Company,29524850464.0,USD,Electronic technology,Computer processing hardware,NYSE,Buy,2025-09-03,2025-06-03
+HPQ,HPQ,HP Inc.,25369760925.0,USD,Technology services,Information technology services,NYSE,Neutral,2025-08-27,2025-05-28
+HRL,HRL,Hormel Foods Corporation,15814968600.0,USD,Consumer non-durables,Food: meat/fish/dairy,NYSE,Neutral,2025-08-28,2025-05-29
+HSIC,HSIC,"Henry Schein, Inc.",8374795553.0,USD,Distribution services,Medical distributors,NASDAQ,Neutral,2025-11-04,2025-08-05
+HST,HST,"Host Hotels & Resorts, Inc.",11640100604.0,USD,Finance,Real estate investment trusts,NASDAQ,Buy,2025-11-05,2025-07-30
+HSY,HSY,The Hershey Company,37179671104.0,USD,Consumer non-durables,Food: specialty/candy,NYSE,Neutral,2025-11-07,2025-07-30
+HUBB,HUBB,Hubbell Inc,23515515322.0,USD,Producer manufacturing,Electrical products,NYSE,Buy,2025-11-04,2025-07-29
+HUM,HUM,Humana Inc.,35945638277.0,USD,Finance,Life/Health insurance,NYSE,Buy,2025-11-05,2025-07-30
+HWM,HWM,Howmet Aerospace Inc.,70917980114.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-10-30,2025-07-31
+IBKR,IBKR,"Interactive Brokers Group, Inc.",28184158736.0,USD,Finance,Investment banks/Brokers,NASDAQ,Buy,2025-10-21,2025-07-17
+IBM,IBM,International Business Machines Corporation,226014514371.0,USD,Technology services,Information technology services,NYSE,Neutral,2025-10-22,2025-07-23
+ICE,ICE,Intercontinental Exchange Inc.,102314896361.0,USD,Finance,Investment banks/Brokers,NYSE,Buy,2025-10-30,2025-07-31
+IDXX,IDXX,"IDEXX Laboratories, Inc.",51340608656.0,USD,Health technology,Medical specialties,NASDAQ,Buy,2025-11-04,2025-08-04
+IEX,IEX,IDEX Corporation,12497689285.0,USD,Producer manufacturing,Industrial machinery,NYSE,Buy,2025-10-28,2025-07-30
+IFF,IFF,"International Flavors & Fragrances, Inc.",17099474214.0,USD,Consumer non-durables,Food: specialty/candy,NYSE,Buy,2025-11-10,2025-08-05
+INCY,INCY,Incyte Corporation,16403195618.0,USD,Health technology,Pharmaceuticals: major,NASDAQ,Buy,2025-11-04,2025-07-29
+INTC,INTC,Intel Corporation,106579951670.0,USD,Electronic technology,Semiconductors,NASDAQ,Neutral,2025-10-23,2025-07-24
+INTU,INTU,Intuit Inc.,183976692293.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-11-20,2025-08-21
+INVH,INVH,Invitation Homes Inc.,18807092982.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-22,2025-07-30
+IP,IP,International Paper Company,25754967008.0,USD,Process industries,Pulp & paper,NYSE,Neutral,2025-10-30,2025-07-31
+IPG,IPG,"Interpublic Group of Companies, Inc. (The)",9786637634.0,USD,Commercial services,Advertising/Marketing services,NYSE,Buy,2025-10-17,2025-07-22
+IQV,IQV,"IQVIA Holdings, Inc.",31919199066.0,USD,Health technology,Biotechnology,NYSE,Buy,2025-10-22,2025-07-22
+IR,IR,Ingersoll Rand Inc.,32245321422.0,USD,Producer manufacturing,Industrial machinery,NYSE,Buy,2025-10-29,2025-07-31
+IRM,IRM,Iron Mountain Incorporated (Delaware),27003686525.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-30,2025-08-06
+ISRG,ISRG,"Intuitive Surgical, Inc.",170011069085.0,USD,Health technology,Medical specialties,NASDAQ,Buy,2025-10-16,2025-07-22
+IT,IT,"Gartner, Inc.",18413643981.0,USD,Technology services,Internet software/Services,NYSE,Buy,2025-11-04,2025-08-05
+ITW,ITW,Illinois Tool Works Inc.,77608957153.0,USD,Producer manufacturing,Auto parts: OEM,NYSE,Neutral,2025-10-28,2025-07-30
+IVZ,IVZ,Invesco Ltd,9779985736.0,USD,Finance,Investment managers,NYSE,Neutral,2025-10-28,2025-07-22
+IWC,IWC,,,,,,,,,
+IWM,IWM,,,,,,,,,
+IWN,IWN,,,,,,,,,
+IWO,IWO,,,,,,,,,
+IYT,IYT,,,,,,,,,
+J,J,Jacobs Solutions Inc.,17708132371.0,USD,Technology services,Data processing services,NYSE,Buy,2025-11-25,2025-08-05
+JBHT,JBHT,"J.B. Hunt Transport Services, Inc.",13970072547.0,USD,Transportation,Trucking,NASDAQ,Buy,2025-10-21,2025-07-15
+JBL,JBL,Jabil Inc.,22362024583.0,USD,Producer manufacturing,Industrial machinery,NYSE,Buy,2025-09-25,2025-06-17
+JCI,JCI,Johnson Controls International plc,70974643899.0,USD,Producer manufacturing,Industrial machinery,NYSE,Buy,2025-11-05,2025-07-29
+JKHY,JKHY,"Jack Henry & Associates, Inc.",11810993998.0,USD,Technology services,Packaged software,NASDAQ,Neutral,2025-11-11,2025-08-19
+JNJ,JNJ,Johnson & Johnson,425047739899.0,USD,Health technology,Pharmaceuticals: major,NYSE,Buy,2025-10-21,2025-07-16
+JPM,JPM,JP Morgan Chase & Co.,820993971036.0,USD,Finance,Major banks,NYSE,Buy,2025-10-14,2025-07-15
+K,K,Kellanova,27747477161.0,USD,Consumer non-durables,Food: specialty/candy,NYSE,Neutral,2025-10-30,2025-07-31
+KBE,KBE,,,,,,,,,
+KDP,KDP,Keurig Dr Pepper Inc.,39326703051.0,USD,Consumer non-durables,Beverages: non-alcoholic,NASDAQ,Buy,2025-10-23,2025-07-24
+KEY,KEY,KeyCorp,21162755438.0,USD,Finance,Major banks,NYSE,Buy,2025-10-16,2025-07-22
+KEYS,KEYS,Keysight Technologies Inc.,28292974766.0,USD,Electronic technology,Electronic equipment/Instruments,NYSE,Buy,2025-11-24,2025-08-19
+KHC,KHC,The Kraft Heinz Company,32785699939.0,USD,Consumer non-durables,Food: major diversified,NASDAQ,Neutral,2025-10-29,2025-07-30
+KIM,KIM,Kimco Realty Corporation (HC),14972903479.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-23,2025-07-31
+KKR,KKR,KKR & Co. Inc.,124804099795.0,USD,Finance,Investment managers,NYSE,Buy,2025-11-04,2025-07-31
+KLAC,KLAC,KLA Corporation,117194898361.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-10-22,2025-07-31
+KMB,KMB,Kimberly-Clark Corporation,43068352909.0,USD,Consumer non-durables,Household/Personal care,NASDAQ,Buy,2025-10-28,2025-08-01
+KMI,KMI,"Kinder Morgan, Inc.",59151702055.0,USD,Industrial services,Oil & gas pipelines,NYSE,Buy,2025-10-15,2025-07-16
+KMX,KMX,CarMax Inc,8954805442.0,USD,Retail trade,Specialty stores,NYSE,Buy,2025-09-25,2025-06-20
+KO,KO,Coca-Cola Company (The),295791080380.0,USD,Consumer non-durables,Beverages: non-alcoholic,NYSE,Buy,2025-10-22,2025-07-22
+KR,KR,Kroger Company (The),45613138799.0,USD,Retail trade,Food retail,NYSE,Buy,2025-09-05,2025-03-06
+KVUE,KVUE,Kenvue Inc.,39897463402.0,USD,Consumer non-durables,Household/Personal care,NYSE,Neutral,2025-10-23,2025-08-07
+L,L,Loews Corporation,19892191271.0,USD,Finance,Property/Casualty insurance,NYSE,Neutral,2025-11-03,2025-08-04
+LDOS,LDOS,"Leidos Holdings, Inc.",23395019413.0,USD,Technology services,Packaged software,NYSE,Buy,2025-11-04,2025-08-05
+LEN,LEN,Lennar Corporation,34335691406.0,USD,Consumer durables,Homebuilding,NYSE,Buy,2025-09-17,2025-06-16
+LH,LH,Labcorp Holdings Inc.,23139195590.0,USD,Health services,Medical/Nursing services,NYSE,Buy,2025-10-23,2025-07-24
+LHX,LHX,"L3Harris Technologies, Inc.",51948743646.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-10-23,2025-07-24
+LII,LII,"Lennox International, Inc.",19937596838.0,USD,Producer manufacturing,Industrial machinery,NYSE,Neutral,2025-10-27,2025-07-23
+LIN,LIN,Linde plc,225976894656.0,USD,Process industries,Chemicals: specialty,NASDAQ,Buy,2025-10-23,2025-08-01
+LKQ,LKQ,LKQ Corporation,8097016273.0,USD,Consumer durables,Automotive aftermarket,NASDAQ,Buy,2025-10-30,2025-07-24
+LLY,LLY,Eli Lilly and Company,696620571821.0,USD,Health technology,Pharmaceuticals: major,NYSE,Buy,2025-10-30,2025-08-07
+LMT,LMT,Lockheed Martin Corporation,106333993036.0,USD,Electronic technology,Aerospace & defense,NYSE,Neutral,2025-10-28,2025-07-22
+LNT,LNT,Alliant Energy Corporation,16885448412.0,USD,Utilities,Electric utilities,NASDAQ,Buy,2025-10-30,2025-08-07
+LOW,LOW,"Lowe's Companies, Inc.",144777859151.0,USD,Retail trade,Home improvement chains,NYSE,Buy,2025-11-19,2025-08-20
+LRCX,LRCX,Lam Research Corporation,131156297819.0,USD,Producer manufacturing,Industrial machinery,NASDAQ,Buy,2025-10-15,2025-07-30
+LULU,LULU,lululemon athletica inc.,25308438499.0,USD,Consumer non-durables,Apparel/Footwear,NASDAQ,Buy,2025-09-04,2025-06-05
+LUV,LUV,Southwest Airlines Company,17541269417.0,USD,Transportation,Airlines,NYSE,Neutral,2025-10-23,2025-07-23
+LVS,LVS,Las Vegas Sands Corp.,38571827588.0,USD,Consumer services,Casinos/Gaming,NYSE,Buy,2025-10-15,2025-07-23
+LW,LW,"Lamb Weston Holdings, Inc.",7860999794.0,USD,Consumer non-durables,Food: specialty/candy,NYSE,Neutral,2025-10-01,2025-07-23
+LYB,LYB,LyondellBasell Industries NV,18205301072.0,USD,Process industries,Chemicals: specialty,NYSE,Neutral,2025-10-24,2025-08-01
+LYV,LYV,"Live Nation Entertainment, Inc.",38647525156.0,USD,Consumer services,Movies/Entertainment,NYSE,Buy,2025-10-30,2025-08-07
+MA,MA,Mastercard Incorporated,534822428416.0,USD,Finance,Finance/Rental/Leasing,NYSE,Buy,2025-10-23,2025-07-31
+MAA,MAA,"Mid-America Apartment Communities, Inc.",16696686000.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-22,2025-07-30
+MAR,MAR,Marriott International,72709988179.0,USD,Consumer services,Hotels/Resorts/Cruise lines,NASDAQ,Buy,2025-10-30,2025-08-05
+MAS,MAS,Masco Corporation,15547344908.0,USD,Producer manufacturing,Building products,NYSE,Buy,2025-10-22,2025-07-31
+MCD,MCD,McDonald's Corporation,223315372427.0,USD,Consumer services,Restaurants,NYSE,Buy,2025-10-23,2025-08-06
+MCHP,MCHP,Microchip Technology Incorporated,36493141951.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-10-30,2025-08-07
+MCK,MCK,McKesson Corporation,84646068727.0,USD,Distribution services,Medical distributors,NYSE,Buy,2025-11-04,2025-08-06
+MCO,MCO,Moody's Corporation,91743365507.0,USD,Commercial services,Financial publishing/Services,NYSE,Buy,2025-10-28,2025-07-23
+MDLZ,MDLZ,"Mondelez International, Inc.",80289313228.0,USD,Consumer non-durables,Food: specialty/candy,NASDAQ,Buy,2025-11-04,2025-07-29
+MDT,MDT,Medtronic plc.,118106986936.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-11-18,2025-08-19
+MDY,MDY,,,,,,,,,
+MET,MET,"MetLife, Inc.",53873762704.0,USD,Finance,Multi-line insurance,NYSE,Buy,2025-10-29,2025-08-06
+META,META,"Meta Platforms, Inc.",1894270786280.0,USD,Technology services,Internet software/Services,NASDAQ,Strong buy,2025-10-22,2025-07-30
+MGM,MGM,MGM Resorts International,10482076495.0,USD,Consumer services,Casinos/Gaming,NYSE,Buy,2025-10-29,2025-07-30
+MHK,MHK,"Mohawk Industries, Inc.",8148599410.0,USD,Producer manufacturing,Building products,NYSE,Buy,2025-10-23,2025-07-24
+MKC,MKC,"McCormick & Company, Incorporated",18872239648.0,USD,Consumer non-durables,Food: specialty/candy,NYSE,Buy,2025-10-07,2025-06-26
+MKTX,MKTX,"MarketAxess Holdings, Inc.",7090896860.0,USD,Finance,Investment banks/Brokers,NASDAQ,Buy,2025-10-15,2025-08-06
+MLM,MLM,"Martin Marietta Materials, Inc.",37211215118.0,USD,Non-energy minerals,Construction materials,NYSE,Buy,2025-10-29,2025-08-07
+MMC,MMC,"Marsh & McLennan Companies, Inc.",101481030018.0,USD,Finance,Insurance brokers/Services,NYSE,Neutral,2025-10-16,2025-07-17
+MMM,MMM,3M Company,83393835984.0,USD,Producer manufacturing,Industrial conglomerates,NYSE,Buy,2025-10-28,2025-07-18
+MNST,MNST,Monster Beverage Corporation,60655716357.0,USD,Consumer non-durables,Beverages: non-alcoholic,NASDAQ,Buy,2025-10-30,2025-08-07
+MO,MO,"Altria Group, Inc.",111628751239.0,USD,Consumer non-durables,Tobacco,NYSE,Neutral,2025-10-30,2025-07-30
+MOH,MOH,Molina Healthcare Inc,9473076067.0,USD,Health services,Managed health care,NYSE,Neutral,2025-10-22,2025-07-23
+MOS,MOS,Mosaic Company (The),10568698028.0,USD,Process industries,Chemicals: agricultural,NYSE,Buy,2025-11-11,2025-08-05
+MPC,MPC,Marathon Petroleum Corporation,52750564870.0,USD,Energy minerals,Oil refining/Marketing,NYSE,Buy,2025-11-04,2025-08-05
+MPWR,MPWR,"Monolithic Power Systems, Inc.",40738850128.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-10-29,2025-07-31
+MRK,MRK,"Merck & Company, Inc.",212286589098.0,USD,Health technology,Pharmaceuticals: major,NYSE,Buy,2025-10-30,2025-07-29
+MRNA,MRNA,"Moderna, Inc.",9621941852.0,USD,Health technology,Biotechnology,NASDAQ,Neutral,2025-10-30,2025-08-01
+MS,MS,Morgan Stanley,237806130188.0,USD,Finance,Investment managers,NYSE,Buy,2025-10-15,2025-07-16
+MSCI,MSCI,MSCI Inc.,44208815312.0,USD,Technology services,Data processing services,NYSE,Buy,2025-10-28,2025-07-22
+MSFT,MSFT,Microsoft Corporation,3731746975137.0,USD,Technology services,Packaged software,NASDAQ,Strong buy,2025-10-28,2025-07-30
+MSI,MSI,"Motorola Solutions, Inc.",75908066781.0,USD,Electronic technology,Telecommunications equipment,NYSE,Buy,2025-10-30,2025-08-07
+MTB,MTB,M&T Bank Corporation,31279212549.0,USD,Finance,Regional banks,NYSE,Buy,2025-10-16,2025-07-16
+MTCH,MTCH,"Match Group, Inc.",8975205885.0,USD,Technology services,Internet software/Services,NASDAQ,Buy,2025-11-04,2025-08-05
+MTD,MTD,"Mettler-Toledo International, Inc.",26465027838.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-11-06,2025-07-31
+MU,MU,"Micron Technology, Inc.",130378076721.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-09-25,2025-06-25
+NCLH,NCLH,Norwegian Cruise Line Holdings Ltd.,11189962780.0,USD,Consumer services,Hotels/Resorts/Cruise lines,NYSE,Buy,2025-10-29,2025-07-31
+NDAQ,NDAQ,"Nasdaq, Inc.",54453167923.0,USD,Finance,Investment banks/Brokers,NASDAQ,Buy,2025-10-15,2025-07-24
+NDSN,NDSN,Nordson Corporation,12717770706.0,USD,Producer manufacturing,Industrial machinery,NASDAQ,Buy,2025-12-10,2025-08-20
+NEE,NEE,"NextEra Energy, Inc.",154117459968.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-22,2025-07-23
+NEM,NEM,Newmont Corporation,79560712615.0,USD,Non-energy minerals,Precious metals,NYSE,Buy,2025-10-23,2025-07-24
+NFLX,NFLX,"Netflix, Inc.",520997910120.0,USD,Technology services,Internet software/Services,NASDAQ,Buy,2025-10-15,2025-07-17
+NI,NI,NiSource Inc,19954835869.0,USD,Utilities,Gas distributors,NYSE,Buy,2025-10-29,2025-08-06
+NKE,NKE,"Nike, Inc.",116158481961.0,USD,Consumer non-durables,Apparel/Footwear,NYSE,Buy,2025-09-30,2025-06-26
+NOC,NOC,Northrop Grumman Corporation,84910375611.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-10-23,2025-07-22
+NOW,NOW,"ServiceNow, Inc.",179849274414.0,USD,Technology services,Packaged software,NYSE,Strong buy,2025-10-22,2025-07-23
+NRG,NRG,"NRG Energy, Inc.",28285385261.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-11-06,2025-08-06
+NSC,NSC,Norfolk Southern Corporation,62072109706.0,USD,Transportation,Railroads,NYSE,Buy,2025-10-22,2025-07-29
+NTAP,NTAP,"NetApp, Inc.",21892820530.0,USD,Electronic technology,Computer peripherals,NASDAQ,Buy,2025-08-27,2025-05-29
+NTRS,NTRS,Northern Trust Corporation,25217933233.0,USD,Finance,Investment managers,NASDAQ,Neutral,2025-10-22,2025-07-23
+NUE,NUE,Nucor Corporation,33959768560.0,USD,Non-energy minerals,Steel,NYSE,Buy,2025-10-27,2025-07-28
+NUKZ,NUKZ,,,,,,,,,
+NVDA,NVDA,NVIDIA Corporation,4435188104248.0,USD,Electronic technology,Semiconductors,NASDAQ,Strong buy,2025-08-27,2025-05-28
+NVR,NVR,"NVR, Inc.",23154272277.0,USD,Consumer durables,Homebuilding,NYSE,Neutral,2025-10-28,2025-07-23
+NWS,NWS,News Corporation,17656299544.0,USD,Consumer services,Publishing: newspapers,NASDAQ,Buy,2025-11-06,2025-08-05
+NWSA,NWSA,News Corporation,17656299544.0,USD,Consumer services,Publishing: newspapers,NASDAQ,Buy,2025-11-06,2025-08-05
+NXPI,NXPI,NXP Semiconductors N.V.,59957894474.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-10-27,2025-07-21
+O,O,Realty Income Corporation,53148614064.0,USD,Finance,Real estate investment trusts,NYSE,Neutral,2025-11-10,2025-08-06
+ODFL,ODFL,"Old Dominion Freight Line, Inc.",32466772844.0,USD,Transportation,Trucking,NASDAQ,Neutral,2025-10-22,2025-07-30
+OIH,OIH,,,,,,,,,
+OKE,OKE,"ONEOK, Inc.",46866438986.0,USD,Industrial services,Oil & gas pipelines,NYSE,Buy,2025-11-04,2025-08-04
+OMC,OMC,Omnicom Group Inc.,15092950690.0,USD,Commercial services,Advertising/Marketing services,NYSE,Buy,2025-10-21,2025-07-15
+ON,ON,ON Semiconductor Corporation,20853584897.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-11-03,2025-08-04
+ORCL,ORCL,Oracle Corporation,657856797618.0,USD,Technology services,Packaged software,NYSE,Buy,2025-09-15,2025-06-11
+ORLY,ORLY,"O'Reilly Automotive, Inc.",87547890188.0,USD,Retail trade,Specialty stores,NASDAQ,Buy,2025-10-22,2025-07-23
+OTIS,OTIS,Otis Worldwide Corporation,34392602427.0,USD,Industrial services,Engineering & construction,NYSE,Neutral,2025-10-22,2025-07-23
+OXY,OXY,Occidental Petroleum Corporation,45323607373.0,USD,Energy minerals,Integrated oil,NYSE,Neutral,2025-11-18,2025-08-06
+PANW,PANW,"Palo Alto Networks, Inc.",122968552076.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-11-13,2025-08-18
+PAYC,PAYC,"Paycom Software, Inc.",13078419826.0,USD,Technology services,Packaged software,NYSE,Neutral,2025-11-04,2025-08-06
+PAYX,PAYX,"Paychex, Inc.",49728060839.0,USD,Technology services,Data processing services,NASDAQ,Neutral,2025-09-24,2025-06-25
+PBW,PBW,,,,,,,,,
+PCAR,PCAR,PACCAR Inc.,52641615204.0,USD,Producer manufacturing,Trucks/Construction/Farm machinery,NASDAQ,Neutral,2025-10-28,2025-07-22
+PCG,PCG,Pacific Gas & Electric Co.,33077453324.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-29,2025-07-31
+PEG,PEG,Public Service Enterprise Group Incorporated,41658186710.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-11-04,2025-08-05
+PEP,PEP,"PepsiCo, Inc.",201254358765.0,USD,Consumer non-durables,Food: specialty/candy,NASDAQ,Neutral,2025-10-09,2025-07-17
+PFE,PFE,"Pfizer, Inc.",141683913735.0,USD,Health technology,Pharmaceuticals: major,NYSE,Buy,2025-11-04,2025-08-05
+PFG,PFG,Principal Financial Group Inc,17943997927.0,USD,Finance,Investment managers,NASDAQ,Neutral,2025-10-23,2025-07-28
+PG,PG,Procter & Gamble Company (The),365339698509.0,USD,Consumer non-durables,Household/Personal care,NYSE,Buy,2025-10-15,2025-07-29
+PGR,PGR,Progressive Corporation (The),144224875578.0,USD,Finance,Multi-line insurance,NYSE,Buy,2025-10-09,2025-07-16
+PH,PH,Parker-Hannifin Corporation,96474796963.0,USD,Electronic technology,Electronic equipment/Instruments,NYSE,Buy,2025-11-06,2025-08-07
+PHM,PHM,"PulteGroup, Inc.",25871632223.0,USD,Consumer durables,Homebuilding,NYSE,Buy,2025-10-28,2025-07-22
+PKG,PKG,Packaging Corporation of America,19041309546.0,USD,Process industries,Containers/Packaging,NYSE,Neutral,2025-10-27,2025-07-23
+PLD,PLD,"Prologis, Inc.",105841290045.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-21,2025-07-16
+PLTR,PLTR,Palantir Technologies Inc.,381639044047.0,USD,Technology services,Packaged software,NASDAQ,Neutral,2025-11-10,2025-08-04
+PM,PM,Philip Morris International Inc,259452302369.0,USD,Consumer non-durables,Tobacco,NYSE,Buy,2025-10-21,2025-07-22
+PNC,PNC,"PNC Financial Services Group, Inc. (The)",80124050764.0,USD,Finance,Major banks,NYSE,Buy,2025-10-15,2025-07-16
+PNR,PNR,Pentair plc.,17896373596.0,USD,Producer manufacturing,Industrial machinery,NYSE,Buy,2025-10-28,2025-07-22
+PNW,PNW,Pinnacle West Capital Corporation,10743674263.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-31,2025-08-06
+PODD,PODD,Insulet Corporation,23358353064.0,USD,Health technology,Medical specialties,NASDAQ,Buy,2025-10-30,2025-08-07
+POOL,POOL,Pool Corporation,11881307704.0,USD,Distribution services,Wholesale distributors,NASDAQ,Buy,2025-10-16,2025-07-24
+PPG,PPG,"PPG Industries, Inc.",25407048588.0,USD,Process industries,Industrial specialties,NYSE,Buy,2025-10-15,2025-07-29
+PPL,PPL,PPL Corporation,27007097589.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-30,2025-07-31
+PRU,PRU,"Prudential Financial, Inc.",38501759033.0,USD,Finance,Life/Health insurance,NYSE,Neutral,2025-11-04,2025-07-30
+PSA,PSA,Public Storage,50684820263.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-11-03,2025-07-30
+PSKY,PSKY,Paramount Skydance Corporation,16864108756.0,USD,Consumer services,Cable/Satellite TV,NASDAQ,Sell,2025-10-30,2025-07-31
+PSX,PSX,Phillips 66,52491696905.0,USD,Energy minerals,Oil refining/Marketing,NYSE,Buy,2025-10-24,2025-07-25
+PTC,PTC,PTC Inc.,25465532751.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-10-29,2025-07-30
+PWR,PWR,"Quanta Services, Inc.",56562854267.0,USD,Industrial services,Engineering & construction,NYSE,Buy,2025-10-30,2025-07-31
+PYPL,PYPL,"PayPal Holdings, Inc.",67048453381.0,USD,Commercial services,Miscellaneous commercial services,NASDAQ,Buy,2025-10-28,2025-07-29
+QCOM,QCOM,QUALCOMM Incorporated,171744428024.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-11-05,2025-07-30
+QQQ,QQQ,,,,,,,,,
+QTUM,QTUM,,,,,,,,,
+RCL,RCL,Royal Caribbean Cruises Ltd.,96085564037.0,USD,Consumer services,Hotels/Resorts/Cruise lines,NYSE,Buy,2025-10-30,2025-07-29
+REG,REG,Regency Centers Corporation,26246157666.0,USD,Finance,Real estate investment trusts,NASDAQ,Buy,2025-10-28,2025-07-29
+REGN,REGN,"Regeneron Pharmaceuticals, Inc.",62283522712.0,USD,Health technology,Pharmaceuticals: major,NASDAQ,Buy,2025-10-30,2025-08-01
+RF,RF,Regions Financial Corporation,24163710039.0,USD,Finance,Major banks,NYSE,Buy,2025-10-17,2025-07-18
+RJF,RJF,"Raymond James Financial, Inc.",33488533304.0,USD,Finance,Investment managers,NYSE,Buy,2025-10-28,2025-07-23
+RL,RL,Ralph Lauren Corporation,17765870809.0,USD,Consumer non-durables,Apparel/Footwear,NYSE,Buy,2025-11-06,2025-08-07
+RMD,RMD,ResMed Inc.,41753122088.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-10-23,2025-07-31
+ROBO,ROBO,,,,,,,,,
+ROK,ROK,"Rockwell Automation, Inc.",39989542721.0,USD,Producer manufacturing,Electrical products,NYSE,Buy,2025-10-29,2025-08-06
+ROL,ROL,"Rollins, Inc.",27367622219.0,USD,Commercial services,Miscellaneous commercial services,NYSE,Buy,2025-10-22,2025-07-23
+ROP,ROP,"Roper Technologies, Inc.",56438070753.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-10-22,2025-07-21
+ROST,ROST,"Ross Stores, Inc.",48514371739.0,USD,Retail trade,Apparel/Footwear retail,NASDAQ,Buy,2025-11-13,2025-08-21
+RSG,RSG,"Republic Services, Inc.",73161533746.0,USD,Industrial services,Environmental services,NYSE,Buy,2025-10-23,2025-07-29
+RTX,RTX,RTX Corporation,213591136018.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-10-28,2025-07-22
+RVTY,RVTY,"Revvity, Inc.",10589301720.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-11-04,2025-07-28
+SBAC,SBAC,SBA Communications Corporation,23498822825.0,USD,Finance,Real estate investment trusts,NASDAQ,Buy,2025-11-03,2025-08-04
+SBUX,SBUX,Starbucks Corporation,98472313648.0,USD,Consumer services,Restaurants,NASDAQ,Buy,2025-10-30,2025-07-29
+SCHW,SCHW,Charles Schwab Corporation (The),176511914853.0,USD,Finance,Investment banks/Brokers,NYSE,Buy,2025-10-20,2025-07-18
+SHW,SHW,Sherwin-Williams Company (The),91370683747.0,USD,Process industries,Industrial specialties,NYSE,Buy,2025-10-28,2025-07-22
+SIL,SIL,,,,,,,,,
+SJM,SJM,The J.M. Smucker Company,11797081272.0,USD,Consumer non-durables,Food: specialty/candy,NYSE,Buy,2025-12-02,2025-08-27
+SLB,SLB,Schlumberger N.V.,53010641539.0,USD,Industrial services,Contract drilling,NYSE,Strong buy,2025-10-17,2025-07-18
+SMCI,SMCI,"Super Micro Computer, Inc.",26474830296.0,USD,Electronic technology,Computer processing hardware,NASDAQ,Neutral,2025-11-04,2025-08-05
+SMH,SMH,,,,,,,,,
+SNA,SNA,Snap-On Incorporated,17202958911.0,USD,Consumer durables,Tools & hardware,NYSE,Neutral,2025-10-16,2025-07-17
+SNPS,SNPS,"Synopsys, Inc.",110286009521.0,USD,Technology services,Packaged software,NASDAQ,Strong buy,2025-09-09,2025-05-28
+SO,SO,Southern Company (The),102403405019.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-10-30,2025-07-31
+SOLV,SOLV,Solventum Corporation,12643438213.0,USD,Health services,Medical/Nursing services,NYSE,Buy,2025-11-06,2025-08-07
+SPG,SPG,"Simon Property Group, Inc.",57732297386.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-11-03,2025-08-04
+SPGI,SPGI,S&P Global Inc.,168623291494.0,USD,Commercial services,Financial publishing/Services,NYSE,Strong buy,2025-10-23,2025-07-31
+SPHB,SPHB,,,,,,,,,
+SPLV,SPLV,,,,,,,,,
+SPY,SPY,,,,,,,,,
+SRE,SRE,DBA Sempra,53359193066.0,USD,Utilities,Gas distributors,NYSE,Buy,2025-10-31,2025-08-07
+STE,STE,STERIS plc (Ireland),24482795571.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-11-10,2025-08-06
+STLD,STLD,"Steel Dynamics, Inc.",19391259991.0,USD,Non-energy minerals,Steel,NASDAQ,Buy,2025-10-15,2025-07-21
+STT,STT,State Street Corporation,32857594542.0,USD,Finance,Investment banks/Brokers,NYSE,Buy,2025-10-21,2025-07-15
+STX,STX,Seagate Technology Holdings PLC,35142776706.0,USD,Electronic technology,Computer peripherals,NASDAQ,Buy,2025-10-22,2025-07-29
+STZ,STZ,"Constellation Brands, Inc.",27919155026.0,USD,Consumer non-durables,Beverages: alcoholic,NYSE,Buy,2025-10-02,2025-07-01
+SW,SW,Smurfit WestRock plc,24098748321.0,USD,Process industries,Containers/Packaging,NYSE,Buy,2025-10-29,2025-07-30
+SWK,SWK,"Stanley Black & Decker, Inc.",11638829775.0,USD,Consumer durables,Tools & hardware,NYSE,Neutral,2025-10-23,2025-07-29
+SWKS,SWKS,"Skyworks Solutions, Inc.",11231513687.0,USD,Electronic technology,Semiconductors,NASDAQ,Neutral,2025-10-30,2025-08-05
+SYF,SYF,Synchrony Financial,28030814918.0,USD,Finance,Finance/Rental/Leasing,NYSE,Buy,2025-10-28,2025-07-22
+SYK,SYK,Stryker Corporation,150755237212.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-10-30,2025-07-31
+SYY,SYY,Sysco Corporation,38080047425.0,USD,Distribution services,Food distributors,NYSE,Buy,2025-11-04,2025-07-29
+T,T,AT&T Inc.,204215012978.0,USD,Communications,Wireless telecommunications,NYSE,Buy,2025-10-16,2025-07-23
+TAP,TAP,Molson Coors Beverage Company,9974977559.0,USD,Consumer non-durables,Beverages: alcoholic,NYSE,Neutral,2025-10-29,2025-08-05
+TDG,TDG,Transdigm Group Inc.,79642109277.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-11-06,2025-08-05
+TDY,TDY,Teledyne Technologies Incorporated,25543447099.0,USD,Electronic technology,Aerospace & defense,NYSE,Strong buy,2025-10-22,2025-07-23
+TECH,TECH,Bio-Techne Corp,8833661419.0,USD,Health technology,Biotechnology,NASDAQ,Buy,2025-11-04,2025-08-06
+TEL,TEL,TE Connectivity plc,61138079560.0,USD,Electronic technology,Semiconductors,NYSE,Buy,2025-10-29,2025-07-23
+TER,TER,"Teradyne, Inc.",18866916809.0,USD,Electronic technology,Electronic production equipment,NASDAQ,Buy,2025-10-28,2025-07-29
+TFC,TFC,Truist Financial Corporation,59778215763.0,USD,Finance,Regional banks,NYSE,Buy,2025-10-17,2025-07-18
+TGT,TGT,Target Corporation,43669107480.0,USD,Retail trade,Specialty stores,NYSE,Neutral,2025-11-12,2025-08-20
+TJX,TJX,"TJX Companies, Inc. (The)",152482332117.0,USD,Retail trade,Apparel/Footwear retail,NYSE,Buy,2025-11-19,2025-08-20
+TKO,TKO,"TKO Group Holdings, Inc.",36716395802.0,USD,Consumer services,Movies/Entertainment,NYSE,Buy,2025-11-05,2025-08-06
+TLT,TLT,,,,,,,,,
+TMO,TMO,Thermo Fisher Scientific Inc,184455973299.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-10-22,2025-07-23
+TMUS,TMUS,"T-Mobile US, Inc.",282705235628.0,USD,Communications,Wireless telecommunications,NASDAQ,Buy,2025-10-23,2025-07-23
+TPL,TPL,Texas Pacific Land Corporation,20942372672.0,USD,Miscellaneous,Investment trusts/Mutual funds,NYSE,Strong buy,2025-10-29,2025-08-06
+TPR,TPR,"Tapestry, Inc.",20958048574.0,USD,Retail trade,Apparel/Footwear retail,NYSE,Buy,2025-11-06,2025-08-14
+TRGP,TRGP,"Targa Resources, Inc.",35093489577.0,USD,Utilities,Gas distributors,NYSE,Strong buy,2025-10-30,2025-08-07
+TRMB,TRMB,Trimble Inc.,19380204163.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-10-29,2025-08-06
+TROW,TROW,"T. Rowe Price Group, Inc.",23852285970.0,USD,Finance,Investment managers,NASDAQ,Sell,2025-10-23,2025-08-01
+TRV,TRV,"The Travelers Companies, Inc.",60986511951.0,USD,Finance,Property/Casualty insurance,NYSE,Buy,2025-10-15,2025-07-17
+TSCO,TSCO,Tractor Supply Company,32692717187.0,USD,Retail trade,Specialty stores,NASDAQ,Buy,2025-10-16,2025-07-24
+TSLA,TSLA,"Tesla, Inc.",1134293684211.0,USD,Consumer durables,Motor vehicles,NASDAQ,Neutral,2025-10-15,2025-07-23
+TSN,TSN,"Tyson Foods, Inc.",19960019978.0,USD,Consumer non-durables,Food: meat/fish/dairy,NYSE,Neutral,2025-11-17,2025-08-04
+TT,TT,Trane Technologies plc,94833824209.0,USD,Producer manufacturing,Industrial machinery,NYSE,Neutral,2025-10-29,2025-07-30
+TTD,TTD,"The Trade Desk, Inc.",25532600462.0,USD,Technology services,Packaged software,NASDAQ,Buy,2025-11-06,2025-08-07
+TTWO,TTWO,"Take-Two Interactive Software, Inc.",42579416341.0,USD,Technology services,Packaged software,NASDAQ,Strong buy,2025-11-06,2025-08-07
+TXN,TXN,Texas Instruments Incorporated,187264078020.0,USD,Electronic technology,Semiconductors,NASDAQ,Buy,2025-10-28,2025-07-22
+TXT,TXT,Textron Inc.,14502346153.0,USD,Electronic technology,Aerospace & defense,NYSE,Buy,2025-10-23,2025-07-24
+TYL,TYL,"Tyler Technologies, Inc.",23671997045.0,USD,Technology services,Data processing services,NYSE,Buy,2025-10-22,2025-07-30
+UAL,UAL,"United Airlines Holdings, Inc.",33710221245.0,USD,Transportation,Airlines,NASDAQ,Strong buy,2025-10-21,2025-07-16
+UBER,UBER,"Uber Technologies, Inc.",201305464678.0,USD,Transportation,Other transportation,NYSE,Strong buy,2025-10-30,2025-08-06
+UDR,UDR,"UDR, Inc.",12839703941.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-22,2025-07-30
+UHS,UHS,"Universal Health Services, Inc.",11544969939.0,USD,Health services,Hospital/Nursing management,NYSE,Buy,2025-10-22,2025-07-28
+ULTA,ULTA,"Ulta Beauty, Inc.",23644085505.0,USD,Retail trade,Specialty stores,NASDAQ,Buy,2025-08-28,2025-05-29
+UNH,UNH,UnitedHealth Group Incorporated,272091526540.0,USD,Health services,Managed health care,NYSE,Buy,2025-10-21,2025-07-29
+UNP,UNP,Union Pacific Corporation,132093687179.0,USD,Transportation,Railroads,NYSE,Buy,2025-10-16,2025-07-24
+UPS,UPS,"United Parcel Service, Inc.",74128435100.0,USD,Transportation,Air freight/Couriers,NYSE,Buy,2025-10-28,2025-07-29
+URA,URA,,,,,,,,,
+URI,URI,"United Rentals, Inc.",60718814507.0,USD,Finance,Finance/Rental/Leasing,NYSE,Buy,2025-10-22,2025-07-23
+USB,USB,U.S. Bancorp,75584121263.0,USD,Finance,Regional banks,NYSE,Buy,2025-10-16,2025-07-17
+UUP,UUP,,,,,,,,,
+V,V,Visa Inc.,676583677317.0,USD,Finance,Finance/Rental/Leasing,NYSE,Buy,2025-10-28,2025-07-29
+VEGI,VEGI,,,,,,,,,
+VGT,VGT,,,,,,,,,
+VICI,VICI,VICI Properties Inc.,35670068984.0,USD,Finance,Real estate investment trusts,NYSE,Strong buy,2025-10-22,2025-07-30
+VLO,VLO,Valero Energy Corporation,45650275759.0,USD,Energy minerals,Oil refining/Marketing,NYSE,Buy,2025-10-23,2025-07-24
+VLTO,VLTO,Veralto Corp,26580508034.0,USD,Producer manufacturing,Industrial machinery,NYSE,Buy,2025-10-22,2025-07-28
+VMC,VMC,Vulcan Materials Company (Holding Company),38474557228.0,USD,Non-energy minerals,Construction materials,NYSE,Buy,2025-10-29,2025-07-31
+VRSK,VRSK,"Verisk Analytics, Inc.",37486922138.0,USD,Technology services,Data processing services,NASDAQ,Buy,2025-11-04,2025-07-30
+VRSN,VRSN,"VeriSign, Inc.",25219384902.0,USD,Technology services,Internet software/Services,NASDAQ,Neutral,2025-10-23,2025-07-24
+VRTX,VRTX,Vertex Pharmaceuticals Incorporated,99269332125.0,USD,Health technology,Pharmaceuticals: major,NASDAQ,Buy,2025-10-29,2025-08-04
+VST,VST,Vistra Corp.,66110617721.0,USD,Utilities,Electric utilities,NYSE,Buy,2025-11-05,2025-08-07
+VTR,VTR,"Ventas, Inc.",31499651828.0,USD,Finance,Real estate investment trusts,NYSE,Strong buy,2025-10-30,2025-07-30
+VTRS,VTRS,Viatris Inc.,12136728074.0,USD,Health technology,Pharmaceuticals: major,NASDAQ,Neutral,2025-11-10,2025-08-07
+VTV,VTV,,,,,,,,,
+VUG,VUG,,,,,,,,,
+VZ,VZ,Verizon Communications Inc.,185349651726.0,USD,Communications,Wireless telecommunications,NYSE,Buy,2025-10-21,2025-07-21
+WAB,WAB,Westinghouse Air Brake Technologies Corporation,33393991753.0,USD,Producer manufacturing,Trucks/Construction/Farm machinery,NYSE,Buy,2025-10-22,2025-07-24
+WAT,WAT,Waters Corporation,17627476126.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-11-04,2025-08-04
+WBD,WBD,"Warner Bros. Discovery, Inc. - Series A",29214112630.0,USD,Consumer services,Cable/Satellite TV,NASDAQ,Buy,2025-11-06,2025-08-07
+WDAY,WDAY,"Workday, Inc.",59508961304.0,USD,Technology services,Information technology services,NASDAQ,Buy,2025-12-02,2025-08-21
+WDC,WDC,Western Digital Corporation,27653161799.0,USD,Electronic technology,Computer peripherals,NASDAQ,Buy,2025-10-23,2025-07-30
+WEC,WEC,"WEC Energy Group, Inc.",34491203964.0,USD,Utilities,Electric utilities,NYSE,Neutral,2025-10-30,2025-07-30
+WELL,WELL,Welltower Inc.,110771805249.0,USD,Finance,Real estate investment trusts,NYSE,Strong buy,2025-11-03,2025-07-28
+WFC,WFC,Wells Fargo & Company,261112495967.0,USD,Finance,Major banks,NYSE,Buy,2025-10-14,2025-07-15
+WM,WM,"Waste Management, Inc.",90737530090.0,USD,Industrial services,Environmental services,NYSE,Buy,2025-10-22,2025-07-28
+WMB,WMB,"Williams Companies, Inc. (The)",69765864348.0,USD,Industrial services,Oil & gas pipelines,NYSE,Buy,2025-11-03,2025-08-04
+WMT,WMT,Walmart Inc.,766519170253.0,USD,Retail trade,Specialty stores,NYSE,Strong buy,2025-11-20,2025-08-21
+WRB,WRB,W.R. Berkley Corporation,26948753578.0,USD,Finance,Multi-line insurance,NYSE,Neutral,2025-10-27,2025-07-21
+WSM,WSM,"Williams-Sonoma, Inc.",24345005537.0,USD,Retail trade,Specialty stores,NYSE,Buy,2025-08-27,2025-05-22
+WST,WST,"West Pharmaceutical Services, Inc.",17581341145.0,USD,Health technology,Medical specialties,NYSE,Buy,2025-10-23,2025-07-24
+WTW,WTW,Willis Towers Watson Public Limited Company,32580051857.0,USD,Finance,Insurance brokers/Services,NASDAQ,Buy,2025-10-23,2025-07-31
+WY,WY,Weyerhaeuser Company,18881942567.0,USD,Finance,Real estate investment trusts,NYSE,Buy,2025-10-23,2025-07-24
+WYNN,WYNN,"Wynn Resorts, Limited",12381525619.0,USD,Consumer services,Casinos/Gaming,NASDAQ,Buy,2025-11-06,2025-08-07
+XEL,XEL,Xcel Energy Inc.,42902057706.0,USD,Utilities,Electric utilities,NASDAQ,Buy,2025-10-23,2025-07-31
+XLB,XLB,,,,,,,,,
+XLC,XLC,,,,,,,,,
+XLE,XLE,,,,Energy,,,,,
+XLF,XLF,,,,Financial,,,,,
+XLI,XLI,,,,,,,,,
+XLK,XLK,,, ,Health,,,,,
+XLP,XLP,,,,,,,,,
+XLRE,XLRE,,,,,,,,,
+XLU,XLU,,,,,,,,,
+XLV,XLV,,,,,,,,,
+XLY,XLY,,,,,,,,,
+XOM,XOM,Exxon Mobil Corporation,475309406762.0,USD,Energy minerals,Integrated oil,NYSE,Buy,2025-10-24,2025-08-01
+XYL,XYL,Xylem Inc.,34890343102.0,USD,Producer manufacturing,Industrial machinery,NYSE,Buy,2025-11-04,2025-07-31
+XYZ,XYZ,"Block, Inc.",48023182336.0,USD,Commercial services,Miscellaneous commercial services,NYSE,Buy,2025-10-30,2025-08-07
+YUM,YUM,"Yum! Brands, Inc.",40806069964.0,USD,Consumer services,Restaurants,NYSE,Buy,2025-11-04,2025-08-05
+ZBH,ZBH,"Zimmer Biomet Holdings, Inc.",21303241632.0,USD,Health technology,Medical specialties,NYSE,Neutral,2025-10-29,2025-08-07
+ZBRA,ZBRA,Zebra Technologies Corporation,16299938725.0,USD,Electronic technology,Computer processing hardware,NASDAQ,Buy,2025-10-28,2025-08-05
+ZTS,ZTS,Zoetis Inc.,68600366606.0,USD,Health technology,Pharmaceuticals: major,NYSE,Buy,2025-10-30,2025-08-05
+^BFX,^BFX,,,,,,,,,
+^BUK100P,^BUK100P,,,,,,,,,
+^DJI,^DJI,,,,,,,,,
+^FCHI,^FCHI,,,,,,,,,
+^FTSE,^FTSE,,,,,,,,,
+^GDAXI,^GDAXI,,,,,,,,,
+^GSPC,^GSPC,,,,,,,,,
+^HSI,^HSI,,,,,,,,,
+^IXIC,^IXIC,,,,,,,,,
+^N100,^N100,,,,,,,,,
+^NYA,^NYA,,,,,,,,,
+^RUT,^RUT,,,,,,,,,
+^STI,^STI,,,,,,,,,
+^STOXX50E,^STOXX50E,,,,,,,,,
+^VIX,^VIX,,,,,,,,,
+^XAX,^XAX,,,,,,,,,
