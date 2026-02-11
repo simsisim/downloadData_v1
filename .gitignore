@@ -1,1 +1,3 @@
-data/market_data/
+/data/market_data
+/data/market_data_tw
+/data/tickers
