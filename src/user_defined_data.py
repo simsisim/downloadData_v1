@@ -16,11 +16,17 @@ class UserConfiguration:
     # Historical data collection
     yf_hist_data: bool = True
     yf_daily_data: bool = True
-    yf_weekly_data: bool = True  
+    yf_weekly_data: bool = True
     yf_monthly_data: bool = True
+    tw_hist_data: bool = False
+    tw_daily_data: bool = True
+    tw_weekly_data: bool = False
+    tw_monthly_data: bool = False
     tw_intraday_data: bool = False
     tw_intraday_file: str = "intraday_data.csv"
-    
+    tw_files_path: str = "data/tw_files"
+    user_input_path: str = "user_input"
+
     # Financial data enrichment
     fin_data_enrich: bool = True
     yf_fin_data: bool = True
@@ -110,7 +116,7 @@ def _read_ticker_filenames(file_path: str) -> dict:
     return ticker_filenames
 
 
-def read_user_data(file_path: str = 'user_data.csv') -> UserConfiguration:
+def read_user_data(file_path: str = 'user_input/user_data.csv') -> UserConfiguration:
     """
     Reads user configuration from the restructured CSV file.
     
@@ -145,8 +151,14 @@ def read_user_data(file_path: str = 'user_data.csv') -> UserConfiguration:
             'YF_daily_data': ('yf_daily_data', parse_boolean),
             'YF_weekly_data': ('yf_weekly_data', parse_boolean),
             'YF_monthly_data': ('yf_monthly_data', parse_boolean),
+            'TW_hist_data': ('tw_hist_data', parse_boolean),
+            'TW_daily_data': ('tw_daily_data', parse_boolean),
+            'TW_weekly_data': ('tw_weekly_data', parse_boolean),
+            'TW_monthly_data': ('tw_monthly_data', parse_boolean),
             'TW_intraday_data': ('tw_intraday_data', parse_boolean),
             'TW_intraday_file': ('tw_intraday_file', str),
+            'TW_files_path': ('tw_files_path', str),
+            'user_input_path': ('user_input_path', str),
             'fin_data_enrich': ('fin_data_enrich', parse_boolean),
             'YF_fin_data': ('yf_fin_data', parse_boolean),
             'TW_fin_data': ('tw_fin_data', parse_boolean),

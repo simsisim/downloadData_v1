@@ -68,12 +68,16 @@ class TradingViewTickerProcessor:
         """Load TradingView universe file."""
         # First try to find the file in tickers directory
         universe_path = os.path.join(self.tickers_dir, self.universe_file)
-        
-        # If not found, try root directory and copy it
+
+        # If not found, try user_input directory and copy it
         if not os.path.exists(universe_path):
-            root_path = self.universe_file  # Try root directory
+            # Import config to get user_input_path
+            from src.user_defined_data import read_user_data
+            config = read_user_data()
+            root_path = os.path.join(config.user_input_path, self.universe_file)
+
             if os.path.exists(root_path):
-                print(f"📁 Found TradingView universe in root: {root_path}")
+                print(f"📁 Found TradingView universe in user_input: {root_path}")
                 print(f"🔄 Copying to tickers directory: {universe_path}")
                 
                 # Read from root and save to tickers directory
@@ -100,8 +104,8 @@ class TradingViewTickerProcessor:
                 df_temp.to_csv(universe_path, index=False)
                 print(f"✅ File copied and processed: {universe_path}")
             else:
-                print(f"❌ TradingView universe file not found in root: {root_path}")
-                raise FileNotFoundError(f"TradingView universe file not found: {root_path}")
+                print(f"❌ TradingView universe file not found at: {root_path}")
+                raise FileNotFoundError(f"TradingView universe file not found at: {root_path}")
         
         try:
             df = pd.read_csv(universe_path)

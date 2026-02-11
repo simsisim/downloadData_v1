@@ -1,0 +1,174 @@
+Symbol,Description,Focus,Exchange,Index tracked,Asset class,Focus,Focus
+SPY,SPDR S&P 500 ETF Trust,Large cap,AMEX,S&P 500,Equity,Large cap,Large cap
+GLD,SPDR Gold Shares,Gold,AMEX,LBMA Gold Price PM ($/ozt),Commodities,Gold,Gold
+XLK,Technology Select Sector SPDR Fund,Information technology,AMEX,S&P Technology Select Sector,Equity,Information technology,Information technology
+SPLG,SPDR Portfolio S&P 500 ETF,Large cap,AMEX,S&P 500,Equity,Large cap,Large cap
+XLF,Financial Select Sector SPDR Fund,Financials,AMEX,S&P Financial Select Sector,Equity,Financials,Financials
+SPYG,SPDR Portfolio S&P 500 Growth ETF,Large cap,AMEX,S&P 500 Growth,Equity,Large cap,Large cap
+BIL,SPDR Bloomberg 1-3 Month T-Bill ETF,Investment grade,AMEX,Bloomberg US Treasury - Bills (1-3 M),Fixed income,Investment grade,Investment grade
+DIA,SPDR Dow Jones Industrial Average ETF Trust,Large cap,AMEX,DJ Industrial Average,Equity,Large cap,Large cap
+XLV,Health Care Select Sector SPDR Fund,Health care,AMEX,S&P Health Care Select Sector,Equity,Health care,Health care
+SPDW,SPDR Portfolio Developed World ex-US ETF,Total market,AMEX,S&P Developed x United States BMI,Equity,Total market,Total market
+SPYV,SPDR Portfolio S&P 500 Value ETF,Large cap,AMEX,S&P 500 Value,Equity,Large cap,Large cap
+XLC,Communication Services Select Sector SPDR Fund,Communication services,AMEX,S&P Communication Services Select Sector Index,Equity,Communication services,Communication services
+XLE,Energy Select Sector SPDR Fund,Energy,AMEX,S&P Energy Select Sector,Equity,Energy,Energy
+XLY,Consumer Discretionary Select Sector SPDR Fund,Consumer discretionary,AMEX,S&P Consumer Discretionary Select Sector,Equity,Consumer discretionary,Consumer discretionary
+XLI,Industrial Select Sector SPDR Fund,Industrials,AMEX,S&P Industrial Select Sector,Equity,Industrials,Industrials
+MDY,SPDR S&P Midcap 400 ETF Trust,Mid cap,AMEX,S&P Mid Cap 400,Equity,Mid cap,Mid cap
+GLDM,SPDR Gold Minishares Trust of beneficial interest,Gold,AMEX,LBMA Gold Price PM ($/ozt),Commodities,Gold,Gold
+XLU,Utilities Select Sector SPDR Fund,Utilities,AMEX,S&P Utilities Select Sector,Equity,Utilities,Utilities
+SDY,SPDR S&P Dividend ETF,High dividend yield,AMEX,S&P High Yield Dividend Aristocrats,Equity,High dividend yield,High dividend yield
+XLP,Consumer Staples Select Sector SPDR Fund,Consumer staples,AMEX,S&P Consumer Staples Select Sector,Equity,Consumer staples,Consumer staples
+SPMD,SPDR Portfolio S&P 400 Mid Cap ETF,Mid cap,AMEX,S&P Mid Cap 400,Equity,Mid cap,Mid cap
+SPEM,SPDR Portfolio Emerging Markets ETF,Total market,AMEX,S&P Emerging Markets BMI,Equity,Total market,Total market
+SPSM,SPDR Portfolio S&P 600 Small Cap ETF,Small cap,AMEX,S&P Small Cap 600,Equity,Small cap,Small cap
+SPTL,SPDR Portfolio Long Term Treasury ETF,Investment grade,AMEX,Bloomberg US Aggregate Government - Treasury - Long,Fixed income,Investment grade,Investment grade
+SPTM,SPDR Portfolio S&P 1500 Composite Stock Market ETF,Total market,AMEX,S&P Composite 1500,Equity,Total market,Total market
+SPIB,SPDR Portfolio Intermediate Term Corporate Bond ETF,Investment grade,AMEX,Bloomberg US Aggregate Credit - Corporate - Investment Grade - Intermediate,Fixed income,Investment grade,Investment grade
+SPHY,SPDR Portfolio High Yield Bond ETF,High yield,AMEX,ICE BofA US High Yield,Fixed income,High yield,High yield
+SPTI,SPDR Portfolio Intermediate Term Treasury ETF,Investment grade,AMEX,Bloomberg US Treasury (3-10 Y),Fixed income,Investment grade,Investment grade
+SPAB,SPDR Portfolio Aggregate Bond ETF,Investment grade,AMEX,Bloomberg US Aggregate,Fixed income,Investment grade,Investment grade
+JNK,SPDR Bloomberg High Yield Bond ETF,High yield,AMEX,Bloomberg High Yield Very Liquid,Fixed income,High yield,High yield
+SPSB,SPDR Portfolio Short Term Corporate Bond ETF,Investment grade,AMEX,Bloomberg US Corporate (1-3 Y) (Inception 11/28/2003),Fixed income,Investment grade,Investment grade
+XLRE,Real Estate Select Sector SPDR Fund,Real estate,AMEX,S&P Real Estate Select Sector,Equity,Real estate,Real estate
+SPYD,SPDR Portfolio S&P 500 High Dividend ETF,High dividend yield,AMEX,S&P 500 High Dividend Index,Equity,High dividend yield,High dividend yield
+SRLN,SPDR Blackstone Senior Loan ETF,High yield,AMEX,No Underlying Index,Fixed income,High yield,High yield
+SPMB,SPDR Portfolio Mortgage Backed Bond ETF,Investment grade,AMEX,Bloomberg US Aggregate Securitized - MBS,Fixed income,Investment grade,Investment grade
+XBI,SPDR S&P BIOTECH ETF,Health care,AMEX,S&P Biotechnology Select Industry,Equity,Health care,Health care
+SPTS,SPDR Portfolio Short Term Treasury ETF,Investment grade,AMEX,Bloomberg US Treasury (1-3 Y) (Inception 4/30/1996),Fixed income,Investment grade,Investment grade
+XLB,Materials Select Sector SPDR Fund,Materials,AMEX,S&P Materials Select Sector,Equity,Materials,Materials
+SJNK,SPDR Bloomberg Short Term High Yield Bond ETF,High yield,AMEX,Bloomberg US High Yield 350mn Cash Pay 2% Capped (0-5 Y),Fixed income,High yield,High yield
+FEZ,SPDR EURO STOXX 50 ETF,Large cap,AMEX,Euro STOXX 50,Equity,Large cap,Large cap
+CWB,SPDR Bloomberg Convertible Securities ETF,Broad credit,AMEX,Bloomberg US Convertibles Liquid Bond,Fixed income,Broad credit,Broad credit
+XAR,SPDR S&P Aerospace & Defense ETF,Industrials,AMEX,S&P Aerospace & Defense Select Industry,Equity,Industrials,Industrials
+SLYV,SPDR S&P 600 Small Cap Value ETF,Small cap,AMEX,S&P Small Cap 600 Value,Equity,Small cap,Small cap
+TOTL,SPDR DoubleLine Total Return Tactical ETF,Broad credit,AMEX,No Underlying Index,Fixed income,Broad credit,Broad credit
+BILS,SPDR Bloomberg 3-12 Month T-Bill ETF,Investment grade,AMEX,Bloomberg 3-12 Month U.S. Treasury Bill Index,Fixed income,Investment grade,Investment grade
+KRE,SPDR S&P Regional Banking ETF,Financials,AMEX,S&P Regional Banks Select Industry,Equity,Financials,Financials
+SLYG,SPDR S&P 600 Small Cap Growth ETF,Small cap,AMEX,S&P Small Cap 600 Growth,Equity,Small cap,Small cap
+SHM,SPDR Nuveen ICE Short Term Municipal Bond ETF,Investment grade,AMEX,ICE 1-5 Year AMT-Free US Select Municipal Index,Fixed income,Investment grade,Investment grade
+GNR,SPDR S&P Global Natural Resources ETF,Theme,AMEX,S&P Global Natural Resources,Equity,Theme,Theme
+TFI,SPDR Nuveen ICE Municipal Bond ETF,Investment grade,AMEX,ICE AMT-Free US Select Municipal Index,Fixed income,Investment grade,Investment grade
+XME,SPDR S&P Metals & Mining ETF,Materials,AMEX,S&P Metals and Mining Select Industry,Equity,Materials,Materials
+HYMB,SPDR Nuveen ICE High Yield Municipal Bond ETF,High yield,AMEX,ICE US Select High Yield Crossover Municipal Index,Fixed income,High yield,High yield
+FLRN,SPDR Bloomberg Investment Grade Floating Rate ETF,Investment grade,AMEX,Bloomberg US Floating Rate Notes (<5 Y),Fixed income,Investment grade,Investment grade
+KOMP,SPDR S&P Kensho New Economies Composite ETF,Theme,AMEX,S&P Kensho New Economies Composite Index,Equity,Theme,Theme
+MDYV,SPDR S&P 400 Mid Cap Value ETF,Mid cap,AMEX,S&P Mid Cap 400 Value,Equity,Mid cap,Mid cap
+MDYG,SPDR S&P 400 Mid Cap Growth ETF,Mid cap,AMEX,S&P Mid Cap 400 Growth,Equity,Mid cap,Mid cap
+SPYX,SPDR S&P 500 Fossil Fuel Reserves Free ETF,Large cap,AMEX,S&P 500 Fossil Fuel Free Index,Equity,Large cap,Large cap
+EBND,SPDR Bloomberg Emerging Markets Local Bond ETF,Broad credit,AMEX,Bloomberg Emerging Market Local Currency Government Diversified,Fixed income,Broad credit,Broad credit
+CWI,SPDR MSCI ACWI ex-US ETF,Total market,AMEX,MSCI AC World ex USA,Equity,Total market,Total market
+XHB,SPDR S&P Homebuilders ETF,Theme,AMEX,S&P Homebuilders Select Industry,Equity,Theme,Theme
+SPBO,SPDR Portfolio Corporate Bond ETF,Investment grade,AMEX,Bloomberg US Corporate Investment Grade,Fixed income,Investment grade,Investment grade
+XOP,SPDR S&P Oil & Gas Exploration & Production ETF,Energy,AMEX,S&P Oil & Gas Exploration & Production Select Industry,Equity,Energy,Energy
+TIPX,SPDR Bloomberg 1-10 Year TIPS ETF,Investment grade,AMEX,Bloomberg US Govt Inflation-Linked (1-10 Y),Fixed income,Investment grade,Investment grade
+RWR,SPDR Dow Jones REIT ETF,Real estate,AMEX,Dow Jones U.S. Select REIT Capped Index - Benchmark TR Gross,Equity,Real estate,Real estate
+XSD,SPDR S&P Semiconductor ETF,Information technology,AMEX,S&P Semiconductors Select Industry,Equity,Information technology,Information technology
+QUS,SPDR MSCI USA StrategicFactors ETF,Total market,AMEX,MSCI USA Factor Mix A-Series Capped (USD),Equity,Total market,Total market
+KBE,SPDR S&P Bank ETF,Financials,AMEX,S&P Banks Select Industry,Equity,Financials,Financials
+XNTK,SPDR NYSE Technology ETF,Information technology,AMEX,NYSE Technology Index,Equity,Information technology,Information technology
+BWX,SPDR Bloomberg International Treasury Bond ETF,Investment grade,AMEX,Bloomberg Global Treasury x US Capped (Inception 8/31/2007),Fixed income,Investment grade,Investment grade
+SPGM,SPDR Portfolio MSCI Global Stock Market ETF,Total market,AMEX,MSCI AC World IMI,Equity,Total market,Total market
+EFIV,SPDR S&P 500 ESG ETF,Large cap,AMEX,S&P 500 Scored & Screened Index,Equity,Large cap,Large cap
+RWO,SPDR Dow Jones Global Real Estate ETF,Real estate,AMEX,DJ Global Select Real Estate Securities Index (RESI),Equity,Real estate,Real estate
+LGLV,SPDR SSGA US Large Cap Low Volatility Index ETF,Large cap,AMEX,SSGA US Large Cap Low Volatility  (TR),Equity,Large cap,Large cap
+XLSR,SPDR SSGA U.S. Sector Rotation ETF,Large cap,AMEX,No Underlying Index,Equity,Large cap,Large cap
+SPIP,SPDR Portfolio TIPS ETF,Investment grade,AMEX,Bloomberg US Govt Inflation-Linked,Fixed income,Investment grade,Investment grade
+QEFA,SPDR MSCI EAFE StrategicFactors ETF,Total market,AMEX,MSCI EAFE Factor Mix A-Series (USD),Equity,Total market,Total market
+SPLB,SPDR Portfolio Long Term Corporate Bond ETF,Investment grade,AMEX,Bloomberg US Corporate - Long,Fixed income,Investment grade,Investment grade
+ONEY,SPDR Russell 1000 Yield Focus ETF,Large cap,AMEX,Russell 1000 Yield Focused Factor Index,Equity,Large cap,Large cap
+EDIV,SPDR S&P Emerging Markets Dividend ETF,High dividend yield,AMEX,S&P Emerging Market Dividend Opportunities,Equity,High dividend yield,High dividend yield
+PSK,SPDR ICE Preferred Securities ETF,Broad credit,AMEX,ICE Exchange-Listed Fixed& Adjustable Rate Preferred Securities Index,Fixed income,Broad credit,Broad credit
+GWX,SPDR S&P International Small Cap ETF,Small cap,AMEX,S&P Developed x United States <2B,Equity,Small cap,Small cap
+EWX,SPDR S&P Emerging Markets Small Cap ETF,Small cap,AMEX,S&P Emerging Markets <2B,Equity,Small cap,Small cap
+NANR,SPDR S&P North American Natural Resources ETF,Theme,AMEX,S&P BMI North American Natural Resources Index,Equity,Theme,Theme
+KIE,SPDR S&P Insurance ETF,Financials,AMEX,S&P Insurance Select Industry,Equity,Financials,Financials
+SPEU,SPDR Portfolio Europe ETF,Total market,AMEX,STOXX Europe TMI,Equity,Total market,Total market
+CERY,SPDR Bloomberg Enhanced Roll Yield Commodity Strategy No K-1 ETF,Broad market,AMEX,Bloomberg Enhanced Roll Yield Index - Benchmark TR Net,Commodities,Broad market,Broad market
+ULST,SPDR SSgA Ultra Short Term Bond ETF,Investment grade,AMEX,No Underlying Index,Fixed income,Investment grade,Investment grade
+GII,SPDR S&P Global Infrastructure ETF,Theme,AMEX,S&P Global Infrastructure Index,Equity,Theme,Theme
+KCE,SPDR S&P Capital Markets ETF,Financials,AMEX,S&P Capital Markets Select Industry,Equity,Financials,Financials
+RLY,SPDR SSgA Multi-Asset Real Return ETF,Multi-strategy,AMEX,No Underlying Index,Alternatives,Multi-strategy,Multi-strategy
+ONEV,SPDR Russell 1000 Low Volatility Focus ETF,Large cap,AMEX,Russell 1000 Low Volatility Focused Factor Index,Equity,Large cap,Large cap
+VLU,SPDR S&P 1500 Value Tilt ETF,Total market,AMEX,S&P 1500 Low Valuation Tilt,Equity,Total market,Total market
+HYBL,SPDR Blackstone High Income ETF,High yield,CBOE,No Underlying Index,Fixed income,High yield,High yield
+GXC,SPDR S&P China ETF,Total market,AMEX,S&P China BMI,Equity,Total market,Total market
+DWX,SPDR S&P International Dividend ETF,High dividend yield,AMEX,S&P International Dividend Opportunities Index,Equity,High dividend yield,High dividend yield
+XSW,SPDR S&P Software & Services ETF,Information technology,AMEX,S&P Software & Services Select Industry,Equity,Information technology,Information technology
+IBND,SPDR Bloomberg International Corporate Bond ETF,Investment grade,AMEX,Bloomberg Global Aggregate x USD >$1B: Corporate Bond,Fixed income,Investment grade,Investment grade
+ALLW,SPDR Bridgewater All Weather ETF,Target outcome,NASDAQ,No Underlying Index,Asset allocation,Target outcome,Target outcome
+DGT,SPDR Global Dow ETF,Large cap,AMEX,The Global Dow,Equity,Large cap,Large cap
+EFAX,SPDR MSCI EAFE Fossil Fuel Free ETF,Total market,AMEX,MSCI EAFE ex Fossil Fuels,Equity,Total market,Total market
+GMF,SPDR S&P Emerging Asia Pacific ETF,Total market,AMEX,S&P Emerging Asia Pacific BMI,Equity,Total market,Total market
+BWZ,SPDR Bloomberg Short Term International Treasury Bond ETF,Investment grade,AMEX,Bloomberg Global Treasury (1-3 Y) Customized,Fixed income,Investment grade,Investment grade
+WIP,SPDR FTSE International Government Inflation-Protected Bond ETF,Broad credit,AMEX,FTSE International Inflation-Linked Securities Select (USD),Fixed income,Broad credit,Broad credit
+RWX,SPDR Dow Jones International Real Estate ETF,Real estate,AMEX,DJ Global x US Select Real Estate Securities Index (RESI),Equity,Real estate,Real estate
+STOT,SPDR DoubleLine Short Duration Total Return Tactical ETF,Broad credit,CBOE,No Underlying Index,Fixed income,Broad credit,Broad credit
+SHE,SPDR MSCI USA Gender Diversity ETF,Total market,AMEX,MSCI USA Gender Diversity Select Index - USD - Benchmark TR Gross,Equity,Total market,Total market
+GAL,SPDR SSgA Global Allocation ETF,Target outcome,AMEX,No Underlying Index,Asset allocation,Target outcome,Target outcome
+XRT,SPDR S&P Retail ETF,Consumer discretionary,AMEX,S&P Retail Select Industry,Equity,Consumer discretionary,Consumer discretionary
+FISR,SPDR SSGA Fixed Income Sector Rotation ETF,Broad credit,AMEX,No Underlying Index,Fixed income,Broad credit,Broad credit
+WDIV,SPDR S&P Global Dividend ETF,High dividend yield,AMEX,S&P Global Dividend Aristocrats Index sp_43,Equity,High dividend yield,High dividend yield
+EMHC,SPDR Bloomberg Emerging Markets USD Bond ETF,Broad credit,AMEX,Bloomberg Emerging Market USD Sovereign & Sovereign Owned,Fixed income,Broad credit,Broad credit
+SMLV,SPDR SSGA US Small Cap Low Volatility Index ETF,Small cap,AMEX,SSGA US Small Cap Low Volatility Index,Equity,Small cap,Small cap
+XES,SPDR S&P Oil & Gas Equipment & Services ETF,Energy,AMEX,S&P Oil & Gas Equipment & Services Select Industry Index,Equity,Energy,Energy
+CNRG,SPDR S&P Kensho Clean Power ETF,Theme,AMEX,S&P Kensho Clean Power Index,Equity,Theme,Theme
+NZAC,SPDR MSCI ACWI Climate Paris Aligned ETF,Theme,NASDAQ,MSCI ACWI Climate Paris Aligned Index,Equity,Theme,Theme
+QWLD,SPDR MSCI World StrategicFactors ETF,Total market,AMEX,MSCI World Factor Mix A-Series (USD),Equity,Total market,Total market
+XPH,SPDR S&P Pharmaceuticals ETF,Health care,AMEX,S&P Pharmaceuticals Select Industry,Equity,Health care,Health care
+XTL,SPDR S&P Telecom ETF,Theme,AMEX,S&P Telecom Select Industry,Equity,Theme,Theme
+MMTM,SPDR S&P 1500 Momentum Tilt ETF,Total market,AMEX,S&P 1500 Positive Momentum Tilt Index,Equity,Total market,Total market
+XTN,SPDR S&P Transportation ETF,Industrials,AMEX,S&P Transportation Select Industry,Equity,Industrials,Industrials
+PRIV,SPDR SSGA IG Public & Private Credit ETF,Broad credit,AMEX,No Underlying Index,Fixed income,Broad credit,Broad credit
+XHE,SPDR S&P Health Care Equipment ETF,Health care,AMEX,S&P Healthcare Equipment Select Industry,Equity,Health care,Health care
+EMTL,SPDR DoubleLine Emerging Markets Fixed Income ETF,Broad credit,CBOE,No Underlying Index,Fixed income,Broad credit,Broad credit
+ONEO,SPDR Russell 1000 Momentum Focus ETF,Large cap,AMEX,Russell 1000 Momentum Focused Factor Index,Equity,Large cap,Large cap
+FITE,SPDR S&P Kensho Future Security ETF,Theme,AMEX,S&P Kensho Future Security,Equity,Theme,Theme
+SPTB,SPDR Portfolio Treasury ETF,Investment grade,AMEX,Bloomberg U.S. Treasury Index - Benchmark TR Gross,Fixed income,Investment grade,Investment grade
+EEMX,SPDR MSCI Emerging Markets Fossil Fuel Free ETF,Total market,AMEX,MSCI EM (Emerging Markets) ex Fossil Fuels,Equity,Total market,Total market
+HECO,SPDR Galaxy Hedged Digital Asset Ecosystem ETF,Theme,NASDAQ,No Underlying Index,Equity,Theme,Theme
+XITK,SPDR FactSet Innovative Technology ETF,Information technology,AMEX,FactSet Innovative Technology Index,Equity,Information technology,Information technology
+XHS,SPDR S&P Health Care Services ETF,Health care,AMEX,S&P Health Care Services Select Industry,Equity,Health care,Health care
+INKM,SPDR SSgA Income Allocation ETF,Target outcome,AMEX,No Underlying Index,Asset allocation,Target outcome,Target outcome
+OBND,SPDR Loomis Sayles Opportunistic Bond ETF,Broad credit,CBOE,No Underlying Index,Fixed income,Broad credit,Broad credit
+QEMM,SPDR MSCI Emerging Markets StrategicFactors ETF,Total market,AMEX,MSCI EM Factor Mix A-Series (USD),Equity,Total market,Total market
+MYCF,SPDR SSGA My2026 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+ROKT,SPDR S&P Kensho Final Frontiers ETF,Theme,AMEX,S&P Kensho Final Frontiers,Equity,Theme,Theme
+MBND,SPDR Nuveen Municipal Bond ETF,Broad credit,CBOE,No Underlying Index,Fixed income,Broad credit,Broad credit
+MYCH,SPDR SSGA My2028 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+MYCI,SPDR SSGA My2029 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+SPIN,SPDR SSGA US Equity Premium Income ETF,Total market,CBOE,No Underlying Index,Equity,Total market,Total market
+LQIG,SPDR MarketAxess Investment Grade 400 Corporate Bond ETF,Investment grade,AMEX,MarketAxess U.S. Investment Grade 400 Corporate Bond Index - Benchmark TR Gross,Fixed income,Investment grade,Investment grade
+HAIL,SPDR S&P Kensho Smart Mobility ETF,Theme,AMEX,S&P Kensho Smart Transportation,Equity,Theme,Theme
+MYCG,SPDR SSGA My2027 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+MYCJ,SPDR SSGA My2030 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+DECO,SPDR Galaxy Digital Asset Ecosystem ETF,Theme,NASDAQ,No Underlying Index,Equity,Theme,Theme
+MBNE,SPDR Nuveen Municipal Bond ESG ETF,Broad credit,CBOE,No Underlying Index,Fixed income,Broad credit,Broad credit
+MYMF,SPDR SSGA My2026 Municipal Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+MYMI,SPDR SSGA My2029 Municipal Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+SPDG,SPDR Portfolio S&P Sector Neutral Dividend ETF,High dividend yield,AMEX,S&P Sector-Neutral High Yield Dividend Aristocrats Index - Benchmark TR Gross,Equity,High dividend yield,High dividend yield
+SIMS,SPDR S&P Kensho Intelligent Structures ETF,Theme,AMEX,S&P Kensho Intelligent Infrastructure Index,Equity,Theme,Theme
+MYMJ,SPDR SSGA My2030 Municipal Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+MYCN,SPDR SSGA My2034 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+ESIX,SPDR S&P SmallCap 600 ESG ETF,Small cap,AMEX,S&P SmallCap 600 ESG Index,Equity,Small cap,Small cap
+MYCK,SPDR SSGA My2031 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+MYCL,SPDR SSGA My2032 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+MYMG,SPDR SSGA My2027 Municipal Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+MYMH,SPDR SSGA My2028 Municipal Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+XCNY,SPDR S&P Emerging Markets ex-China ETF,Total market,NASDAQ,S&P Emerging ex China BMI Index,Equity,Total market,Total market
+MYCM,SPDR SSGA My2033 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+MYCO,SPDR SSGA My2035 Corporate Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+MYMK,SPDR SSGA My2031 Municipal Bond ETF,Investment grade,NASDAQ,No Underlying Index,Fixed income,Investment grade,Investment grade
+NZUS,SPDR MSCI USA Climate Paris Aligned ETF,Theme,NASDAQ,MSCI USA Climate Paris Aligned Index,Equity,Theme,Theme
+TEKX,SPDR Galaxy Transformative Tech Accelerators ETF,Theme,NASDAQ,No Underlying Index,Equity,Theme,Theme
+XLUI,Utilities Select Sector SPDR Premium Income Fund,Utilities,AMEX,S&P Utilities Select Sector,Equity,Utilities,Utilities
+XLBI,Materials Select Sector SPDR Premium Income Fund,Materials,AMEX,S&P Materials Select Sector,Equity,Materials,Materials
+XLEI,Energy Select Sector SPDR Premium Income Fund,Energy,AMEX,S&P Energy Select Sector,Equity,Energy,Energy
+XLKI,Technology Select Sector SPDR Premium Income Fund,Information technology,AMEX,S&P Technology Select Sector,Equity,Information technology,Information technology
+XLCI,Communication Services Select Sector SPDR Premium Income Fund,Communication services,AMEX,S&P Communication Services Select Sector Index,Equity,Communication services,Communication services
+XLRI,Real Estate Select Sector SPDR Premium Income Fund,Real estate,AMEX,S&P Real Estate Select Sector,Equity,Real estate,Real estate
+XLYI,Consumer Discretionary Select Sector SPDR Premium Income Fund,Consumer discretionary,AMEX,S&P Consumer Discretionary Select Sector,Equity,Consumer discretionary,Consumer discretionary
+XLVI,Health Care Select Sector SPDR Premium Income Fund,Health care,AMEX,S&P Health Care Select Sector,Equity,Health care,Health care
+XLSI,Consumer Staples Select Sector SPDR Premium Income Fund,Consumer staples,AMEX,S&P Consumer Staples Select Sector,Equity,Consumer staples,Consumer staples
+XLFI,Financial Select Sector SPDR Premium Income Fund,Financials,AMEX,S&P Financial Select Sector,Equity,Financials,Financials
+XLII,Industrial Select Sector SPDR Premium Income Fund,Industrials,AMEX,S&P Industrial Select Sector,Equity,Industrials,Industrials

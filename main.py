@@ -277,7 +277,7 @@ def main():
         
         print("\n⚠️ This usually indicates that ticker file generation failed or")
         print("   the configuration doesn't match available files.")
-        print("   Please check your user_data.csv settings and run again.")
+        print("   Please check your user_input/user_data.csv settings and run again.")
         exit(1)
     
     print(f"✅ Combined ticker file ready: {combined_file}")
@@ -314,7 +314,7 @@ def main():
                 print("\n📅 Downloading daily (1d) market data...")
                 daily_params = {
                     'interval': '1d',
-                    'start_date': '2023-12-31',
+                    'start_date': '2020-01-01',
                     'end_date': datetime.now().strftime('%Y-%m-%d'),
                     'folder': PARAMS_DIR["MARKET_DATA_DIR_1d"],
                     'ticker_file': combined_file,
@@ -369,8 +369,54 @@ def main():
         print("HISTORICAL DATA COLLECTION DISABLED")
         print("="*60)
         print("⏭️  Skipping historical market data collection (YF_hist_data = FALSE)")
-        print("   To enable: Set YF_hist_data = TRUE in user_data.csv")
-   
+        print("   To enable: Set YF_hist_data = TRUE in user_input/user_data.csv")
+
+    # ============ ROUTE 2: TRADINGVIEW DATA UPDATES ============
+    if config.tw_hist_data:
+        print("\n" + "="*60)
+        print("UPDATING DATA FROM TRADINGVIEW BULK FILES")
+        print("="*60)
+        print(f"📁 TW Files Path: {config.tw_files_path}")
+
+        from src.get_tradingview_data import TradingViewDataRetriever
+
+        # Create TW config
+        tw_config = {
+            'ticker_file': combined_file,
+            'TW_FILES_DIR': config.tw_files_path,
+            'MARKET_DATA_TW_DIR': PARAMS_DIR["MARKET_DATA_TW_DIR"],
+            'TICKERS_DIR': PARAMS_DIR["TICKERS_DIR"]
+        }
+
+        tw_retriever = TradingViewDataRetriever(tw_config)
+
+        # Daily updates
+        if config.tw_daily_data:
+            print("\n📅 Processing TradingView daily data...")
+            tw_retriever.update_from_tw_files('daily')
+        else:
+            print("\n⏭️  Daily TW data disabled (TW_daily_data = FALSE)")
+
+        # Weekly updates
+        if config.tw_weekly_data:
+            print("\n📅 Processing TradingView weekly data...")
+            tw_retriever.update_from_tw_files('weekly')
+        else:
+            print("⏭️  Weekly TW data disabled (TW_weekly_data = FALSE)")
+
+        # Monthly updates
+        if config.tw_monthly_data:
+            print("\n📅 Processing TradingView monthly data...")
+            tw_retriever.update_from_tw_files('monthly')
+        else:
+            print("⏭️  Monthly TW data disabled (TW_monthly_data = FALSE)")
+    else:
+        print("\n" + "="*60)
+        print("TRADINGVIEW DATA UPDATES DISABLED")
+        print("="*60)
+        print("⏭️  Skipping TradingView updates (TW_hist_data = FALSE)")
+        print("   To enable: Set TW_hist_data = TRUE in user_input/user_data.csv")
+
     # ============ COMPREHENSIVE FINANCIAL DATA RETRIEVAL ============
     if config.fin_data_enrich:
         print("\n" + "="*60)
@@ -415,7 +461,7 @@ def main():
         print("FINANCIAL DATA ENRICHMENT DISABLED")
         print("="*60)
         print("⏭️  Skipping financial data collection (fin_data_enrich = FALSE)")
-        print("   To enable: Set fin_data_enrich = TRUE in user_data.csv")
+        print("   To enable: Set fin_data_enrich = TRUE in user_input/user_data.csv")
     
     print("\n" + "="*60)
     print("ALL DATA COLLECTION COMPLETED")

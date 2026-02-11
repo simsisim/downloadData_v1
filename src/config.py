@@ -7,10 +7,23 @@ from src.user_defined_data import read_user_data_legacy, read_user_data, _get_de
 PARAMS_DIR = {
     "DATA_DIR": "data",
     "TICKERS_DIR": os.path.join("data", "tickers"),
+
+    # Yahoo Finance data directories
     "MARKET_DATA_DIR_1d": os.path.join("data", "market_data/daily/"),
     "MARKET_DATA_DIR_1wk": os.path.join("data", "market_data/weekly/"),
-    "MARKET_DATA_DIR_1mo": os.path.join("data", "market_data/monthly/")
-    
+    "MARKET_DATA_DIR_1mo": os.path.join("data", "market_data/monthly/"),
+
+    # TradingView data directories
+    "MARKET_DATA_TW_DIR": "data/market_data_tw",
+    "MARKET_DATA_TW_DIR_1d": os.path.join("data", "market_data_tw/daily/"),
+    "MARKET_DATA_TW_DIR_1wk": os.path.join("data", "market_data_tw/weekly/"),
+    "MARKET_DATA_TW_DIR_1mo": os.path.join("data", "market_data_tw/monthly/"),
+
+    # TradingView bulk files directories
+    "TW_FILES_DIR": "data/tw_files",
+    "TW_FILES_DAILY": os.path.join("data", "tw_files/daily/"),
+    "TW_FILES_WEEKLY": os.path.join("data", "tw_files/weekly/"),
+    "TW_FILES_MONTHLY": os.path.join("data", "tw_files/monthly/")
 }
 
 class Config:
@@ -29,10 +42,21 @@ def setup_directories():
     """Create required directories if they don't exist."""
     os.makedirs(PARAMS_DIR["DATA_DIR"], exist_ok=True)
     os.makedirs(PARAMS_DIR["TICKERS_DIR"], exist_ok=True)
+
+    # Yahoo Finance directories
     os.makedirs(PARAMS_DIR["MARKET_DATA_DIR_1d"], exist_ok=True)
     os.makedirs(PARAMS_DIR["MARKET_DATA_DIR_1wk"], exist_ok=True)
     os.makedirs(PARAMS_DIR["MARKET_DATA_DIR_1mo"], exist_ok=True)
-    #os.makedirs(PARAMS_DIR["MARKET_DATA_DIR_1wk"], exist_ok=True)
+
+    # TradingView data directories
+    os.makedirs(PARAMS_DIR["MARKET_DATA_TW_DIR_1d"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["MARKET_DATA_TW_DIR_1wk"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["MARKET_DATA_TW_DIR_1mo"], exist_ok=True)
+
+    # TradingView bulk files directories
+    os.makedirs(PARAMS_DIR["TW_FILES_DAILY"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["TW_FILES_WEEKLY"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["TW_FILES_MONTHLY"], exist_ok=True)
     
 
 # Generate filenames (example)
