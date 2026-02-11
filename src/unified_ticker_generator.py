@@ -182,7 +182,9 @@ class UnifiedTickerGenerator:
                 pass
         
         # Check for TradingView universe file
-        universe_file = Path('tradingview_universe.csv')
+        from src.user_defined_data import read_user_data
+        config = read_user_data()
+        universe_file = Path(config.user_input_path) / config.tw_universe_file
         tickers_universe_file = self.tickers_dir / 'tradingview_universe.csv'
         
         # Check for individual ticker files
@@ -259,8 +261,10 @@ class UnifiedTickerGenerator:
             universe_bool_file.unlink()
             print(f"🔄 Removed existing universe data for regeneration")
         
-        # Create universe data from root tradingview_universe.csv
-        root_universe = Path('tradingview_universe.csv')
+        # Create universe data from user_input/tradingview_universe.csv
+        from src.user_defined_data import read_user_data
+        config = read_user_data()
+        root_universe = Path(config.user_input_path) / config.tw_universe_file
         if not root_universe.exists():
             print(f"❌ Missing root TradingView universe file: {root_universe}")
             return False

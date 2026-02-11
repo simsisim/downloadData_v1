@@ -1,0 +1,21 @@
+# Financial Market Data Collection System
+# Python Dependencies
+
+# Core Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Financial Data APIs
+yfinance>=0.2.30
+
+# HTTP Requests
+requests>=2.31.0
+
+# Date/Time Handling
+python-dateutil>=2.8.2
+
+# Optional: Progress bars
+tqdm>=4.65.0
+
+# Optional: Data validation
+openpyxl>=3.1.0  # For Excel file support if needed

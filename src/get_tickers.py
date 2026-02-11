@@ -102,12 +102,16 @@ class TickerRetriever:
        return table['ticker'].tolist() 
    
     def get_portofolio_tickers(self):
-       file_path_manual = 'portofolio_tickers.csv'
+       from src.user_defined_data import read_user_data
+       config = read_user_data()
+       file_path_manual = os.path.join(config.user_input_path, 'portofolio_tickers.csv')
        table = pd.read_csv(file_path_manual)
        return table['ticker'].tolist() 
 
     def get_tradingview_universe_tickers(self):
-       file_path_manual = 'tradingview_universe.csv'
+       from src.user_defined_data import read_user_data
+       config = read_user_data()
+       file_path_manual = os.path.join(config.user_input_path, config.tw_universe_file)
        table = pd.read_csv(file_path_manual)
        
        # Clean ticker symbols and create info files

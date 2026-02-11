@@ -7,16 +7,23 @@
 # -------------------,,
 WEB_tickers_down,FALSE,Download ticker names from web sources (NASDAQ SP500 etc)
 TW_tickers_down,TRUE,Use ticker names from TradingView universe file
-TW_universe_file,tradingview_universe.csv,File name for TradingView universe data
+TW_universe_file,tradingview_universe.csv,File name for TradingView universe data (relative to user_input_path)
 ,,
 # HISTORICAL DATA COLLECTION,,
 # ---------------------------,,
 YF_hist_data,TRUE,Download historical OHLCV data via YFinance
 YF_daily_data,TRUE,Download daily (1d) historical data
-YF_weekly_data,TRUE,Download weekly (1wk) historical data  
-YF_monthly_data,TRUE,Download monthly (1mo) historical data
-TW_intraday_data,FALSE,Process intraday data from TradingView source
-TW_intraday_file,intraday_data.csv,File name for intraday data input
+YF_weekly_data,TRUE,Download weekly (1wk) historical data
+YF_monthly_data,FALSE,Download monthly (1mo) historical data
+TW_hist_data,TRUE,Update historical OHLCV data from TradingView bulk files
+user_input_path,user_input,Directory for user input files (portfolio universe indexes etc)
+TW_daily_data,TRUE,Process daily TradingView bulk files
+TW_weekly_data,FALSE,Process weekly TradingView bulk files
+TW_monthly_data,FALSE,Process monthly TradingView bulk files
+TW_intraday_data,FALSE,NOT IMPLEMENTED: Process intraday data from TradingView source
+TW_intraday_file,intraday_data.csv,NOT IMPLEMENTED: File name for intraday data input
+TW_files_path,data/tw_files,Base directory for TradingView bulk CSV files
+,,
 ,,
 # FINANCIAL DATA ENRICHMENT,,
 # --------------------------,,
@@ -31,7 +38,7 @@ write_info_file,TRUE,Write detailed info files during processing
 ticker_info_TW,TRUE,Get ticker info from TradingView universe file
 ticker_info_TW_file,tradingview_universe_bool.csv,File name for TradingView ticker info
 ticker_info_YF,FALSE,Download ticker info from YFinance
-ticker_choice,1-5,Ticker combination choice (use single numbers or dash-separated)
+ticker_choice,2,Ticker combination choice (use single numbers or dash-separated)
 ,,
 # TICKER GROUP CHOICES (ticker_choice values),,
 # ==========================================,,

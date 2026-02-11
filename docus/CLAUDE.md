@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Python-based financial data collection system that downloads historical market data (OHLCV) and comprehensive financial data for CANSLIM stock analysis. The system retrieves stock tickers from various sources and collects both price data and fundamental financial metrics for investment analysis.
 
+The system supports two data routes:
+- **Yahoo Finance route** (`data/market_data/`) - Full historical downloads via yfinance API
+- **TradingView route** (`data/market_data_tw/`) - Daily updates from TradingView bulk CSV files
+
 ## Common Commands
 
 ### Run the main data collection pipeline:
@@ -42,6 +46,13 @@ pip install -r requirements.txt
 - Supports daily (1d), weekly (1wk), and monthly (1mo) intervals
 - Automatic BRK-B ticker addition
 - Error handling for problematic tickers
+
+**src/get_tradingview_data.py**: TradingView bulk file updates:
+- TradingViewDataRetriever class for processing TW bulk CSV files
+- Smart sampling (5 random tickers) to determine if update needed
+- Timezone-aware date handling for mixed EST/EDT files
+- Appends new data to existing ticker files
+- Date extraction from TW filenames
 
 **src/get_financial_data.py**: Comprehensive financial metrics:
 - FinancialDataRetriever class for CANSLIM analysis
@@ -97,6 +108,7 @@ pip install -r requirements.txt
 - **yfinance**: Primary data source for market and financial data
 - **pandas**: Data manipulation and CSV handling
 - **datetime**: Date range calculations for historical data
+- **re**: Regular expressions for timezone extraction and date parsing
 
 ### CANSLIM Analysis Features
 
@@ -126,6 +138,24 @@ The system includes extensive testing functionality in main.py that validates:
 
 ### Expected Runtime
 
-- Market data collection: 2-10 minutes depending on ticker count
+- Market data collection (yfinance): 2-10 minutes depending on ticker count
+- TradingView updates: 1-2 minutes (bulk file parsing and distribution)
 - Financial data collection: 5-15 minutes (comprehensive CANSLIM analysis)
 - Total pipeline: 10-25 minutes for full execution
+
+### TradingView Update Process
+
+The TradingView updater (`src/get_tradingview_data.py`) handles timezone-aware date updates:
+
+1. **Smart Sampling**: Checks 5 random ticker files to determine if update needed
+2. **Date Extraction**: Extracts date from TW filename (e.g., `all_stocks _OHLCV_2025-10-01.csv`)
+3. **Timezone Preservation**: Reads last date from existing file to extract timezone
+4. **Format Matching**: Applies existing timezone to new TW date for consistency
+5. **String-Based Updates**: Avoids `parse_dates` to handle mixed EST/EDT timezones
+6. **Append Logic**: Concatenates new row and sorts by date (ISO strings sort correctly)
+
+**Key Feature**: Mixed timezone support
+- Files spanning Jan-Sep contain both EST (`-05:00`) and EDT (`-04:00`)
+- New dates match the timezone of the most recent entry
+- No datetime parsing issues with mixed timezones
+- Example: If last date is `2025-09-05 00:00:00-04:00`, new date becomes `2025-10-01 00:00:00-04:00`

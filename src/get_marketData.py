@@ -155,11 +155,17 @@ class MarketDataRetriever:
         ok_full_df.to_csv(ok_file, index=False)
         print(f"Clean tickers file: {ok_file}")
 
-    def generate_portfolio_clean_tickers_file(self, portfolio_tickers_file='portofolio_tickers.csv'):
+    def generate_portfolio_clean_tickers_file(self, portfolio_tickers_file=None):
         """
         Generates a clean tickers file specifically for the portfolio tickers.
         """
-        portfolio_tickers_path = os.path.join(self.PARAMS_DIR["TICKERS_DIR"], portfolio_tickers_file)
+        from src.user_defined_data import read_user_data
+
+        if portfolio_tickers_file is None:
+            config = read_user_data()
+            portfolio_tickers_file = os.path.join(config.user_input_path, 'portofolio_tickers.csv')
+
+        portfolio_tickers_path = portfolio_tickers_file if os.path.isabs(portfolio_tickers_file) else portfolio_tickers_file
         try:
             portfolio_tickers_df = pd.read_csv(portfolio_tickers_path)
             portfolio_tickers = portfolio_tickers_df['ticker'].tolist()
