@@ -83,14 +83,28 @@ class MarketDataRetriever:
             interval_str = self.config['interval'].replace("/", "")
             file_path = os.path.join(self.config['folder'], f"{ticker}.csv")
             ticker_obj = yf.Ticker(ticker)
-            latest_yf_date = ticker_obj.history(period="1d").index[0].date()
+            # Handle both Timestamp (old yfinance) and string (new yfinance 1.1.0+)
+            latest_yf_idx = ticker_obj.history(period="1d").index[0]
+            if isinstance(latest_yf_idx, str):
+                latest_yf_date = pd.to_datetime(latest_yf_idx).date()
+            elif hasattr(latest_yf_idx, 'date'):
+                latest_yf_date = latest_yf_idx.date()
+            else:
+                latest_yf_date = pd.to_datetime(str(latest_yf_idx)).date()
 
             if os.path.isfile(file_path):
                 # If the file exists, consider it successful regardless of updates
                 self.successful_tickers.append(ticker)
                 existing_data = pd.read_csv(file_path, index_col='Date', parse_dates=True)
                 if not existing_data.empty:
-                    latest_file_date = existing_data.index.max().date()
+                    # Handle both Timestamp and string date formats
+                    latest_file_idx = existing_data.index.max()
+                    if isinstance(latest_file_idx, str):
+                        latest_file_date = pd.to_datetime(latest_file_idx).date()
+                    elif hasattr(latest_file_idx, 'date'):
+                        latest_file_date = latest_file_idx.date()
+                    else:
+                        latest_file_date = pd.to_datetime(str(latest_file_idx)).date()
                     if latest_file_date >= latest_yf_date:
                         self.logger.info(f"{ticker} not updated. Latest data already available.")
                         return

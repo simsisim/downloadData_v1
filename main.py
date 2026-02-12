@@ -9,6 +9,8 @@ from src.user_defined_data import read_user_data_legacy, read_user_data
 from src.config import setup_directories, PARAMS_DIR
 from src.unified_ticker_generator import generate_all_ticker_files
 import yfinance as yf
+# Verify yfinance version for Pandas 3.0 compatibility
+print(f"Using yfinance version: {yf.__version__}")
 
 # Try to import TickerRetriever, if it fails, we'll handle it
 try:
