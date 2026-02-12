@@ -63,7 +63,8 @@ class MarketDataRetriever:
         info = ticker_obj.info
         additional_params = [
             'volume', 'averageDailyVolume10Day', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow',
-            'fiftyDayAverage', 'twoHundredDayAverage', 'marketCap', 'industry', 'sector', 'exchange'
+            'fiftyDayAverage', 'twoHundredDayAverage', 'marketCap', 'industry', 'sector', 'exchange',
+            'trailingPE', 'forwardPE'  # P/E ratio metrics
         ]
     
         for param in additional_params:

@@ -442,3 +442,18 @@ data/
 ---
 
 **Need help?** See `CONFIGURATION_EXAMPLES.md` for more examples!
+
+# TICKER GROUP CHOICES (ticker_choice values)	
+# ==========================================	
+# Use single numbers or dash-separated combinations (e.g. "1-2-3")	
+# 0: TradingView Universe only	tradingview_universe.csv
+# 1: S&P 500 only	sp500_tickers.csv
+# 2: NASDAQ 100 only	nasdaq100_tickers.csv
+# 3: All NASDAQ stocks	nasdaq_all_tickers.csv
+# 4: Russell 1000 (IWM) only	iwm1000_tickers.csv
+# 5: Index tickers only	indexes_tickers.csv
+# 6: Portfolio tickers only	portofolio_tickers.csv
+# 7: ETF tickers only	etf_tickers.csv
+# 8: TEST tickers only	test_tickers.csv
+# Examples: "1" (S&P 500) "1-2" (S&P 500 + NASDAQ 100) "1-2-3" (all major indexes)	
+
