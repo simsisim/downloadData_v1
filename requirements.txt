@@ -6,7 +6,7 @@ pandas>=2.0.0
 numpy>=1.24.0
 
 # Financial Data APIs
-yfinance>=0.2.30
+yfinance>=1.1.0
 
 # HTTP Requests
 requests>=2.31.0
