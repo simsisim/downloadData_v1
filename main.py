@@ -1,6 +1,7 @@
 import logging
-import os 
+import os
 import pandas as pd
+import argparse
 from datetime import datetime, timedelta
 from src.get_marketData import run_market_data_retrieval
 from src.get_financial_data import run_financial_data_retrieval  # New import
@@ -28,6 +29,268 @@ try:
 except ImportError as e:
     print(f"Warning: Could not import TradingViewTickerProcessor: {e}")
     TRADINGVIEW_PROCESSOR_AVAILABLE = False
+
+
+# ============================================================================
+# CONFIGURATION PRESETS
+# ============================================================================
+CONFIG_PRESETS = {
+    'quick_test': {
+        'ticker_choice': '8',           # Test tickers only
+        'yf_hist_data': True,
+        'yf_daily_data': True,
+        'yf_weekly_data': False,
+        'yf_monthly_data': False,
+        'tw_hist_data': False,
+        'fin_data_enrich': False,
+        'write_info_file': False
+    },
+    'nasdaq_daily': {
+        'ticker_choice': '2',           # NASDAQ 100
+        'yf_hist_data': True,
+        'yf_daily_data': True,
+        'yf_weekly_data': False,
+        'yf_monthly_data': False,
+        'tw_hist_data': False,
+        'fin_data_enrich': False,
+        'write_info_file': True
+    },
+    'sp500_full': {
+        'ticker_choice': '1',           # S&P 500
+        'yf_hist_data': True,
+        'yf_daily_data': True,
+        'yf_weekly_data': True,
+        'yf_monthly_data': True,
+        'tw_hist_data': False,
+        'fin_data_enrich': True,
+        'write_info_file': True
+    },
+    'nasdaq_sp500_daily': {
+        'ticker_choice': '1-2',         # S&P 500 + NASDAQ 100
+        'yf_hist_data': True,
+        'yf_daily_data': True,
+        'yf_weekly_data': False,
+        'yf_monthly_data': False,
+        'tw_hist_data': False,
+        'fin_data_enrich': False,
+        'write_info_file': True
+    },
+    'portfolio_only': {
+        'ticker_choice': '6',           # Portfolio tickers
+        'yf_hist_data': True,
+        'yf_daily_data': True,
+        'yf_weekly_data': True,
+        'yf_monthly_data': False,
+        'tw_hist_data': False,
+        'fin_data_enrich': True,
+        'write_info_file': True
+    },
+    'full_canslim': {
+        'ticker_choice': '2',           # NASDAQ 100
+        'yf_hist_data': True,
+        'yf_daily_data': True,
+        'yf_weekly_data': True,
+        'yf_monthly_data': True,
+        'tw_hist_data': False,
+        'fin_data_enrich': True,
+        'yf_fin_data': True,
+        'write_info_file': True
+    }
+}
+
+
+# ============================================================================
+# COMMAND-LINE ARGUMENT PARSER
+# ============================================================================
+def parse_arguments():
+    """Parse command-line arguments for configuration override."""
+    parser = argparse.ArgumentParser(
+        description='Financial Market Data Collection System',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  # Use a preset configuration
+  python main.py --preset nasdaq_daily
+
+  # Download NASDAQ 100 with daily data only
+  python main.py --ticker-choice 2 --daily --no-weekly --no-monthly
+
+  # Download S&P 500 + NASDAQ 100 with daily and weekly data
+  python main.py --ticker-choice 1-2 --daily --weekly
+
+  # Quick test with test tickers
+  python main.py --preset quick_test
+
+  # Full CANSLIM analysis
+  python main.py --preset full_canslim
+
+Available presets: quick_test, nasdaq_daily, sp500_full, nasdaq_sp500_daily, portfolio_only, full_canslim
+
+Ticker choice values:
+  0: TradingView Universe
+  1: S&P 500
+  2: NASDAQ 100
+  3: All NASDAQ stocks
+  4: Russell 1000
+  5: Index tickers
+  6: Portfolio tickers
+  7: ETF tickers
+  8: Test tickers
+  Use dash-separated for combinations: "1-2" (S&P 500 + NASDAQ 100)
+        '''
+    )
+
+    # Preset
+    parser.add_argument('--preset', type=str, choices=CONFIG_PRESETS.keys(),
+                       help='Use a predefined configuration preset')
+
+    # Ticker selection
+    parser.add_argument('--ticker-choice', type=str, dest='ticker_choice',
+                       help='Ticker group selection (e.g., "2" for NASDAQ 100, "1-2" for S&P500+NASDAQ100)')
+
+    # Historical data control
+    parser.add_argument('--hist-data', dest='yf_hist_data', action='store_true',
+                       help='Enable historical data download')
+    parser.add_argument('--no-hist-data', dest='yf_hist_data', action='store_false',
+                       help='Disable historical data download')
+
+    # Data intervals
+    parser.add_argument('--daily', dest='yf_daily_data', action='store_true',
+                       help='Enable daily (1d) data download')
+    parser.add_argument('--no-daily', dest='yf_daily_data', action='store_false',
+                       help='Disable daily data download')
+
+    parser.add_argument('--weekly', dest='yf_weekly_data', action='store_true',
+                       help='Enable weekly (1wk) data download')
+    parser.add_argument('--no-weekly', dest='yf_weekly_data', action='store_false',
+                       help='Disable weekly data download')
+
+    parser.add_argument('--monthly', dest='yf_monthly_data', action='store_true',
+                       help='Enable monthly (1mo) data download')
+    parser.add_argument('--no-monthly', dest='yf_monthly_data', action='store_false',
+                       help='Disable monthly data download')
+
+    # TradingView data
+    parser.add_argument('--tw-data', dest='tw_hist_data', action='store_true',
+                       help='Enable TradingView data processing')
+    parser.add_argument('--no-tw-data', dest='tw_hist_data', action='store_false',
+                       help='Disable TradingView data processing')
+
+    # Financial data enrichment
+    parser.add_argument('--fin-data', dest='fin_data_enrich', action='store_true',
+                       help='Enable financial data enrichment')
+    parser.add_argument('--no-fin-data', dest='fin_data_enrich', action='store_false',
+                       help='Disable financial data enrichment')
+
+    # Info file
+    parser.add_argument('--write-info', dest='write_info_file', action='store_true',
+                       help='Enable info file generation')
+    parser.add_argument('--no-write-info', dest='write_info_file', action='store_false',
+                       help='Disable info file generation')
+
+    args = parser.parse_args()
+
+    # Track which arguments were actually provided by checking sys.argv
+    import sys
+    provided_args = set()
+
+    # Map CLI flags to their destination names
+    flag_to_dest = {
+        '--ticker-choice': 'ticker_choice',
+        '--hist-data': 'yf_hist_data',
+        '--no-hist-data': 'yf_hist_data',
+        '--daily': 'yf_daily_data',
+        '--no-daily': 'yf_daily_data',
+        '--weekly': 'yf_weekly_data',
+        '--no-weekly': 'yf_weekly_data',
+        '--monthly': 'yf_monthly_data',
+        '--no-monthly': 'yf_monthly_data',
+        '--tw-data': 'tw_hist_data',
+        '--no-tw-data': 'tw_hist_data',
+        '--fin-data': 'fin_data_enrich',
+        '--no-fin-data': 'fin_data_enrich',
+        '--write-info': 'write_info_file',
+        '--no-write-info': 'write_info_file'
+    }
+
+    for arg in sys.argv[1:]:
+        if arg in flag_to_dest:
+            provided_args.add(flag_to_dest[arg])
+
+    # Convert args to dict, only including values that were explicitly provided
+    config_dict = {}
+    for key, value in vars(args).items():
+        if key != 'preset' and key in provided_args:
+            config_dict[key] = value
+
+    # Smart logic: If any interval is enabled, auto-enable yf_hist_data
+    # (unless user explicitly disabled it)
+    intervals_enabled = (
+        config_dict.get('yf_daily_data', False) or
+        config_dict.get('yf_weekly_data', False) or
+        config_dict.get('yf_monthly_data', False)
+    )
+
+    if intervals_enabled and 'yf_hist_data' not in config_dict:
+        # User enabled an interval but didn't specify --hist-data or --no-hist-data
+        # Auto-enable historical data
+        config_dict['yf_hist_data'] = True
+        print("ℹ️  Auto-enabling YF historical data (interval specified)")
+
+    return args.preset, config_dict
+
+
+# ============================================================================
+# CONFIGURATION MERGING
+# ============================================================================
+def merge_configs(base_config, config_override=None, preset=None, cli_args=None):
+    """
+    Merge configurations with priority: CLI args > preset > config_override > CSV base
+
+    Args:
+        base_config: UserConfiguration object from CSV
+        config_override: dict - Python dict override (for Colab usage)
+        preset: str - Preset name to use
+        cli_args: dict - Command-line arguments
+
+    Returns:
+        UserConfiguration object with merged settings
+    """
+    import copy
+    merged = copy.deepcopy(base_config)
+
+    # Priority 1: Apply preset if specified
+    if preset:
+        if preset not in CONFIG_PRESETS:
+            print(f"⚠️  Warning: Unknown preset '{preset}'. Using base config.")
+            print(f"   Available presets: {', '.join(CONFIG_PRESETS.keys())}")
+        else:
+            print(f"📋 Using preset: {preset}")
+            preset_config = CONFIG_PRESETS[preset]
+            for key, value in preset_config.items():
+                if hasattr(merged, key):
+                    setattr(merged, key, value)
+
+    # Priority 2: Apply config_override dict (for Colab)
+    if config_override:
+        print(f"🔧 Applying config overrides: {list(config_override.keys())}")
+        for key, value in config_override.items():
+            if hasattr(merged, key):
+                setattr(merged, key, value)
+            else:
+                print(f"⚠️  Warning: Unknown config key '{key}' ignored")
+
+    # Priority 3: Apply CLI arguments (highest priority)
+    if cli_args:
+        print(f"⌨️  Applying CLI arguments: {list(cli_args.keys())}")
+        for key, value in cli_args.items():
+            if hasattr(merged, key):
+                setattr(merged, key, value)
+            else:
+                print(f"⚠️  Warning: Unknown CLI arg '{key}' ignored")
+
+    return merged
+
 
 def test_yfinance_and_financial_data():
     """Test yfinance functionality and the new financial data module"""
@@ -187,14 +450,81 @@ def test_yfinance_and_financial_data():
     
     print('✅ yfinance and financial data module tests completed successfully.')
 
-def main():
+def main(config_override=None, preset=None):
+    """
+    Main data collection function with flexible configuration options.
+
+    Args:
+        config_override (dict, optional): Dictionary to override CSV config values.
+            Useful for programmatic usage (e.g., Colab notebooks).
+            Example: {'ticker_choice': '2', 'yf_daily_data': True}
+
+        preset (str, optional): Named preset configuration to use.
+            Available presets: 'quick_test', 'nasdaq_daily', 'sp500_full',
+                               'nasdaq_sp500_daily', 'portfolio_only', 'full_canslim'
+            Example: preset='nasdaq_daily'
+
+    Priority order: CLI args > preset > config_override > CSV defaults
+
+    Usage examples:
+        # Use CSV config (backward compatible)
+        main()
+
+        # Use preset
+        main(preset='nasdaq_daily')
+
+        # Use dict override (Colab-friendly)
+        main({'ticker_choice': '2', 'yf_daily_data': True})
+
+        # Command line
+        python main.py --preset nasdaq_daily
+        python main.py --ticker-choice 2 --daily --weekly
+    """
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     # all messages are suppressed
     logging.getLogger().setLevel(logging.CRITICAL)
     setup_directories()  # Initialize directories via config
-    
-    # Get the full configuration object for fine-grained control
-    config = read_user_data()
+
+    # ============ CONFIGURATION MERGING ============
+    print("\n" + "="*60)
+    print("CONFIGURATION SETUP")
+    print("="*60)
+
+    # Read base configuration from CSV
+    base_config = read_user_data()
+    print(f"📄 Base config loaded from: user_input/user_data.csv")
+
+    # Parse CLI arguments (if running from command line)
+    cli_preset = None
+    cli_args = None
+    try:
+        # Only parse CLI args if we're actually being run from command line
+        import sys
+        if len(sys.argv) > 1:  # Has command-line arguments
+            cli_preset, cli_args = parse_arguments()
+    except SystemExit:
+        # parse_arguments() was called but no valid args, use defaults
+        pass
+
+    # Merge preset parameter with CLI preset (CLI takes priority)
+    final_preset = cli_preset if cli_preset else preset
+
+    # Merge all configurations
+    config = merge_configs(base_config, config_override, final_preset, cli_args)
+
+    # Display final configuration
+    print(f"\n🎯 Final Configuration:")
+    print(f"   Ticker Choice: {config.ticker_choice}")
+    print(f"   YF Historical Data: {config.yf_hist_data}")
+    if config.yf_hist_data:
+        intervals = []
+        if config.yf_daily_data: intervals.append("Daily")
+        if config.yf_weekly_data: intervals.append("Weekly")
+        if config.yf_monthly_data: intervals.append("Monthly")
+        print(f"   Intervals: {', '.join(intervals) if intervals else 'None'}")
+    print(f"   TW Historical Data: {config.tw_hist_data}")
+    print(f"   Financial Data Enrichment: {config.fin_data_enrich}")
+    print(f"   Write Info Files: {config.write_info_file}")
     
     # ============ TICKER DATA RETRIEVAL ============
     print("\n" + "="*60)
