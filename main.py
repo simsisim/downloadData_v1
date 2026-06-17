@@ -4,7 +4,8 @@ import pandas as pd
 import argparse
 from datetime import datetime, timedelta
 from src.get_marketData import run_market_data_retrieval
-from src.get_financial_data import run_financial_data_retrieval  # New import
+from src.get_financial_data import run_financial_data_retrieval
+from src.get_batchData import run_batch_data_retrieval, _parse_interval_cfg
 from src.config import user_choice, write_file_info, Config
 from src.user_defined_data import read_user_data_legacy, read_user_data
 from src.config import setup_directories, PARAMS_DIR
@@ -188,6 +189,36 @@ Ticker choice values:
     parser.add_argument('--no-write-info', dest='write_info_file', action='store_false',
                        help='Disable info file generation')
 
+    # Fast batch downloader
+    parser.add_argument('--batch-data', dest='yf_batch_data', action='store_true',
+                       help='Enable fast batch downloader (yf.download)')
+    parser.add_argument('--no-batch-data', dest='yf_batch_data', action='store_false',
+                       help='Disable fast batch downloader')
+    parser.add_argument('--batch-daily', dest='yf_batch_daily', action='store_true',
+                       help='Enable batch daily bars')
+    parser.add_argument('--no-batch-daily', dest='yf_batch_daily', action='store_false',
+                       help='Disable batch daily bars')
+    parser.add_argument('--batch-weekly', dest='yf_batch_weekly', action='store_true',
+                       help='Enable batch weekly bars')
+    parser.add_argument('--no-batch-weekly', dest='yf_batch_weekly', action='store_false',
+                       help='Disable batch weekly bars')
+    parser.add_argument('--batch-monthly', dest='yf_batch_monthly', action='store_true',
+                       help='Enable batch monthly bars')
+    parser.add_argument('--no-batch-monthly', dest='yf_batch_monthly', action='store_false',
+                       help='Disable batch monthly bars')
+    parser.add_argument('--batch-only', action='store_true', dest='batch_only',
+                       help='Run batch pipeline only — disables slow YF, TW, and financial data pipelines')
+    parser.add_argument('--batch-ticker-choice', type=str, dest='yf_batch_ticker_choice',
+                       help='Ticker group for batch only (0-8 or dash-separated e.g. 1-2); independent of --ticker-choice')
+    parser.add_argument('--batch-universe', type=str, dest='yf_batch_universe',
+                       help='Universe file in user_input/ for batch download (overrides CSV)')
+    parser.add_argument('--batch-start', type=str, dest='batch_start',
+                       help='Start date for all batch intervals YYYY-MM-DD')
+    parser.add_argument('--batch-end', type=str, dest='batch_end',
+                       help='End date for all batch intervals YYYY-MM-DD or today')
+    parser.add_argument('--batch-period', type=str, dest='batch_period',
+                       help='Period for all batch intervals when start is empty (e.g. 5d, 1y)')
+
     args = parser.parse_args()
 
     # Track which arguments were actually provided by checking sys.argv
@@ -210,7 +241,17 @@ Ticker choice values:
         '--fin-data': 'fin_data_enrich',
         '--no-fin-data': 'fin_data_enrich',
         '--write-info': 'write_info_file',
-        '--no-write-info': 'write_info_file'
+        '--no-write-info': 'write_info_file',
+        '--batch-data': 'yf_batch_data',
+        '--no-batch-data': 'yf_batch_data',
+        '--batch-daily': 'yf_batch_daily',
+        '--no-batch-daily': 'yf_batch_daily',
+        '--batch-weekly': 'yf_batch_weekly',
+        '--no-batch-weekly': 'yf_batch_weekly',
+        '--batch-monthly': 'yf_batch_monthly',
+        '--no-batch-monthly': 'yf_batch_monthly',
+        '--batch-ticker-choice': 'yf_batch_ticker_choice',
+        '--batch-universe': 'yf_batch_universe',
     }
 
     for arg in sys.argv[1:]:
@@ -224,20 +265,40 @@ Ticker choice values:
             config_dict[key] = value
 
     # Smart logic: If any interval is enabled, auto-enable yf_hist_data
-    # (unless user explicitly disabled it)
     intervals_enabled = (
         config_dict.get('yf_daily_data', False) or
         config_dict.get('yf_weekly_data', False) or
         config_dict.get('yf_monthly_data', False)
     )
-
     if intervals_enabled and 'yf_hist_data' not in config_dict:
-        # User enabled an interval but didn't specify --hist-data or --no-hist-data
-        # Auto-enable historical data
         config_dict['yf_hist_data'] = True
         print("ℹ️  Auto-enabling YF historical data (interval specified)")
 
-    return args.preset, config_dict
+    # Smart logic: If any batch interval is enabled, auto-enable yf_batch_data
+    batch_intervals_enabled = (
+        config_dict.get('yf_batch_daily', False) or
+        config_dict.get('yf_batch_weekly', False) or
+        config_dict.get('yf_batch_monthly', False)
+    )
+    if batch_intervals_enabled and 'yf_batch_data' not in config_dict:
+        config_dict['yf_batch_data'] = True
+        print("ℹ️  Auto-enabling YF batch data (batch interval specified)")
+
+    # --batch-only: disable all non-batch pipelines
+    if args.batch_only:
+        config_dict['yf_hist_data']   = False
+        config_dict['tw_hist_data']   = False
+        config_dict['fin_data_enrich'] = False
+        config_dict['yf_batch_data']  = True
+        print("ℹ️  --batch-only: slow YF, TW and financial pipelines disabled")
+
+    # Capture batch date/period CLI overrides (not mapped through UserConfiguration)
+    batch_overrides = {}
+    if args.batch_start:  batch_overrides['batch_start']  = args.batch_start
+    if args.batch_end:    batch_overrides['batch_end']    = args.batch_end
+    if args.batch_period: batch_overrides['batch_period'] = args.batch_period
+
+    return args.preset, config_dict, batch_overrides
 
 
 # ============================================================================
@@ -497,13 +558,12 @@ def main(config_override=None, preset=None):
     # Parse CLI arguments (if running from command line)
     cli_preset = None
     cli_args = None
+    batch_overrides = {}
     try:
-        # Only parse CLI args if we're actually being run from command line
         import sys
-        if len(sys.argv) > 1:  # Has command-line arguments
-            cli_preset, cli_args = parse_arguments()
+        if len(sys.argv) > 1:
+            cli_preset, cli_args, batch_overrides = parse_arguments()
     except SystemExit:
-        # parse_arguments() was called but no valid args, use defaults
         pass
 
     # Merge preset parameter with CLI preset (CLI takes priority)
@@ -795,6 +855,65 @@ def main(config_override=None, preset=None):
         print("⏭️  Skipping financial data collection (fin_data_enrich = FALSE)")
         print("   To enable: Set fin_data_enrich = TRUE in user_input/user_data.csv")
     
+    # ============ FAST BATCH DOWNLOADER ============
+    if config.yf_batch_data:
+        print("\n" + "="*60)
+        print("FAST BATCH DOWNLOAD (yf.download)")
+        print("="*60)
+
+        # Determine universe file
+        # Priority: batch_ticker_choice (CLI) > batch_universe (CSV/CLI) > slow-pipeline combined_file
+        if config.yf_batch_ticker_choice:
+            batch_choice = config.yf_batch_ticker_choice
+            print(f"  Generating ticker files for batch ticker_choice: {batch_choice}")
+            generate_all_ticker_files(unified_config, batch_choice)
+            batch_ticker_file = os.path.join(PARAMS_DIR["TICKERS_DIR"], f"combined_tickers_{batch_choice}.csv")
+        elif config.yf_batch_universe:
+            batch_ticker_file = os.path.join(config.user_input_path, config.yf_batch_universe)
+        else:
+            batch_ticker_file = combined_file  # reuse slow-pipeline universe
+        print(f"  Universe: {batch_ticker_file}")
+
+        # Build interval config from CSV settings
+        interval_cfg = {}
+        if config.yf_batch_daily:
+            interval_cfg["1d"] = _parse_interval_cfg(
+                config.yf_batch_daily_start_date,
+                config.yf_batch_daily_end_date,
+                config.yf_batch_daily_period,
+            )
+        if config.yf_batch_weekly:
+            interval_cfg["1wk"] = _parse_interval_cfg(
+                config.yf_batch_weekly_start_date,
+                config.yf_batch_weekly_end_date,
+                config.yf_batch_weekly_period,
+            )
+        if config.yf_batch_monthly:
+            interval_cfg["1mo"] = _parse_interval_cfg(
+                config.yf_batch_monthly_start_date,
+                config.yf_batch_monthly_end_date,
+                config.yf_batch_monthly_period,
+            )
+
+        if not interval_cfg:
+            print("  No batch intervals enabled — set YF_batch_daily/weekly/monthly to TRUE")
+        else:
+            batch_params = {
+                "ticker_file":    batch_ticker_file,
+                "output_dir":     config.yf_batch_output_path,
+                "failed_file":    os.path.join(PARAMS_DIR["TICKERS_DIR"], "problematic_tickers_batch.csv"),
+                "use_failed_file": config.yf_batch_use_failed_file,
+                "interval_cfg":   interval_cfg,
+                **batch_overrides,  # CLI --batch-start/end/period overrides
+            }
+            run_batch_data_retrieval(batch_params)
+    else:
+        print("\n" + "="*60)
+        print("FAST BATCH DOWNLOAD DISABLED")
+        print("="*60)
+        print("  To enable: Set YF_batch_data = TRUE in user_input/user_data.csv")
+        print("  Or use CLI: python main.py --batch-data --batch-daily")
+
     print("\n" + "="*60)
     print("ALL DATA COLLECTION COMPLETED")
     print("="*60)
