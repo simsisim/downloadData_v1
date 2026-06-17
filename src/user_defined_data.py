@@ -43,6 +43,25 @@ class UserConfiguration:
     # Ticker group filenames
     ticker_filenames: dict = None
 
+    # Fast batch downloader (YF_batch)
+    yf_batch_data: bool = False
+    yf_batch_ticker_choice: str = ""     # empty = use ticker_choice; set to override (0-8 or dash-separated)
+    yf_batch_daily: bool = True
+    yf_batch_weekly: bool = False
+    yf_batch_monthly: bool = False
+    yf_batch_universe: str = ""          # empty = use combined_tickers_{choice}.csv
+    yf_batch_use_failed_file: bool = True
+    yf_batch_output_path: str = "data/market_data_batch"
+    yf_batch_daily_start_date: str = ""
+    yf_batch_daily_end_date: str = "today"
+    yf_batch_daily_period: str = "5d"
+    yf_batch_weekly_start_date: str = ""
+    yf_batch_weekly_end_date: str = "today"
+    yf_batch_weekly_period: str = "1y"
+    yf_batch_monthly_start_date: str = ""
+    yf_batch_monthly_end_date: str = "today"
+    yf_batch_monthly_period: str = "5y"
+
 
 def parse_boolean(value: str) -> bool:
     """
@@ -136,7 +155,7 @@ def read_user_data(file_path: str = 'user_input/user_data.csv') -> UserConfigura
         # Remove rows where variable is NaN (empty lines, etc.)
         df = df.dropna(subset=['variable'])
         df['variable'] = df['variable'].str.strip()
-        df['value'] = df['value'].str.strip()
+        df['value'] = df['value'].fillna('').str.strip()
         
         # Create configuration object with defaults
         config = UserConfiguration()
@@ -167,7 +186,24 @@ def read_user_data(file_path: str = 'user_input/user_data.csv') -> UserConfigura
             'ticker_info_TW': ('ticker_info_TW', parse_boolean),
             'ticker_info_TW_file': ('ticker_info_TW_file', str),
             'ticker_info_YF': ('ticker_info_YF', parse_boolean),
-            'ticker_choice': ('ticker_choice', str)
+            'ticker_choice': ('ticker_choice', str),
+            'YF_batch_data': ('yf_batch_data', parse_boolean),
+            'YF_batch_ticker_choice': ('yf_batch_ticker_choice', str),
+            'YF_batch_daily': ('yf_batch_daily', parse_boolean),
+            'YF_batch_weekly': ('yf_batch_weekly', parse_boolean),
+            'YF_batch_monthly': ('yf_batch_monthly', parse_boolean),
+            'YF_batch_universe': ('yf_batch_universe', str),
+            'YF_batch_use_failed_file': ('yf_batch_use_failed_file', parse_boolean),
+            'YF_batch_output_path': ('yf_batch_output_path', str),
+            'YF_batch_daily_start_date': ('yf_batch_daily_start_date', str),
+            'YF_batch_daily_end_date': ('yf_batch_daily_end_date', str),
+            'YF_batch_daily_period': ('yf_batch_daily_period', str),
+            'YF_batch_weekly_start_date': ('yf_batch_weekly_start_date', str),
+            'YF_batch_weekly_end_date': ('yf_batch_weekly_end_date', str),
+            'YF_batch_weekly_period': ('yf_batch_weekly_period', str),
+            'YF_batch_monthly_start_date': ('yf_batch_monthly_start_date', str),
+            'YF_batch_monthly_end_date': ('yf_batch_monthly_end_date', str),
+            'YF_batch_monthly_period': ('yf_batch_monthly_period', str),
         }
         
         # Process each row in the dataframe

@@ -23,7 +23,13 @@ PARAMS_DIR = {
     "TW_FILES_DIR": "data/tw_files",
     "TW_FILES_DAILY": os.path.join("data", "tw_files/daily/"),
     "TW_FILES_WEEKLY": os.path.join("data", "tw_files/weekly/"),
-    "TW_FILES_MONTHLY": os.path.join("data", "tw_files/monthly/")
+    "TW_FILES_MONTHLY": os.path.join("data", "tw_files/monthly/"),
+
+    # Fast batch downloader output directories
+    "MARKET_DATA_BATCH_DIR": "data/market_data_batch",
+    "MARKET_DATA_BATCH_DIR_1d": os.path.join("data", "market_data_batch/daily/"),
+    "MARKET_DATA_BATCH_DIR_1wk": os.path.join("data", "market_data_batch/weekly/"),
+    "MARKET_DATA_BATCH_DIR_1mo": os.path.join("data", "market_data_batch/monthly/"),
 }
 
 class Config:
@@ -57,6 +63,11 @@ def setup_directories():
     os.makedirs(PARAMS_DIR["TW_FILES_DAILY"], exist_ok=True)
     os.makedirs(PARAMS_DIR["TW_FILES_WEEKLY"], exist_ok=True)
     os.makedirs(PARAMS_DIR["TW_FILES_MONTHLY"], exist_ok=True)
+
+    # Fast batch downloader directories
+    os.makedirs(PARAMS_DIR["MARKET_DATA_BATCH_DIR_1d"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["MARKET_DATA_BATCH_DIR_1wk"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["MARKET_DATA_BATCH_DIR_1mo"], exist_ok=True)
     
 
 # Generate filenames (example)

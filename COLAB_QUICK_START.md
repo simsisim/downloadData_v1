@@ -457,3 +457,10 @@ data/
 # 8: TEST tickers only	test_tickers.csv
 # Examples: "1" (S&P 500) "1-2" (S&P 500 + NASDAQ 100) "1-2-3" (all major indexes)	
 
+Need explicitly to define what data to download and what data not to download, sice it re-writes the csv (which alreday has a set up)
+
+1) can download all data: daily, weekly, monthly
+python main.py --ticker-choice 1 --monthly
+2) explicitly download only monthly
+python main.py --ticker-choice 1 --no-daily --no-weekly --monthly
+
