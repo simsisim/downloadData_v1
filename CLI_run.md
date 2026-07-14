@@ -51,6 +51,9 @@ python main.py --hist-data --daily --weekly --no-monthly --ticker-choice 5
 
 # Quick smoke test (8 test tickers)
 python main.py --preset quick_test
+
+# Daily only — Index ETFs, capped at a specific end date
+python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 5 --end-date 2026-06-11
 ```
 
 ---
@@ -126,6 +129,9 @@ python main.py --batch-only --batch-daily --batch-ticker-choice 0 --no-hist-data
 
 # S&P 500 + NASDAQ 100 combined, daily
 python main.py --batch-only --batch-daily --batch-ticker-choice 1-2
+
+# TradingView universe (~4,700) + Index/benchmark ETFs combined, daily
+python main.py --batch-only --batch-daily --batch-ticker-choice 0-5
 ```
 
 ---
@@ -156,6 +162,7 @@ python main.py --hist-data --daily --fin-data --ticker-choice 1
 
 ## Notes
 
+- `--end-date YYYY-MM-DD` caps the end date for **all** slow-pipeline (YF historical) intervals; defaults to today
 - `--batch-only` disables slow YF, TW, and financial pipelines regardless of `user_data.csv`
 - `--batch-start` / `--batch-end` / `--batch-period` override date settings for **all** batch intervals
 - Per-interval date tuning (daily vs weekly vs monthly independently) is done in `user_input/user_data.csv`

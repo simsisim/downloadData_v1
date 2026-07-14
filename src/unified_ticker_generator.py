@@ -389,6 +389,17 @@ class UnifiedTickerGenerator:
     def _generate_files_for_choice(self, choice):
         """Force regenerate all 3 file types for a specific choice."""
         try:
+            # Choice 0 always means the full TradingView universe. When the overall
+            # mode was forced to 'individual_files' (e.g. because a special choice like
+            # 5/6/7/8 is also in the combo), we still want to generate choice-0 files
+            # from tradingview_universe_bool.csv rather than the individual SP500/NASDAQ
+            # fallback files.
+            if choice == 0 and self.mode == 'individual_files':
+                universe_bool = self.tickers_dir / 'tradingview_universe_bool.csv'
+                if universe_bool.exists():
+                    print(f"  • Choice 0: using TradingView universe (overriding individual_files mode)")
+                    return self._generate_files_tradingview_mode(choice)
+
             if self.mode == 'tradingview':
                 return self._generate_files_tradingview_mode(choice)
             elif self.mode == 'individual_files':
@@ -566,8 +577,27 @@ class UnifiedTickerGenerator:
         # Combine tickers from all choices
         all_tickers = []
         used_files = []
-        
+
         for choice in choices:
+            # Choice 0 = TradingView universe. _generate_files_for_choice(0) already
+            # regenerated combined_tickers_0.csv from tradingview_universe_bool.csv
+            # before this method is called, so load from that fresh output rather than
+            # the individual_files[0] fallback (SP500/NASDAQ/Russell files).
+            if choice == 0:
+                tw_output = self.tickers_dir / 'combined_tickers_0.csv'
+                if tw_output.exists():
+                    try:
+                        df0 = pd.read_csv(tw_output)
+                        if 'ticker' in df0.columns:
+                            all_tickers.extend(df0['ticker'].tolist())
+                            label = 'combined_tickers_0.csv'
+                            if label not in used_files:
+                                used_files.append(label)
+                            print(f"  • Choice 0: {len(df0)} tickers from TradingView universe")
+                            continue
+                    except Exception as e:
+                        print(f"⚠️  Could not read combined_tickers_0.csv: {e} — falling back")
+
             files = self.individual_files.get(choice, [])
             for file in files:
                 # First check in data/tickers/ directory
@@ -578,7 +608,7 @@ class UnifiedTickerGenerator:
                     if root_file_path.exists():
                         file_path = root_file_path
                         print(f"📁 Using file from root directory: {file}")
-                
+
                 if file_path.exists():
                     try:
                         df = pd.read_csv(file_path)
