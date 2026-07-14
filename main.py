@@ -212,6 +212,8 @@ Ticker choice values:
                        help='Ticker group for batch only (0-8 or dash-separated e.g. 1-2); independent of --ticker-choice')
     parser.add_argument('--batch-universe', type=str, dest='yf_batch_universe',
                        help='Universe file in user_input/ for batch download (overrides CSV)')
+    parser.add_argument('--end-date', type=str, dest='end_date',
+                       help='End date for YF historical (slow) data download YYYY-MM-DD (default: today)')
     parser.add_argument('--batch-start', type=str, dest='batch_start',
                        help='Start date for all batch intervals YYYY-MM-DD')
     parser.add_argument('--batch-end', type=str, dest='batch_end',
@@ -297,6 +299,7 @@ Ticker choice values:
     if args.batch_start:  batch_overrides['batch_start']  = args.batch_start
     if args.batch_end:    batch_overrides['batch_end']    = args.batch_end
     if args.batch_period: batch_overrides['batch_period'] = args.batch_period
+    if args.end_date:     batch_overrides['hist_end_date'] = args.end_date
 
     return args.preset, config_dict, batch_overrides
 
@@ -701,13 +704,15 @@ def main(config_override=None, preset=None):
         else:
             print(f"📈 Historical data intervals enabled: {', '.join(enabled_intervals)}")
     
+            hist_end_date = batch_overrides.get('hist_end_date', datetime.now().strftime('%Y-%m-%d'))
+
             # Daily market data
             if config.yf_daily_data:
                 print("\n📅 Downloading daily (1d) market data...")
                 daily_params = {
                     'interval': '1d',
                     'start_date': '2020-01-01',
-                    'end_date': datetime.now().strftime('%Y-%m-%d'),
+                    'end_date': hist_end_date,
                     'folder': PARAMS_DIR["MARKET_DATA_DIR_1d"],
                     'ticker_file': combined_file,
                     'write_file_info': write_file_info,
@@ -726,7 +731,7 @@ def main(config_override=None, preset=None):
                 weekly_params = {
                     'interval': '1wk',
                     'start_date': '2000-01-01',
-                    'end_date': datetime.now().strftime('%Y-%m-%d'),
+                    'end_date': hist_end_date,
                     'folder': PARAMS_DIR["MARKET_DATA_DIR_1wk"],
                     'ticker_file': combined_file,
                     'write_file_info': write_file_info,
@@ -739,13 +744,13 @@ def main(config_override=None, preset=None):
                 print("⏭️  Weekly data collection disabled (YF_weekly_data = FALSE)")
  
              
-            # Monthly market data  
+            # Monthly market data
             if config.yf_monthly_data:
                 print("\n📅 Downloading monthly (1mo) market data...")
                 monthly_params = {
                     'interval': '1mo',
                     'start_date': '2000-01-01',
-                    'end_date': datetime.now().strftime('%Y-%m-%d'),
+                    'end_date': hist_end_date,
                     'folder': PARAMS_DIR["MARKET_DATA_DIR_1mo"],
                     'ticker_file': combined_file,
                     'write_file_info': write_file_info,

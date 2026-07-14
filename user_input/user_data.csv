@@ -11,9 +11,9 @@ TW_universe_file,tradingview_universe.csv,File name for TradingView universe dat
 ,,
 # HISTORICAL DATA COLLECTION,,
 # ---------------------------,,
-YF_hist_data,FALSE,Download historical OHLCV data via YFinance
+YF_hist_data,TRUE,Download historical OHLCV data via YFinance
 YF_daily_data,FALSE,Download daily (1d) historical data
-YF_weekly_data,FALSE,Download weekly (1wk) historical data
+YF_weekly_data,TRUE,Download weekly (1wk) historical data
 YF_monthly_data,FALSE,Download monthly (1mo) historical data
 TW_hist_data,FALSE,Update historical OHLCV data from TradingView bulk files
 user_input_path,user_input,Directory for user input files (portfolio universe indexes etc)
@@ -27,9 +27,9 @@ TW_files_path,data/tw_files,Base directory for TradingView bulk CSV files
 ,,
 # FAST BATCH DOWNLOADER (yf.download — one file per date, all tickers in chunks),
 # -------------------------------------------------------------------------------,,
-YF_batch_data,TRUE,Enable fast batch downloader
+YF_batch_data,FALSE,Enable fast batch downloader
 YF_batch_ticker_choice,,Ticker group for batch (0-8 or dash-separated e.g. 1-2) — leave empty to use ticker_choice
-YF_batch_daily,TRUE,Batch download daily bars: TRUE / FALSE
+YF_batch_daily,FALSE,Batch download daily bars: TRUE / FALSE
 YF_batch_weekly,FALSE,Batch download weekly bars: TRUE / FALSE
 YF_batch_monthly,FALSE,Batch download monthly bars: TRUE / FALSE
 YF_batch_universe,symbols_universe.csv,Universe file in user_input/ (leave empty to use combined_tickers from ticker_choice)
@@ -58,7 +58,7 @@ write_info_file,TRUE,Write detailed info files during processing
 ticker_info_TW,TRUE,Get ticker info from TradingView universe file
 ticker_info_TW_file,tradingview_universe_bool.csv,File name for TradingView ticker info
 ticker_info_YF,FALSE,Download ticker info from YFinance
-ticker_choice,0,Ticker combination choice (use single numbers or dash-separated)
+ticker_choice,5,Ticker combination choice (use single numbers or dash-separated)
 ,,
 # TICKER GROUP CHOICES (ticker_choice values),,
 # ==========================================,,
