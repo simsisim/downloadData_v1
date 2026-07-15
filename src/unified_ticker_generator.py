@@ -446,7 +446,8 @@ class UnifiedTickerGenerator:
             file_path = self.tickers_dir / file
             # If not found, check user_input/ (tracked in git), then root as fallbacks
             if not file_path.exists():
-                user_input_file_path = Path(self.config.user_input_path) / file
+                user_input_dir = getattr(self.config, 'user_input_path', 'user_input')
+                user_input_file_path = Path(user_input_dir) / file
                 root_file_path = Path(file)
                 if user_input_file_path.exists():
                     file_path = user_input_file_path
