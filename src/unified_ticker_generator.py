@@ -444,13 +444,17 @@ class UnifiedTickerGenerator:
         for file in files:
             # First check in data/tickers/ directory
             file_path = self.tickers_dir / file
-            # If not found, check in root directory as fallback
+            # If not found, check user_input/ (tracked in git), then root as fallbacks
             if not file_path.exists():
+                user_input_file_path = Path(self.config.user_input_path) / file
                 root_file_path = Path(file)
-                if root_file_path.exists():
+                if user_input_file_path.exists():
+                    file_path = user_input_file_path
+                    print(f"📁 Using file from user_input directory: {file}")
+                elif root_file_path.exists():
                     file_path = root_file_path
                     print(f"📁 Using file from root directory: {file}")
-            
+
             if file_path.exists():
                 try:
                     df = pd.read_csv(file_path)
@@ -462,7 +466,7 @@ class UnifiedTickerGenerator:
                 except Exception as e:
                     print(f"⚠️  Error reading {file}: {e}")
             else:
-                print(f"⚠️  File not found in data/tickers/ or root: {file}")
+                print(f"⚠️  File not found in data/tickers/, user_input/, or root: {file}")
         
         if not all_tickers:
             print(f"❌ No tickers found for choice {choice}")
