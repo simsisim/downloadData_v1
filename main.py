@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from src.get_marketData import run_market_data_retrieval
 from src.get_financial_data import run_financial_data_retrieval
 from src.get_batchData import run_batch_data_retrieval, _parse_interval_cfg
+from src.get_cboe_putcall import run_cboe_putcall_retrieval
 from src.config import user_choice, write_file_info, Config
 from src.user_defined_data import read_user_data_legacy, read_user_data
 from src.config import setup_directories, PARAMS_DIR
@@ -548,6 +549,18 @@ def main(config_override=None, preset=None):
     # all messages are suppressed
     logging.getLogger().setLevel(logging.CRITICAL)
     setup_directories()  # Initialize directories via config
+
+    # ============ CBOE EQUITY PUT/CALL RATIO UPDATE ============
+    # Runs unconditionally on every invocation, independent of ticker-choice/
+    # batch settings. Failures here must never block the rest of the pipeline.
+    print("\n" + "="*60)
+    print("CBOE EQUITY PUT/CALL RATIO UPDATE")
+    print("="*60)
+    try:
+        run_cboe_putcall_retrieval()
+    except Exception as e:
+        print(f"Error updating CBOE Put/Call Ratio: {e}")
+        print("Continuing with the rest of the pipeline...")
 
     # ============ CONFIGURATION MERGING ============
     print("\n" + "="*60)
