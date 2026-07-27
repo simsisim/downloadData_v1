@@ -19,3 +19,6 @@ tqdm>=4.65.0
 
 # Optional: Data validation
 openpyxl>=3.1.0  # For Excel file support if needed
+
+# CANSLIM EPS trend charts
+matplotlib>=3.8.0

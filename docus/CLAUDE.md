@@ -55,10 +55,15 @@ pip install -r requirements.txt
 - Date extraction from TW filenames
 
 **src/get_financial_data.py**: Comprehensive financial metrics:
-- FinancialDataRetriever class for CANSLIM analysis
-- Collects 3+ years of quarterly data and 5+ years of annual data
-- Calculates growth acceleration, CANSLIM scoring
-- Extracts 100+ financial metrics per ticker
+- FinancialDataRetriever class for CANSLIM (CANSI subset - C/A/N/S/I; L and M are explicitly out of scope) analysis
+- Collects 3+ years of quarterly data and 5+ years of annual data, plus a deep quarterly EPS history (`qh{i}_` fields via `ticker.get_earnings_dates()`) that goes beyond yfinance's ~5-quarter statement cap
+- Calculates real YoY growth/acceleration (`eps_growth_accelerating`), annual quality checks (ROE, cash-flow-vs-EPS), supply trend (buyback/dilution), sponsorship level, and a simple composite `cansi_criteria_met` signal
+- Extracts 300+ financial metrics per ticker - see `docus/CANSI_RAW_DATA_REQUIREMENTS.md` for the full field-by-field mapping
+- **Incremental refresh**: a per-ticker JSON cache (`data/fin_data/tickers/<TICKER>.json`) is the freshness source of truth, independent of `ticker_choice` - a ticker already fresh under one ticker universe is recognized as fresh under any other overlapping universe, not re-fetched per-choice
+
+**src/visualize_financial_data.py**: O'Neil/IBD-style EPS trend charts (log-scale quarterly EPS vs. same-industry/sector peers), saved to `data/charts/eps_trend/`
+
+**src/process_financial_data.py**: Processing stage (charts today, filters/screening planned) - reads already-downloaded financial data, independent of the download stage
 
 **src/get_tickers.py**: Ticker collection from various sources:
 - Downloads from NASDAQ, Wikipedia, S&P 500 lists
@@ -81,6 +86,8 @@ pip install -r requirements.txt
 **user_data.csv**: Controls data collection behavior:
 - Line 19: User choice (0-17) determining which ticker sets to process
 - Line 22: Boolean flag for writing detailed info files
+- `fin_data_download` (renamed from `fin_data_enrich`): enable/disable the financial-data download stage. `fin_data_refresh_days` / `fin_data_force_refresh` control the incremental-refresh threshold and escape hatch.
+- `fin_data_process`: independent flag for the processing stage (charts today) - can run with `fin_data_download=FALSE` entirely off previously-downloaded data, or vice versa. `fin_data_chart_top_n` / `fin_data_chart_max_peers` / `fin_data_chart_quarters` control chart scope.
 
 ### Ticker Selection Options (0-17):
 - 0, 17: Portfolio tickers only
@@ -93,11 +100,16 @@ pip install -r requirements.txt
 
 ### Output Structure
 
-**data/tickers/**: Ticker lists and financial data
+**data/tickers/**: Ticker lists
 - `combined_tickers_{choice}.csv`: Final ticker list used
-- `financial_data_{choice}.csv`: Complete financial dataset
-- `financial_data_summary_{choice}.csv`: Key metrics summary
 - `problematic_tickers_{choice}.csv`: Failed ticker retrievals
+
+**data/fin_data/**: CANSLIM financial data (moved out of `data/tickers/`)
+- `financial_data_{choice}.csv`: Complete financial dataset for that ticker_choice
+- `financial_data_summary_{choice}.csv`: Key metrics summary
+- `tickers/{ticker}.json`: Per-ticker cache - the incremental-refresh source of truth (see above), one file per symbol regardless of which ticker_choice fetched it
+
+**data/charts/eps_trend/**: EPS trend chart PNGs (`{ticker}_eps_trend.png`), from `src/visualize_financial_data.py` / `src/process_financial_data.py`
 
 **data/market_data/**: Historical price data organized by timeframe
 - `daily/`, `weekly/`, `monthly/` subdirectories
@@ -112,14 +124,13 @@ pip install -r requirements.txt
 
 ### CANSLIM Analysis Features
 
-The financial data retrieval focuses on CANSLIM methodology:
-- **C**: Current quarterly earnings growth
-- **A**: Annual earnings growth trends  
-- **N**: New products, management, or price highs
-- **S**: Supply and demand (shares outstanding, float)
-- **L**: Leader or laggard (market cap, beta, price performance)
-- **I**: Institutional sponsorship
-- **M**: Market direction and fundamentals
+The financial data retrieval focuses on CANSLIM methodology - deliberately scoped to **C/A/N/S/I** ("CANSI"); **L** (leader/laggard) and **M** (market direction) are explicitly out of scope (see `docus/CANSI_RAW_DATA_REQUIREMENTS.md` for why):
+- **C**: Current quarterly earnings growth, with real YoY acceleration (`eps_growth_accelerating`) computed from a deep quarterly EPS history, not just the ~5 quarters yfinance's statement endpoint caps out at
+- **A**: Annual earnings growth trends, ROE (`roe_meets_threshold`, ≥17% bar), cash-flow-vs-EPS quality check (`cashflow_quality_pass`)
+- **N**: New highs proximity (`near_new_high`) and a recent-IPO heuristic (`recent_ipo`)
+- **S**: Supply and demand - share-count trend classification (`supply_trend`: shrinking/stable/diluting) and buyback evidence (`buyback_active`)
+- **I**: Institutional sponsorship level (`sponsorship_level`: healthy/over_owned/low)
+- A simple composite (`cansi_criteria_met` / `cansi_criteria_available` / `cansi_letters_passed`) counts how many of the above pass - not a full weighted score
 
 ### Error Handling
 

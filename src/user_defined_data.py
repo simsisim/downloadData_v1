@@ -27,12 +27,20 @@ class UserConfiguration:
     tw_files_path: str = "data/tw_files"
     user_input_path: str = "user_input"
 
-    # Financial data enrichment
-    fin_data_enrich: bool = True
+    # Financial data download
+    fin_data_download: bool = True
     yf_fin_data: bool = True
     tw_fin_data: bool = False
     zacks_fin_data: bool = False
-    
+    fin_data_refresh_days: int = 7
+    fin_data_force_refresh: bool = False
+
+    # Financial data processing (charts, filters) - independent of download
+    fin_data_process: bool = False
+    fin_data_chart_top_n: int = 10
+    fin_data_chart_max_peers: int = 4
+    fin_data_chart_quarters: int = 8
+
     # General settings
     write_info_file: bool = False
     ticker_info_TW: bool = False
@@ -178,10 +186,16 @@ def read_user_data(file_path: str = 'user_input/user_data.csv') -> UserConfigura
             'TW_intraday_file': ('tw_intraday_file', str),
             'TW_files_path': ('tw_files_path', str),
             'user_input_path': ('user_input_path', str),
-            'fin_data_enrich': ('fin_data_enrich', parse_boolean),
+            'fin_data_download': ('fin_data_download', parse_boolean),
             'YF_fin_data': ('yf_fin_data', parse_boolean),
             'TW_fin_data': ('tw_fin_data', parse_boolean),
             'Zacks_fin_data': ('zacks_fin_data', parse_boolean),
+            'fin_data_refresh_days': ('fin_data_refresh_days', int),
+            'fin_data_force_refresh': ('fin_data_force_refresh', parse_boolean),
+            'fin_data_process': ('fin_data_process', parse_boolean),
+            'fin_data_chart_top_n': ('fin_data_chart_top_n', int),
+            'fin_data_chart_max_peers': ('fin_data_chart_max_peers', int),
+            'fin_data_chart_quarters': ('fin_data_chart_quarters', int),
             'write_info_file': ('write_info_file', parse_boolean),
             'ticker_info_TW': ('ticker_info_TW', parse_boolean),
             'ticker_info_TW_file': ('ticker_info_TW_file', str),

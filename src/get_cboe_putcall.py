@@ -32,7 +32,7 @@ def run_cboe_putcall_retrieval(output_file=None, lookback_days=10):
     """
     if output_file is None:
         from src.config import PARAMS_DIR
-        output_file = os.path.join(PARAMS_DIR["DATA_DIR"], "EPC_ratio.csv")
+        output_file = os.path.join(PARAMS_DIR["MARKET_DATA_DIR_1d"], "EPC_ratio.csv")
 
     try:
         if os.path.exists(output_file):

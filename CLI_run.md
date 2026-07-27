@@ -18,42 +18,45 @@ Ticker choice values:
 
 ## Slow pipeline only (yf.Ticker per-ticker)
 
+Every command below explicitly disables both financial-data flags (`--no-fin-data --no-fin-process`) so behavior is self-contained regardless of what `fin_data_download`/`fin_data_process` currently are in `user_data.csv` — without this, whichever value is sitting in the CSV would silently apply.
+
 ```bash
 # Daily only — NASDAQ 100
-python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 2
+python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 2 --no-fin-data --no-fin-process
 
 # Daily only — S&P 500
-python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 1
+python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 1 --no-fin-data --no-fin-process
 
 # Daily only — TradingView universe (all ~4,700)
-python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 0
+python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 0 --no-fin-data --no-fin-process
 
 # Weekly only — NASDAQ 100
-python main.py --hist-data --no-daily --weekly --no-monthly --ticker-choice 2
+python main.py --hist-data --no-daily --weekly --no-monthly --ticker-choice 2 --no-fin-data --no-fin-process
 
 # Monthly only — S&P 500
-python main.py --hist-data --no-daily --no-weekly --monthly --ticker-choice 1
+python main.py --hist-data --no-daily --no-weekly --monthly --ticker-choice 1 --no-fin-data --no-fin-process
 
 # Daily + Weekly — NASDAQ 100
-python main.py --hist-data --daily --weekly --no-monthly --ticker-choice 2
+python main.py --hist-data --daily --weekly --no-monthly --ticker-choice 2 --no-fin-data --no-fin-process
 
 # Daily + Weekly + Monthly — S&P 500
-python main.py --hist-data --daily --weekly --monthly --ticker-choice 1
+python main.py --hist-data --daily --weekly --monthly --ticker-choice 1 --no-fin-data --no-fin-process
 
 # Daily + Weekly + Monthly — S&P 500 + NASDAQ 100 combined
-python main.py --hist-data --daily --weekly --monthly --ticker-choice 1-2
+python main.py --hist-data --daily --weekly --monthly --ticker-choice 1-2 --no-fin-data --no-fin-process
 
 # Portfolio tickers — daily only
-python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 6
+python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 6 --no-fin-data --no-fin-process
 
 # Index ETFs — daily + weekly
-python main.py --hist-data --daily --weekly --no-monthly --ticker-choice 5
+python main.py --hist-data --daily --weekly --no-monthly --ticker-choice 5 --no-fin-data --no-fin-process
 
-# Quick smoke test (8 test tickers)
+# Quick smoke test (8 test tickers) — preset already sets fin_data_download/
+# fin_data_process explicitly, no extra flags needed
 python main.py --preset quick_test
 
 # Daily only — Index ETFs, capped at a specific end date
-python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 5 --end-date 2026-06-11
+python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 5 --end-date 2026-06-11 --no-fin-data --no-fin-process
 ```
 
 ---
@@ -138,32 +141,52 @@ python main.py --batch-only --batch-daily --batch-ticker-choice 0-5
 
 ## Both pipelines together
 
+`--no-fin-data --no-fin-process` again added explicitly, same reasoning as above.
+
 ```bash
 # Slow daily (NASDAQ 100) + Batch daily (TradingView universe)
-python main.py --hist-data --daily --ticker-choice 2 --batch-data --batch-daily --batch-ticker-choice 0
+python main.py --hist-data --daily --ticker-choice 2 --batch-data --batch-daily --batch-ticker-choice 0 --no-fin-data --no-fin-process
 
 # Slow daily+weekly (S&P 500) + Batch daily+weekly (same universe)
-python main.py --hist-data --daily --weekly --ticker-choice 1 --batch-data --batch-daily --batch-weekly --batch-ticker-choice 1
+python main.py --hist-data --daily --weekly --ticker-choice 1 --batch-data --batch-daily --batch-weekly --batch-ticker-choice 1 --no-fin-data --no-fin-process
 ```
 
 ---
 
 ## Financial data (CANSLIM)
 
+Download and processing are independent flags — either can run alone off previously-saved data, or together in one invocation. `--ticker-choice` selects the universe for **both** stages (which `financial_data_<choice>.csv` gets written to / read from).
+
 ```bash
-# Financial data only — NASDAQ 100
+# Download only — NASDAQ 100 (skips re-fetching tickers still fresh within
+# fin_data_refresh_days; see user_data.csv)
 python main.py --fin-data --no-hist-data --ticker-choice 2
 
-# Daily + financial data — S&P 500
+# Download, ignoring freshness — force re-fetch every ticker
+python main.py --fin-data --fin-data-force-refresh --no-hist-data --ticker-choice 2
+
+# Daily historical + financial data download — S&P 500
 python main.py --hist-data --daily --fin-data --ticker-choice 1
+
+# Processing only (EPS trend charts) — off data already downloaded for
+# NASDAQ 100, no yfinance calls at all. Fails gracefully with a message if
+# financial_data_2.csv doesn't exist yet.
+python main.py --no-fin-data --fin-process --no-hist-data --ticker-choice 2
+
+# Download AND process in one run — S&P 500
+python main.py --fin-data --fin-process --no-hist-data --ticker-choice 1
 ```
+
+Chart scope (`fin_data_chart_top_n`/`fin_data_chart_max_peers`/`fin_data_chart_quarters`) is set in `user_data.csv`, not on the CLI.
 
 ---
 
 ## Notes
 
 - `--end-date YYYY-MM-DD` caps the end date for **all** slow-pipeline (YF historical) intervals; defaults to today
-- `--batch-only` disables slow YF, TW, and financial pipelines regardless of `user_data.csv`
+- `--batch-only` disables slow YF, TW, and financial pipelines (both `--fin-data` and `--fin-process`) regardless of `user_data.csv`
+- `--fin-data-force-refresh` ignores the incremental-refresh cache (`data/fin_data/tickers/<TICKER>.json`) and re-downloads every ticker in the universe
+- `--fin-process` with no prior `financial_data_<choice>.csv` for that `--ticker-choice` prints a message and skips — it never triggers a download itself
 - `--batch-start` / `--batch-end` / `--batch-period` override date settings for **all** batch intervals
 - Per-interval date tuning (daily vs weekly vs monthly independently) is done in `user_input/user_data.csv`
 - CLI flags always override `user_data.csv` values

@@ -30,6 +30,15 @@ PARAMS_DIR = {
     "MARKET_DATA_BATCH_DIR_1d": os.path.join("data", "market_data_batch/daily/"),
     "MARKET_DATA_BATCH_DIR_1wk": os.path.join("data", "market_data_batch/weekly/"),
     "MARKET_DATA_BATCH_DIR_1mo": os.path.join("data", "market_data_batch/monthly/"),
+
+    # CANSLIM chart output directory
+    "CHARTS_DIR": os.path.join("data", "charts", "eps_trend"),
+
+    # CANSLIM raw financial data output directory
+    "FIN_DATA_DIR": os.path.join("data", "fin_data"),
+    # Per-ticker financial data cache (freshness source of truth, independent
+    # of ticker_choice - see FinancialDataRetriever's incremental refresh)
+    "FIN_DATA_TICKERS_DIR": os.path.join("data", "fin_data", "tickers"),
 }
 
 class Config:
@@ -68,7 +77,14 @@ def setup_directories():
     os.makedirs(PARAMS_DIR["MARKET_DATA_BATCH_DIR_1d"], exist_ok=True)
     os.makedirs(PARAMS_DIR["MARKET_DATA_BATCH_DIR_1wk"], exist_ok=True)
     os.makedirs(PARAMS_DIR["MARKET_DATA_BATCH_DIR_1mo"], exist_ok=True)
-    
+
+    # CANSLIM chart output directory
+    os.makedirs(PARAMS_DIR["CHARTS_DIR"], exist_ok=True)
+
+    # CANSLIM raw financial data output directory
+    os.makedirs(PARAMS_DIR["FIN_DATA_DIR"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["FIN_DATA_TICKERS_DIR"], exist_ok=True)
+
 
 # Generate filenames (example)
 #TICKER_FILE = os.path.join(PARAMS_DIR["TICKERS_DIR"], "combined_tickers.csv")

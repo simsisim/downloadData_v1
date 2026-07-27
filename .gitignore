@@ -1,3 +1,7 @@
 data/market_data/
 data/market_data_tw/
 data/tickers/
+data
+
+__pycache__/
+*.pyc

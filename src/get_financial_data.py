@@ -3,6 +3,7 @@ import pandas as pd
 import datetime as dt
 import time
 import os
+import json
 import logging
 from src.config import user_choice, PARAMS_DIR
 
@@ -22,47 +23,112 @@ class FinancialDataRetriever:
         # File paths for financial data storage
         # Sanitize user_choice for filenames (replace dashes with underscores)
         safe_user_choice = str(user_choice).replace('-', '_')
+        fin_data_dir = self.PARAMS_DIR["FIN_DATA_DIR"]
         self.financial_data_file = os.path.join(
-            self.PARAMS_DIR["TICKERS_DIR"], 
+            fin_data_dir,
             f'financial_data_{safe_user_choice}.csv'
         )
         self.financial_summary_file = os.path.join(
-            self.PARAMS_DIR["TICKERS_DIR"], 
+            fin_data_dir,
             f'financial_data_summary_{safe_user_choice}.csv'
         )
         self.canslim_screened_file = os.path.join(
-            self.PARAMS_DIR["TICKERS_DIR"], 
+            fin_data_dir,
             f'canslim_screened_{safe_user_choice}.csv'
         )
-        
+
         # Debug: Print file paths
         print(f"🔧 FinancialDataRetriever initialized with user_choice: {user_choice}")
         print(f"🔧 Financial data file: {self.financial_data_file}")
         print(f"🔧 Summary file: {self.financial_summary_file}")
         print(f"🔧 Screened file: {self.canslim_screened_file}")
-        print(f"🔧 Tickers directory: {self.PARAMS_DIR['TICKERS_DIR']}")
-        
+        print(f"🔧 Financial data directory: {fin_data_dir}")
+
         # Test directory access
-        tickers_dir = self.PARAMS_DIR["TICKERS_DIR"]
-        if os.path.exists(tickers_dir):
-            print(f"✅ Tickers directory exists: {tickers_dir}")
-            if os.access(tickers_dir, os.W_OK):
-                print(f"✅ Tickers directory is writable")
+        if os.path.exists(fin_data_dir):
+            print(f"✅ Financial data directory exists: {fin_data_dir}")
+            if os.access(fin_data_dir, os.W_OK):
+                print(f"✅ Financial data directory is writable")
             else:
-                print(f"❌ Tickers directory is NOT writable")
+                print(f"❌ Financial data directory is NOT writable")
         else:
-            print(f"❌ Tickers directory does NOT exist: {tickers_dir}")
+            print(f"❌ Financial data directory does NOT exist: {fin_data_dir}")
             print(f"🔧 Attempting to create directory...")
             try:
-                os.makedirs(tickers_dir, exist_ok=True)
-                print(f"✅ Created tickers directory")
+                os.makedirs(fin_data_dir, exist_ok=True)
+                print(f"✅ Created financial data directory")
             except Exception as e:
                 print(f"❌ Failed to create directory: {e}")
         
         # Data collection settings for CANSLIM (more history needed)
         self.quarters_to_collect = 12  # 3 years of quarterly data
         self.years_to_collect = 5      # 5 years of annual data
-        
+
+        # Institutional sponsorship detail (major/institutional/mutualfund holders)
+        # requires 3 extra yfinance calls per ticker - opt-in to avoid slowing down
+        # large-universe runs / hitting rate limits.
+        self.collect_sponsorship_detail = bool(self.config.get('collect_sponsorship_detail', False))
+
+        # quarterly_income_stmt only exposes ~5 trailing quarters via yfinance's free
+        # feed, too few for O'Neil's 3-quarter acceleration check (needs 7+). This
+        # separate deep-history source (ticker.get_earnings_dates) covers years of
+        # reported EPS instead - always-on, since it's central to the "C" criterion
+        # and costs just 1 extra request/ticker (vs. 3 for sponsorship detail).
+        self.earnings_history_limit = int(self.config.get('earnings_history_limit', 12))
+
+        # Incremental refresh: skip re-fetching a ticker if its stored data is
+        # already fresher than this many days (fundamentals change slowly - no
+        # need to burn 7-10 yfinance calls/ticker on data that hasn't changed).
+        self.refresh_days = int(self.config.get('refresh_days', 7))
+        self.force_refresh = bool(self.config.get('force_refresh', False))
+
+    @staticmethod
+    def _get_row_by_exact_name(df, row_name):
+        """Return a Series for an exact statement row name, or None if absent/empty."""
+        if df is None or df.empty or row_name not in df.index:
+            return None
+        return df.loc[row_name]
+
+    def _ticker_cache_path(self, ticker):
+        return os.path.join(self.PARAMS_DIR["FIN_DATA_TICKERS_DIR"], f"{ticker}.json")
+
+    def _load_ticker_cache(self, ticker):
+        """
+        Return the cached financial_data dict for a ticker, or None if absent/
+        unreadable. This is the freshness source of truth - one file per ticker,
+        independent of ticker_choice, so a ticker fetched under one ticker_choice
+        is recognized as fresh under any other choice that also includes it.
+        """
+        path = self._ticker_cache_path(ticker)
+        if not os.path.exists(path):
+            return None
+        try:
+            with open(path, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            self.logger.warning(f"Could not read cache for {ticker}: {str(e)}")
+            return None
+
+    def _save_ticker_cache(self, ticker, financial_data):
+        """
+        Write a ticker's financial_data dict to its cache file. Called right
+        after a successful fetch (not batched at the end) so a run that dies
+        partway through doesn't lose already-fetched tickers.
+        """
+        try:
+            with open(self._ticker_cache_path(ticker), 'w') as f:
+                json.dump(financial_data, f)
+        except Exception as e:
+            self.logger.warning(f"Could not save cache for {ticker}: {str(e)}")
+
+    def _is_fresh(self, last_updated_str):
+        """True if a stored 'last_updated' timestamp is within self.refresh_days of now."""
+        try:
+            last_updated = dt.datetime.strptime(str(last_updated_str), '%Y-%m-%d %H:%M:%S')
+        except (ValueError, TypeError):
+            return False
+        return (dt.datetime.now() - last_updated) <= dt.timedelta(days=self.refresh_days)
+
     def load_tickers_from_file(self, ticker_file_path):
         """Load tickers from a CSV file"""
         try:
@@ -131,15 +197,19 @@ class FinancialDataRetriever:
                 'profitMargins': info.get('profitMargins', 'N/A'),
                 'ebitdaMargins': info.get('ebitdaMargins', 'N/A'),
                 
-                # ============ N & S - NEW STOCK & SUPPLY/DEMAND ============
+                # ============ N - NEW (PRODUCTS/MANAGEMENT/NEW HIGHS) ============
+                'fiftyTwoWeekHighChangePercent': info.get('fiftyTwoWeekHighChangePercent', 'N/A'),
+                'allTimeHigh': info.get('allTimeHigh', 'N/A'),
+                'firstTradeDateMilliseconds': info.get('firstTradeDateMilliseconds', 'N/A'),
+
+                # ============ S - SUPPLY/DEMAND ============
                 'sharesOutstanding': info.get('sharesOutstanding', 'N/A'),
                 'floatShares': info.get('floatShares', 'N/A'),
                 'sharesShort': info.get('sharesShort', 'N/A'),
                 'shortRatio': info.get('shortRatio', 'N/A'),
                 'shortPercentOfFloat': info.get('shortPercentOfFloat', 'N/A'),
                 'heldPercentInsiders': info.get('heldPercentInsiders', 'N/A'),
-                'heldPercentInstitutions': info.get('heldPercentInstitutions', 'N/A'),
-                
+
                 # ============ L - LEADER/LAGGARD ============
                 'beta': info.get('beta', 'N/A'),
                 'averageVolume': info.get('averageVolume', 'N/A'),
@@ -148,8 +218,9 @@ class FinancialDataRetriever:
                 'fiftyTwoWeekLow': info.get('fiftyTwoWeekLow', 'N/A'),
                 'fiftyDayAverage': info.get('fiftyDayAverage', 'N/A'),
                 'twoHundredDayAverage': info.get('twoHundredDayAverage', 'N/A'),
-                
+
                 # ============ I - INSTITUTIONAL SPONSORSHIP ============
+                'heldPercentInstitutions': info.get('heldPercentInstitutions', 'N/A'),
                 'bookValue': info.get('bookValue', 'N/A'),
                 'priceToBook': info.get('priceToBook', 'N/A'),
                 'recommendationKey': info.get('recommendationKey', 'N/A'),
@@ -157,7 +228,7 @@ class FinancialDataRetriever:
                 'targetHighPrice': info.get('targetHighPrice', 'N/A'),
                 'targetLowPrice': info.get('targetLowPrice', 'N/A'),
                 'targetMeanPrice': info.get('targetMeanPrice', 'N/A'),
-                
+
                 # ============ M - MARKET DIRECTION & FUNDAMENTALS ============
                 'debtToEquity': info.get('debtToEquity', 'N/A'),
                 'totalDebt': info.get('totalDebt', 'N/A'),
@@ -172,18 +243,51 @@ class FinancialDataRetriever:
                 'netIncomeToCommon': info.get('netIncomeToCommon', 'N/A'),
             }
             
+            # N - derive years since IPO/listing from firstTradeDateMilliseconds
+            first_trade_ms = info.get('firstTradeDateMilliseconds', None)
+            if first_trade_ms:
+                first_trade_date = dt.datetime.fromtimestamp(first_trade_ms / 1000)
+                financial_data['yearsSincePublic'] = round((dt.datetime.now() - first_trade_date).days / 365.25, 1)
+            else:
+                financial_data['yearsSincePublic'] = 'N/A'
+
             # ============ EXTENDED QUARTERLY DATA (8-12 quarters) ============
             self._extract_quarterly_data(financial_data, quarterly_income_stmt, quarterly_balance_sheet, quarterly_cashflow)
-            
+
             # ============ EXTENDED ANNUAL DATA (5+ years) ============
             self._extract_annual_data(financial_data, annual_income_stmt, annual_balance_sheet, annual_cashflow)
-            
+
+            # ============ C - DEEP QUARTERLY EARNINGS HISTORY (beyond the ~5-quarter statement cap) ============
+            self._extract_earnings_history(financial_data, ticker_obj)
+
+            # ============ I - INSTITUTIONAL SPONSORSHIP DETAIL (gated, extra API calls) ============
+            if self.collect_sponsorship_detail:
+                self._extract_sponsorship_detail(financial_data, ticker_obj)
+
+            # ============ C/A - EPS GROWTH (YoY + acceleration, diluted & basic) ============
+            self._calculate_eps_growth(financial_data)
+
+            # ============ A - ANNUAL EARNINGS QUALITY (ROE + cash-flow-per-share vs EPS) ============
+            self._calculate_annual_quality(financial_data)
+
+            # ============ N - NEW-HIGH / RECENT-IPO THRESHOLD FLAGS ============
+            self._calculate_n_flags(financial_data)
+
+            # ============ S - SUPPLY TREND (BUYBACK VS DILUTION) ============
+            self._calculate_supply_trend(financial_data)
+
+            # ============ I - SPONSORSHIP LEVEL CLASSIFICATION ============
+            self._calculate_sponsorship_level(financial_data)
+
+            # ============ CANSI COMPOSITE SIGNAL ============
+            self._calculate_cansi_score(financial_data)
+
             # ============ GROWTH TREND ANALYSIS ============
             #self._calculate_growth_trends(financial_data)
-            
+
             # ============ CANSLIM SCORING ============
             #self._calculate_canslim_score(financial_data)
-            
+
             return financial_data
             
         except Exception as e:
@@ -234,7 +338,28 @@ class FinancialDataRetriever:
                 for i, (date, value) in enumerate(operating_data.items()):
                     if i < self.quarters_to_collect:
                         financial_data[f'q{i+1}_operating_income'] = value if pd.notna(value) else 'N/A'
-    
+
+        # C - Extract quarterly diluted EPS (YoY comparison + acceleration checks)
+        eps_data = self._get_row_by_exact_name(quarterly_income_stmt, 'Diluted EPS')
+        if eps_data is not None:
+            for i, (date, value) in enumerate(eps_data.items()):
+                if i < self.quarters_to_collect:
+                    financial_data[f'q{i+1}_eps'] = value if pd.notna(value) else 'N/A'
+
+        # C - Extract quarterly basic EPS (undiluted - kept alongside diluted, undecided yet which O'Neil intended)
+        basic_eps_data = self._get_row_by_exact_name(quarterly_income_stmt, 'Basic EPS')
+        if basic_eps_data is not None:
+            for i, (date, value) in enumerate(basic_eps_data.items()):
+                if i < self.quarters_to_collect:
+                    financial_data[f'q{i+1}_eps_basic'] = value if pd.notna(value) else 'N/A'
+
+        # C - Extract quarterly pretax income (margin-expansion / quality-of-earnings check)
+        pretax_data = self._get_row_by_exact_name(quarterly_income_stmt, 'Pretax Income')
+        if pretax_data is not None:
+            for i, (date, value) in enumerate(pretax_data.items()):
+                if i < self.quarters_to_collect:
+                    financial_data[f'q{i+1}_pretax_income'] = value if pd.notna(value) else 'N/A'
+
     def _extract_annual_data(self, financial_data, annual_income_stmt, annual_balance_sheet, annual_cashflow):
         """Extract extended annual data (up to 5 years)"""
         
@@ -264,7 +389,368 @@ class FinancialDataRetriever:
                 for i, (year, value) in enumerate(revenue_data.items()):
                     if i < self.years_to_collect:
                         financial_data[f'y{i+1}_revenue'] = value if pd.notna(value) else 'N/A'
-    
+
+        # A - Extract annual diluted EPS (3-5yr growth consistency check)
+        annual_eps_data = self._get_row_by_exact_name(annual_income_stmt, 'Diluted EPS')
+        if annual_eps_data is not None:
+            for i, (year, value) in enumerate(annual_eps_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_eps'] = value if pd.notna(value) else 'N/A'
+
+        # A - Extract annual basic EPS (undiluted - kept alongside diluted, undecided yet which O'Neil intended)
+        annual_basic_eps_data = self._get_row_by_exact_name(annual_income_stmt, 'Basic EPS')
+        if annual_basic_eps_data is not None:
+            for i, (year, value) in enumerate(annual_basic_eps_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_eps_basic'] = value if pd.notna(value) else 'N/A'
+
+        # A - Extract annual pretax income (margin trend)
+        annual_pretax_data = self._get_row_by_exact_name(annual_income_stmt, 'Pretax Income')
+        if annual_pretax_data is not None:
+            for i, (year, value) in enumerate(annual_pretax_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_pretax_income'] = value if pd.notna(value) else 'N/A'
+
+        # A - Extract annual stockholders' equity (real ROE-trend basis)
+        equity_data = self._get_row_by_exact_name(annual_balance_sheet, 'Stockholders Equity')
+        if equity_data is not None:
+            for i, (year, value) in enumerate(equity_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_stockholders_equity'] = value if pd.notna(value) else 'N/A'
+
+        # A - Extract annual long-term debt (falling debt is a supporting "A" signal)
+        ltd_data = self._get_row_by_exact_name(annual_balance_sheet, 'Long Term Debt')
+        if ltd_data is not None:
+            for i, (year, value) in enumerate(ltd_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_long_term_debt'] = value if pd.notna(value) else 'N/A'
+
+        # A - Extract annual operating cash flow (cash-flow-per-share vs EPS quality check)
+        ocf_data = self._get_row_by_exact_name(annual_cashflow, 'Operating Cash Flow')
+        if ocf_data is not None:
+            for i, (year, value) in enumerate(ocf_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_operating_cashflow'] = value if pd.notna(value) else 'N/A'
+
+        # S - Extract annual ordinary shares outstanding (buyback/dilution trend)
+        shares_data = self._get_row_by_exact_name(annual_balance_sheet, 'Ordinary Shares Number')
+        if shares_data is not None:
+            for i, (year, value) in enumerate(shares_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_shares_outstanding'] = value if pd.notna(value) else 'N/A'
+
+        # S - Extract annual treasury shares (confirms buyback activity)
+        treasury_data = self._get_row_by_exact_name(annual_balance_sheet, 'Treasury Shares Number')
+        if treasury_data is not None:
+            for i, (year, value) in enumerate(treasury_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_treasury_shares'] = value if pd.notna(value) else 'N/A'
+
+        # S - Extract annual stock buyback $ (direct evidence, stronger than share-count diffing)
+        buyback_data = self._get_row_by_exact_name(annual_cashflow, 'Repurchase Of Capital Stock')
+        if buyback_data is not None:
+            for i, (year, value) in enumerate(buyback_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_buyback'] = value if pd.notna(value) else 'N/A'
+
+    def _extract_earnings_history(self, financial_data, ticker_obj):
+        """
+        C - Deep quarterly EPS history via ticker.get_earnings_dates(), which covers
+        years of reported EPS vs. the ~5 trailing quarters yfinance's free feed
+        exposes through quarterly_income_stmt. 'Reported EPS' here is diluted-basis
+        (cross-verified against q{i}_eps). Keys use a 'qh{i}_' (quarter-history)
+        prefix so they don't collide with the statement-based q{i}_eps series.
+        """
+        ticker = financial_data.get('ticker', 'Unknown')
+        try:
+            earnings_dates = ticker_obj.get_earnings_dates(limit=self.earnings_history_limit)
+        except Exception as e:
+            self.logger.warning(f"Error fetching earnings_dates for {ticker}: {str(e)}")
+            return
+
+        if earnings_dates is None or earnings_dates.empty:
+            return
+
+        # Drop future/upcoming rows (estimate present, nothing reported yet)
+        reported = earnings_dates[earnings_dates['Reported EPS'].notna()]
+
+        for i, (date, row) in enumerate(reported.iterrows()):
+            idx = i + 1
+            financial_data[f'qh{idx}_date'] = date.strftime('%Y-%m-%d') if pd.notna(date) else 'N/A'
+            financial_data[f'qh{idx}_eps'] = row['Reported EPS'] if pd.notna(row['Reported EPS']) else 'N/A'
+            financial_data[f'qh{idx}_eps_estimate'] = row['EPS Estimate'] if pd.notna(row['EPS Estimate']) else 'N/A'
+            financial_data[f'qh{idx}_surprise_pct'] = row['Surprise(%)'] if pd.notna(row['Surprise(%)']) else 'N/A'
+
+    def _extract_sponsorship_detail(self, financial_data, ticker_obj):
+        """
+        Extract institutional/mutual-fund sponsorship detail (I).
+        Requires 3 extra yfinance calls per ticker - only called when
+        self.collect_sponsorship_detail is True. Each sub-call is isolated
+        so one failure never drops the ticker's already-collected data.
+        """
+        ticker = financial_data.get('ticker', 'Unknown')
+
+        try:
+            major_holders = ticker_obj.major_holders
+            if major_holders is not None and not major_holders.empty and 'institutionsCount' in major_holders.index:
+                financial_data['institutionsCount'] = major_holders.loc['institutionsCount', 'Value']
+                financial_data['institutionsPercentHeld'] = major_holders.loc['institutionsPercentHeld', 'Value']
+            else:
+                financial_data['institutionsCount'] = 'N/A'
+                financial_data['institutionsPercentHeld'] = 'N/A'
+        except Exception as e:
+            self.logger.warning(f"Error fetching major_holders for {ticker}: {str(e)}")
+            financial_data['institutionsCount'] = 'N/A'
+            financial_data['institutionsPercentHeld'] = 'N/A'
+
+        try:
+            inst_holders = ticker_obj.institutional_holders
+            if inst_holders is not None and not inst_holders.empty:
+                financial_data['institutional_holders_count'] = len(inst_holders)
+                financial_data['institutional_holders_avg_pct_change'] = (
+                    inst_holders['pctChange'].mean() if 'pctChange' in inst_holders.columns else 'N/A'
+                )
+            else:
+                financial_data['institutional_holders_count'] = 'N/A'
+                financial_data['institutional_holders_avg_pct_change'] = 'N/A'
+        except Exception as e:
+            self.logger.warning(f"Error fetching institutional_holders for {ticker}: {str(e)}")
+            financial_data['institutional_holders_count'] = 'N/A'
+            financial_data['institutional_holders_avg_pct_change'] = 'N/A'
+
+        try:
+            mf_holders = ticker_obj.mutualfund_holders
+            if mf_holders is not None and not mf_holders.empty:
+                financial_data['mutualfund_holders_count'] = len(mf_holders)
+                financial_data['mutualfund_holders_avg_pct_change'] = (
+                    mf_holders['pctChange'].mean() if 'pctChange' in mf_holders.columns else 'N/A'
+                )
+            else:
+                financial_data['mutualfund_holders_count'] = 'N/A'
+                financial_data['mutualfund_holders_avg_pct_change'] = 'N/A'
+        except Exception as e:
+            self.logger.warning(f"Error fetching mutualfund_holders for {ticker}: {str(e)}")
+            financial_data['mutualfund_holders_count'] = 'N/A'
+            financial_data['mutualfund_holders_avg_pct_change'] = 'N/A'
+
+    @staticmethod
+    def _safe_growth_rate(current, prior):
+        """
+        YoY growth rate as a fraction (0.25 = +25%). Returns 'N/A' when not
+        numeric or when the prior-period value is zero/negative - a percentage
+        is not meaningful when earnings swing across zero (e.g. loss -> profit).
+        """
+        if current in (None, 'N/A') or prior in (None, 'N/A'):
+            return 'N/A'
+        if not isinstance(current, (int, float)) or not isinstance(prior, (int, float)):
+            return 'N/A'
+        if pd.isna(current) or pd.isna(prior) or prior <= 0:
+            return 'N/A'
+        return (current - prior) / prior
+
+    @staticmethod
+    def _safe_ratio(numerator, denominator):
+        """
+        numerator/denominator, e.g. for ROE or cash-flow-per-share. Returns
+        'N/A' when not numeric or when denominator <= 0 - ratios involving a
+        non-positive denominator (e.g. negative equity from heavy buybacks)
+        aren't meaningfully interpretable as a simple ratio.
+        """
+        if numerator in (None, 'N/A') or denominator in (None, 'N/A'):
+            return 'N/A'
+        if not isinstance(numerator, (int, float)) or not isinstance(denominator, (int, float)):
+            return 'N/A'
+        if pd.isna(numerator) or pd.isna(denominator) or denominator <= 0:
+            return 'N/A'
+        return numerator / denominator
+
+    @staticmethod
+    def _is_number(value):
+        """True if value is a real, non-NaN int/float (not the 'N/A' sentinel)."""
+        return isinstance(value, (int, float)) and not pd.isna(value)
+
+    def _calculate_eps_growth(self, financial_data):
+        """
+        C - Quarterly YoY EPS growth (statement-based, capped at ~5 quarters by
+        yfinance, and deep-history qh-based, which actually has enough quarters
+        for O'Neil's 3-quarter acceleration check) + the acceleration flag itself.
+        A - Annual YoY EPS growth.
+        Computed for both diluted (q{i}_eps / y{i}_eps) and basic
+        (q{i}_eps_basic / y{i}_eps_basic) so the two bases can be compared
+        before deciding which one to standardize on for screening.
+        """
+        # C - quarterly YoY growth (statement-based): compare q{i} against q{i+4}
+        # (same calendar quarter one year earlier). In practice yfinance only
+        # returns ~5 quarters here, so usually only q1's pair is fillable - kept
+        # for cross-checking against the deep qh-based series below.
+        max_quarter_pairs = self.quarters_to_collect - 4
+        for i in range(1, max_quarter_pairs + 1):
+            for suffix in ('', '_basic'):
+                current = financial_data.get(f'q{i}_eps{suffix}', 'N/A')
+                prior = financial_data.get(f'q{i+4}_eps{suffix}', 'N/A')
+                financial_data[f'q{i}_eps{suffix}_growth_yoy'] = self._safe_growth_rate(current, prior)
+
+        # C - quarterly YoY growth (deep-history, qh-based): same YoY-pairing
+        # logic, but against the much longer earnings_dates series so there's
+        # actually enough history for a real acceleration check.
+        max_qh_pairs = self.earnings_history_limit - 4
+        for i in range(1, max_qh_pairs + 1):
+            current = financial_data.get(f'qh{i}_eps', 'N/A')
+            prior = financial_data.get(f'qh{i+4}_eps', 'N/A')
+            financial_data[f'qh{i}_eps_growth_yoy'] = self._safe_growth_rate(current, prior)
+
+        # C - acceleration flag: is YoY growth increasing over the last 3
+        # comparable quarters (qh1 > qh2 > qh3) - O'Neil's core "C" test.
+        # Based on the qh (deep-history) series since the q (statement) series
+        # rarely has enough quarters to fill all three.
+        gh1 = financial_data.get('qh1_eps_growth_yoy', 'N/A')
+        gh2 = financial_data.get('qh2_eps_growth_yoy', 'N/A')
+        gh3 = financial_data.get('qh3_eps_growth_yoy', 'N/A')
+        if all(isinstance(g, (int, float)) and not pd.isna(g) for g in (gh1, gh2, gh3)):
+            financial_data['eps_growth_accelerating'] = bool(gh1 > gh2 > gh3)
+        else:
+            financial_data['eps_growth_accelerating'] = 'N/A'
+
+        # A - annual YoY growth: compare y{i} against y{i+1} (already yearly).
+        max_year_pairs = self.years_to_collect - 1
+        for i in range(1, max_year_pairs + 1):
+            for suffix in ('', '_basic'):
+                current = financial_data.get(f'y{i}_eps{suffix}', 'N/A')
+                prior = financial_data.get(f'y{i+1}_eps{suffix}', 'N/A')
+                financial_data[f'y{i}_eps{suffix}_growth_yoy'] = self._safe_growth_rate(current, prior)
+
+    def _calculate_annual_quality(self, financial_data):
+        """
+        A - Annual earnings quality checks built on already-extracted raw data:
+          - ROE per year (net income / stockholders equity), flagged against
+            O'Neil's 17%+ minimum bar.
+          - Cash-flow-per-share vs. EPS ("cash flow should exceed EPS by ~20%+",
+            O'Neil's quality-of-earnings check).
+        """
+        for i in range(1, self.years_to_collect + 1):
+            net_income = financial_data.get(f'y{i}_net_income', 'N/A')
+            equity = financial_data.get(f'y{i}_stockholders_equity', 'N/A')
+            financial_data[f'y{i}_roe'] = self._safe_ratio(net_income, equity)
+
+            ocf = financial_data.get(f'y{i}_operating_cashflow', 'N/A')
+            shares = financial_data.get(f'y{i}_shares_outstanding', 'N/A')
+            cfps = self._safe_ratio(ocf, shares)
+            financial_data[f'y{i}_cashflow_per_share'] = cfps
+
+            eps = financial_data.get(f'y{i}_eps', 'N/A')
+            financial_data[f'y{i}_cashflow_vs_eps_ratio'] = self._safe_ratio(cfps, eps)
+
+        roe_1 = financial_data.get('y1_roe', 'N/A')
+        financial_data['roe_meets_threshold'] = roe_1 >= 0.17 if self._is_number(roe_1) else 'N/A'
+
+        cf_ratio_1 = financial_data.get('y1_cashflow_vs_eps_ratio', 'N/A')
+        financial_data['cashflow_quality_pass'] = cf_ratio_1 >= 1.2 if self._is_number(cf_ratio_1) else 'N/A'
+
+    def _calculate_n_flags(self, financial_data):
+        """
+        N - Threshold flags from already-extracted raw fields.
+        near_new_high: O'Neil favors stocks within ~15% of a new high (proper-base
+        breakout candidates).
+        recent_ipo: rough heuristic, not a hard rule from O'Neil's writing - he
+        favors relatively young, recently-public leaders but never gave a fixed
+        cutoff; 10 years is used here as an approximation.
+        """
+        high_change_pct = financial_data.get('fiftyTwoWeekHighChangePercent', 'N/A')
+        financial_data['near_new_high'] = (
+            bool(high_change_pct >= -0.15) if self._is_number(high_change_pct) else 'N/A'
+        )
+
+        years_public = financial_data.get('yearsSincePublic', 'N/A')
+        financial_data['recent_ipo'] = (
+            bool(years_public <= 10) if self._is_number(years_public) else 'N/A'
+        )
+
+    def _calculate_supply_trend(self, financial_data):
+        """
+        S - Classify the multi-year share-count trend (buyback vs. dilution)
+        from y{i}_shares_outstanding, and flag whether direct buyback $
+        evidence exists in y{i}_buyback.
+        """
+        valid_years = [
+            i for i in range(1, self.years_to_collect + 1)
+            if self._is_number(financial_data.get(f'y{i}_shares_outstanding', 'N/A'))
+        ]
+        if len(valid_years) >= 2:
+            newest = financial_data[f'y{min(valid_years)}_shares_outstanding']
+            oldest = financial_data[f'y{max(valid_years)}_shares_outstanding']
+            change = self._safe_ratio(newest - oldest, oldest)
+            if not self._is_number(change):
+                financial_data['supply_trend'] = 'N/A'
+            elif change <= -0.02:
+                financial_data['supply_trend'] = 'shrinking'
+            elif change >= 0.02:
+                financial_data['supply_trend'] = 'diluting'
+            else:
+                financial_data['supply_trend'] = 'stable'
+        else:
+            financial_data['supply_trend'] = 'N/A'
+
+        has_data = False
+        buyback_active = False
+        for i in range(1, self.years_to_collect + 1):
+            buyback = financial_data.get(f'y{i}_buyback', 'N/A')
+            if self._is_number(buyback):
+                has_data = True
+                if buyback < 0:
+                    buyback_active = True
+        financial_data['buyback_active'] = buyback_active if has_data else 'N/A'
+
+    def _calculate_sponsorship_level(self, financial_data):
+        """
+        I - Classify institutional ownership level. O'Neil likes healthy
+        institutional sponsorship but flags over-ownership (~>70%) as a
+        ceiling risk that limits future buying power. Uses the always-on
+        heldPercentInstitutions snapshot, so this works even when
+        collect_sponsorship_detail is off.
+        """
+        held_pct = financial_data.get('heldPercentInstitutions', 'N/A')
+        if not self._is_number(held_pct):
+            financial_data['sponsorship_level'] = 'N/A'
+        elif held_pct > 0.70:
+            financial_data['sponsorship_level'] = 'over_owned'
+        elif held_pct >= 0.20:
+            financial_data['sponsorship_level'] = 'healthy'
+        else:
+            financial_data['sponsorship_level'] = 'low'
+
+    def _calculate_cansi_score(self, financial_data):
+        """
+        Composite CANSI signal (C/A/N/S/I only - no L/M, and not a full
+        weighted CANSLIM score/rank like IBD's). One point per letter whose
+        criteria are met, out of however many letters have usable data for
+        this ticker - letters with 'N/A' inputs are excluded from the
+        denominator rather than counted as failing.
+        """
+        roe_flag = financial_data.get('roe_meets_threshold', 'N/A')
+        cf_flag = financial_data.get('cashflow_quality_pass', 'N/A')
+        a_pass = (roe_flag is True and cf_flag is True) if roe_flag in (True, False) and cf_flag in (True, False) else 'N/A'
+
+        supply_trend = financial_data.get('supply_trend', 'N/A')
+        s_pass = (supply_trend in ('shrinking', 'stable')) if supply_trend != 'N/A' else 'N/A'
+
+        sponsorship_level = financial_data.get('sponsorship_level', 'N/A')
+        i_pass = (sponsorship_level == 'healthy') if sponsorship_level != 'N/A' else 'N/A'
+
+        checks = {
+            'C': financial_data.get('eps_growth_accelerating', 'N/A'),
+            'A': a_pass,
+            'N': financial_data.get('near_new_high', 'N/A'),
+            'S': s_pass,
+            'I': i_pass,
+        }
+
+        available = {letter: passed for letter, passed in checks.items() if passed != 'N/A'}
+        financial_data['cansi_criteria_met'] = sum(1 for passed in available.values() if passed is True)
+        financial_data['cansi_criteria_available'] = len(available)
+        financial_data['cansi_letters_passed'] = (
+            ''.join(letter for letter, passed in available.items() if passed is True) or 'N/A'
+        )
+
     #def _calculate_growth_trends(self, financial_data):
     #    """Calculate growth trends over multiple periods"""
     #    try:
@@ -427,22 +913,45 @@ class FinancialDataRetriever:
             delay_between_requests (float): Delay in seconds between API requests
         """
         print("Generating comprehensive financial data for CANSLIM analysis...")
-        
+
         # Load tickers
         tickers_list = self.load_tickers_from_file(ticker_file_path)
         if not tickers_list:
             print("No tickers found to process.")
             return
-        
+
+        # Incremental refresh: reuse a ticker's cached data if it's still fresh,
+        # instead of re-fetching everyone. The cache is per-ticker (data/fin_data/
+        # tickers/<TICKER>.json) and independent of ticker_choice, so a ticker
+        # already fresh under one ticker_choice is recognized as fresh under any
+        # other choice that also includes it - not just within the same choice's
+        # file. A ticker with no cache file (new to the universe) always gets
+        # fetched fresh, same as one whose cache is stale.
+        if self.force_refresh:
+            print("🔄 force_refresh=True: ignoring freshness, re-fetching every ticker")
+
         financial_data_list = []
-        
+        reused_count = 0
+        fetched_count = 0
+        failed_count = 0
+
         for i, ticker in enumerate(tickers_list, 1):
+            cached = None if self.force_refresh else self._load_ticker_cache(ticker)
+            if cached is not None and self._is_fresh(cached.get('last_updated')):
+                financial_data_list.append(cached)
+                reused_count += 1
+                if i <= 3:
+                    print(f"  ♻️  {ticker}: reused cached data (fresh)")
+                continue
+
             try:
                 print(f"Processing financial data for {ticker} ({i}/{len(tickers_list)})")
                 financial_data = self.get_comprehensive_financial_data(ticker)
-                
+
                 if 'error' not in financial_data:
+                    self._save_ticker_cache(ticker, financial_data)
                     financial_data_list.append(financial_data)
+                    fetched_count += 1
                     # Show sample of collected data for first few tickers
                     #if i <= 3:
                     #    score = financial_data.get('canslim_score', 'N/A')
@@ -451,20 +960,24 @@ class FinancialDataRetriever:
                     if i <= 3:
                         print(f"  ✅ {ticker}: Financial data collected")
                 else:
+                    failed_count += 1
                     print(f"  ⚠️ Error with {ticker}: {financial_data.get('error', 'Unknown error')}")
-                
+
                 # Add delay to avoid overwhelming the API
                 time.sleep(delay_between_requests)
-                
+
                 # Longer break every 50 tickers
                 if i % 50 == 0:
                     print(f"Processed {i} tickers. Taking a longer break...")
                     time.sleep(10)
-                    
+
             except Exception as e:
+                failed_count += 1
                 self.logger.error(f"Error processing financial data for {ticker}: {str(e)}")
                 print(f"  ❌ Exception processing {ticker}: {str(e)}")
                 continue
+
+        print(f"\n📊 Summary: {reused_count} reused (fresh), {fetched_count} fetched fresh, {failed_count} failed")
         
         if financial_data_list:
             # Save comprehensive data
@@ -483,10 +996,15 @@ class FinancialDataRetriever:
             try:
                 print("Creating financial data summary...")
                 summary_columns = [
-                    'ticker', 'sector', 'industry', 'marketCap', 'earningsGrowth', 
+                    'ticker', 'sector', 'industry', 'marketCap', 'earningsGrowth',
                     'revenueGrowth', 'earningsQuarterlyGrowth', 'revenueQuarterlyGrowth',
                     'trailingPE', 'pegRatio', 'returnOnEquity', 'profitMargins',
-                    'shortPercentOfFloat', 'heldPercentInstitutions'
+                    'shortPercentOfFloat', 'heldPercentInstitutions',
+                    'institutionsCount', 'fiftyTwoWeekHighChangePercent',
+                    'y1_eps', 'y1_stockholders_equity',
+                    'eps_growth_accelerating', 'roe_meets_threshold', 'cashflow_quality_pass',
+                    'near_new_high', 'supply_trend', 'sponsorship_level',
+                    'cansi_criteria_met', 'cansi_criteria_available', 'cansi_letters_passed'
                     #'canslim_score', 'canslim_score_percentage', 'earnings_acceleration', 'revenue_acceleration'
                 ]
                 
@@ -714,10 +1232,67 @@ class FinancialDataRetriever:
 def run_financial_data_retrieval(ticker_file_path, config=None):
     """
     Main function to run financial data retrieval
-    
+
     Args:
         ticker_file_path (str): Path to the CSV file containing tickers
         config (dict): Configuration dictionary
     """
     retriever = FinancialDataRetriever(config)
     retriever.generate_financial_data_file(ticker_file_path)
+
+
+def migrate_existing_financial_data_to_cache(config=None):
+    """
+    One-time backfill: seed the per-ticker cache (data/fin_data/tickers/<TICKER>.json)
+    from any already-downloaded financial_data_<choice>.csv files under FIN_DATA_DIR,
+    so previously-fetched tickers aren't needlessly re-fetched after upgrading to the
+    per-ticker cache. Skips any ticker that already has a cache file. Not part of the
+    normal pipeline - run manually once, e.g.:
+        python -c "from src.get_financial_data import migrate_existing_financial_data_to_cache as m; m()"
+    """
+    retriever = FinancialDataRetriever(config)
+    fin_data_dir = retriever.PARAMS_DIR["FIN_DATA_DIR"]
+    tickers_dir = retriever.PARAMS_DIR["FIN_DATA_TICKERS_DIR"]
+    os.makedirs(tickers_dir, exist_ok=True)
+
+    if not os.path.exists(fin_data_dir):
+        print(f"No financial data directory found at {fin_data_dir} - nothing to migrate.")
+        return
+
+    csv_files = [
+        f for f in os.listdir(fin_data_dir)
+        if f.startswith('financial_data_') and not f.startswith('financial_data_summary_') and f.endswith('.csv')
+    ]
+    if not csv_files:
+        print(f"No financial_data_<choice>.csv files found in {fin_data_dir} - nothing to migrate.")
+        return
+
+    migrated = 0
+    skipped = 0
+    for csv_file in csv_files:
+        csv_path = os.path.join(fin_data_dir, csv_file)
+        print(f"Reading {csv_path}...")
+        try:
+            df = pd.read_csv(csv_path)
+        except Exception as e:
+            print(f"  ⚠️ Could not read {csv_path}: {e}")
+            continue
+
+        if 'ticker' not in df.columns:
+            print(f"  ⚠️ {csv_path} has no 'ticker' column, skipping")
+            continue
+
+        for _, row in df.iterrows():
+            ticker = row['ticker']
+            cache_path = os.path.join(tickers_dir, f"{ticker}.json")
+            if os.path.exists(cache_path):
+                skipped += 1
+                continue
+            try:
+                with open(cache_path, 'w') as f:
+                    json.dump(row.to_dict(), f)
+                migrated += 1
+            except Exception as e:
+                print(f"  ⚠️ Could not write cache for {ticker}: {e}")
+
+    print(f"✅ Migration complete: {migrated} tickers backfilled, {skipped} already cached (skipped)")

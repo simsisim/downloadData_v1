@@ -20,7 +20,7 @@ def test_base_config():
     print(f"✓ YF Historical Data: {config.yf_hist_data}")
     print(f"✓ Daily Data: {config.yf_daily_data}")
     print(f"✓ Weekly Data: {config.yf_weekly_data}")
-    print(f"✓ Financial Data Enrichment: {config.fin_data_enrich}")
+    print(f"✓ Financial Data Download: {config.fin_data_download}")
     print("✅ Base config loaded successfully\n")
     return config
 
@@ -56,7 +56,7 @@ def test_dict_override(base_config):
         'ticker_choice': '8',
         'yf_daily_data': True,
         'yf_weekly_data': False,
-        'fin_data_enrich': False
+        'fin_data_download': False
     }
 
     print(f"Override dict: {override}")
@@ -66,7 +66,7 @@ def test_dict_override(base_config):
     print(f"   Ticker Choice: {merged.ticker_choice} (expected: 8)")
     print(f"   Daily Data: {merged.yf_daily_data} (expected: True)")
     print(f"   Weekly Data: {merged.yf_weekly_data} (expected: False)")
-    print(f"   Fin Data: {merged.fin_data_enrich} (expected: False)")
+    print(f"   Fin Data: {merged.fin_data_download} (expected: False)")
 
     # Verify overrides were applied
     assert merged.ticker_choice == '8', "Dict override failed for ticker_choice"
@@ -112,7 +112,7 @@ def test_available_presets():
         ticker_choice = preset_config.get('ticker_choice', 'N/A')
         daily = preset_config.get('yf_daily_data', 'N/A')
         weekly = preset_config.get('yf_weekly_data', 'N/A')
-        fin_data = preset_config.get('fin_data_enrich', 'N/A')
+        fin_data = preset_config.get('fin_data_download', 'N/A')
 
         print(f"\n   📋 {preset_name}")
         print(f"      - Ticker Choice: {ticker_choice}")

@@ -44,7 +44,8 @@ CONFIG_PRESETS = {
         'yf_weekly_data': False,
         'yf_monthly_data': False,
         'tw_hist_data': False,
-        'fin_data_enrich': False,
+        'fin_data_download': False,
+        'fin_data_process': False,
         'write_info_file': False
     },
     'nasdaq_daily': {
@@ -54,7 +55,8 @@ CONFIG_PRESETS = {
         'yf_weekly_data': False,
         'yf_monthly_data': False,
         'tw_hist_data': False,
-        'fin_data_enrich': False,
+        'fin_data_download': False,
+        'fin_data_process': False,
         'write_info_file': True
     },
     'sp500_full': {
@@ -64,7 +66,8 @@ CONFIG_PRESETS = {
         'yf_weekly_data': True,
         'yf_monthly_data': True,
         'tw_hist_data': False,
-        'fin_data_enrich': True,
+        'fin_data_download': True,
+        'fin_data_process': False,
         'write_info_file': True
     },
     'nasdaq_sp500_daily': {
@@ -74,7 +77,8 @@ CONFIG_PRESETS = {
         'yf_weekly_data': False,
         'yf_monthly_data': False,
         'tw_hist_data': False,
-        'fin_data_enrich': False,
+        'fin_data_download': False,
+        'fin_data_process': False,
         'write_info_file': True
     },
     'portfolio_only': {
@@ -84,7 +88,8 @@ CONFIG_PRESETS = {
         'yf_weekly_data': True,
         'yf_monthly_data': False,
         'tw_hist_data': False,
-        'fin_data_enrich': True,
+        'fin_data_download': True,
+        'fin_data_process': False,
         'write_info_file': True
     },
     'full_canslim': {
@@ -94,7 +99,8 @@ CONFIG_PRESETS = {
         'yf_weekly_data': True,
         'yf_monthly_data': True,
         'tw_hist_data': False,
-        'fin_data_enrich': True,
+        'fin_data_download': True,
+        'fin_data_process': False,
         'yf_fin_data': True,
         'write_info_file': True
     }
@@ -178,11 +184,19 @@ Ticker choice values:
     parser.add_argument('--no-tw-data', dest='tw_hist_data', action='store_false',
                        help='Disable TradingView data processing')
 
-    # Financial data enrichment
-    parser.add_argument('--fin-data', dest='fin_data_enrich', action='store_true',
-                       help='Enable financial data enrichment')
-    parser.add_argument('--no-fin-data', dest='fin_data_enrich', action='store_false',
-                       help='Disable financial data enrichment')
+    # Financial data download
+    parser.add_argument('--fin-data', dest='fin_data_download', action='store_true',
+                       help='Enable financial data download (raw CANSI data)')
+    parser.add_argument('--no-fin-data', dest='fin_data_download', action='store_false',
+                       help='Disable financial data download')
+    parser.add_argument('--fin-data-force-refresh', dest='fin_data_force_refresh', action='store_true',
+                       help='Ignore freshness check and re-download every ticker')
+
+    # Financial data processing (charts, filters) - independent of download
+    parser.add_argument('--fin-process', dest='fin_data_process', action='store_true',
+                       help='Enable financial data processing (charts/filters) off existing data')
+    parser.add_argument('--no-fin-process', dest='fin_data_process', action='store_false',
+                       help='Disable financial data processing')
 
     # Info file
     parser.add_argument('--write-info', dest='write_info_file', action='store_true',
@@ -241,8 +255,11 @@ Ticker choice values:
         '--no-monthly': 'yf_monthly_data',
         '--tw-data': 'tw_hist_data',
         '--no-tw-data': 'tw_hist_data',
-        '--fin-data': 'fin_data_enrich',
-        '--no-fin-data': 'fin_data_enrich',
+        '--fin-data': 'fin_data_download',
+        '--no-fin-data': 'fin_data_download',
+        '--fin-data-force-refresh': 'fin_data_force_refresh',
+        '--fin-process': 'fin_data_process',
+        '--no-fin-process': 'fin_data_process',
         '--write-info': 'write_info_file',
         '--no-write-info': 'write_info_file',
         '--batch-data': 'yf_batch_data',
@@ -291,7 +308,8 @@ Ticker choice values:
     if args.batch_only:
         config_dict['yf_hist_data']   = False
         config_dict['tw_hist_data']   = False
-        config_dict['fin_data_enrich'] = False
+        config_dict['fin_data_download'] = False
+        config_dict['fin_data_process']  = False
         config_dict['yf_batch_data']  = True
         print("ℹ️  --batch-only: slow YF, TW and financial pipelines disabled")
 
@@ -599,7 +617,8 @@ def main(config_override=None, preset=None):
         if config.yf_monthly_data: intervals.append("Monthly")
         print(f"   Intervals: {', '.join(intervals) if intervals else 'None'}")
     print(f"   TW Historical Data: {config.tw_hist_data}")
-    print(f"   Financial Data Enrichment: {config.fin_data_enrich}")
+    print(f"   Financial Data Download: {config.fin_data_download}")
+    print(f"   Financial Data Processing: {config.fin_data_process}")
     print(f"   Write Info Files: {config.write_info_file}")
     
     # ============ TICKER DATA RETRIEVAL ============
@@ -828,7 +847,7 @@ def main(config_override=None, preset=None):
         print("   To enable: Set TW_hist_data = TRUE in user_input/user_data.csv")
 
     # ============ COMPREHENSIVE FINANCIAL DATA RETRIEVAL ============
-    if config.fin_data_enrich:
+    if config.fin_data_download:
         print("\n" + "="*60)
         print("DOWNLOADING COMPREHENSIVE FINANCIAL DATA FOR CANSLIM")
         print("="*60)
@@ -843,7 +862,7 @@ def main(config_override=None, preset=None):
             financial_sources.append("Zacks")
             
         if not financial_sources:
-            print("❌ Financial data enrichment enabled but no data sources selected!")
+            print("❌ Financial data download enabled but no data sources selected!")
             print("   Please enable at least one of: YF_fin_data, TW_fin_data, Zacks_fin_data")
         else:
             print(f"📊 Financial data sources enabled: {', '.join(financial_sources)}")
@@ -855,24 +874,58 @@ def main(config_override=None, preset=None):
                 'delay_between_requests': 1.5,  # Slightly longer delay for comprehensive data
                 'enable_canslim_scoring': True,
                 'enable_growth_acceleration': True,
+                # Institutional sponsorship (I) detail - adds 3 extra yfinance calls per
+                # ticker (major/institutional/mutualfund holders). Opt-in since it slows
+                # down large-universe runs and increases rate-limit risk.
+                'collect_sponsorship_detail': True,
                 'yf_enabled': config.yf_fin_data,
                 'tw_enabled': config.tw_fin_data,
-                'zacks_enabled': config.zacks_fin_data
+                'zacks_enabled': config.zacks_fin_data,
+                # Incremental refresh: skip re-downloading tickers whose data is
+                # already fresher than this many days (fundamentals change slowly).
+                'refresh_days': config.fin_data_refresh_days,
+                'force_refresh': config.fin_data_force_refresh,
             }
-            
+
             print("Starting comprehensive financial data collection...")
             print("This will collect 8-12 quarters and 5+ years of financial history for CANSLIM analysis")
-            print("Expected duration: 5-15 minutes depending on number of tickers\n")
-            
+            print(f"Incremental refresh: tickers fresher than {config.fin_data_refresh_days} days will be reused"
+                  f"{' (forced full refresh)' if config.fin_data_force_refresh else ''}\n")
+
             # Run financial data retrieval separately
             run_financial_data_retrieval(combined_file, financial_config)
     else:
         print("\n" + "="*60)
-        print("FINANCIAL DATA ENRICHMENT DISABLED")
+        print("FINANCIAL DATA DOWNLOAD DISABLED")
         print("="*60)
-        print("⏭️  Skipping financial data collection (fin_data_enrich = FALSE)")
-        print("   To enable: Set fin_data_enrich = TRUE in user_input/user_data.csv")
-    
+        print("⏭️  Skipping financial data download (fin_data_download = FALSE)")
+        print("   To enable: Set fin_data_download = TRUE in user_input/user_data.csv")
+
+    # ============ FINANCIAL DATA PROCESSING (charts, filters) ============
+    # Independent of fin_data_download - works entirely off a previously-saved
+    # financial_data_<choice>.csv, so it can run on its own (no yfinance calls)
+    # or alongside a download in the same invocation.
+    if config.fin_data_process:
+        print("\n" + "="*60)
+        print("PROCESSING FINANCIAL DATA (CHARTS)")
+        print("="*60)
+
+        safe_choice = str(config.ticker_choice).replace('-', '_')
+        financial_data_csv = os.path.join(PARAMS_DIR["FIN_DATA_DIR"], f'financial_data_{safe_choice}.csv')
+
+        if not os.path.exists(financial_data_csv):
+            print(f"❌ {financial_data_csv} not found.")
+            print("   Run with fin_data_download=TRUE first to generate it.")
+        else:
+            from src.process_financial_data import run_financial_data_processing
+            run_financial_data_processing(financial_data_csv, config)
+    else:
+        print("\n" + "="*60)
+        print("FINANCIAL DATA PROCESSING DISABLED")
+        print("="*60)
+        print("⏭️  Skipping financial data processing (fin_data_process = FALSE)")
+        print("   To enable: Set fin_data_process = TRUE in user_input/user_data.csv")
+
     # ============ FAST BATCH DOWNLOADER ============
     if config.yf_batch_data:
         print("\n" + "="*60)
@@ -957,14 +1010,20 @@ def main(config_override=None, preset=None):
     else:
         print("⏭️ Historical market data - SKIPPED (YF_hist_data disabled)")
     
-    if config.fin_data_enrich:
+    if config.fin_data_download:
         print("✅ Comprehensive financial data (CANSLIM) - COMPLETED")
-        print(f"📁 Financial data saved to: {PARAMS_DIR['TICKERS_DIR']}")
+        print(f"📁 Financial data saved to: {PARAMS_DIR['FIN_DATA_DIR']}")
         print("\nFinancial files generated:")
         print("  • financial_data_<choice>.csv - Complete financial dataset")
         print("  • financial_data_summary_<choice>.csv - Key metrics summary")
     else:
-        print("⏭️ Financial data enrichment - SKIPPED")
+        print("⏭️ Financial data download - SKIPPED")
+
+    if config.fin_data_process:
+        print("✅ Financial data processing (charts) - COMPLETED")
+        print(f"📁 Charts saved to: {PARAMS_DIR['CHARTS_DIR']}")
+    else:
+        print("⏭️ Financial data processing - SKIPPED")
     print('Finished')
 
 if __name__ == "__main__":
