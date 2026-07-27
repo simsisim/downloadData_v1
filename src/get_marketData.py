@@ -9,6 +9,187 @@ from src.config import PARAMS_DIR
 import logging
 
 
+def fetch_ohlcv(ticker, start_date, end_date, interval='1d'):
+    """
+    Retrieve historical OHLCV data plus market-context fields for a single ticker.
+    Standalone (no MarketDataRetriever instance needed) so repair_from_date()
+    can call it without a ticker-list file.
+    """
+    ticker_obj = yf.Ticker(ticker)
+    ohlc_data = ticker_obj.history(start=start_date, end=end_date, interval=interval)
+
+    info = ticker_obj.info
+    additional_params = [
+        'volume', 'averageDailyVolume10Day', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow',
+        'fiftyDayAverage', 'twoHundredDayAverage', 'marketCap', 'industry', 'sector', 'exchange',
+        'trailingPE', 'forwardPE'
+    ]
+    for param in additional_params:
+        if param in info:
+            ohlc_data[param] = info[param]
+    ohlc_data['Symbol'] = ticker
+    return ohlc_data
+
+
+def _read_header(file_path):
+    """Read just the first line of a CSV - O(1) regardless of file size."""
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as fh:
+        return fh.readline().strip().split(',')
+
+
+def _tail_lines(file_path, max_bytes=8192):
+    """
+    Read only the last `max_bytes` of a file and split into lines - avoids a full parse.
+    The first split element is dropped: for any file bigger than max_bytes it's a
+    truncated fragment of a row, not a complete one.
+    """
+    with open(file_path, 'rb') as fh:
+        fh.seek(0, os.SEEK_END)
+        size = fh.tell()
+        fh.seek(max(0, size - max_bytes))
+        chunk = fh.read().decode('utf-8', errors='ignore')
+    lines = chunk.strip().split('\n')
+    return lines[1:] if size > max_bytes else lines
+
+
+def scan_for_corrupted_tickers(folder, since_date):
+    """
+    Find CSVs in `folder` with rows on/after `since_date` whose Open/High/Low/Close
+    are blank or all-zero (signature of a degraded yfinance API response).
+
+    Deliberately avoids pandas.read_csv per file (~24ms/file, ~2min for ~4.7k
+    tickers in this project) in favor of a raw tail-read (~0.01ms/file) since we
+    only need to inspect the last few rows, not the full history. Date comparison
+    is done as ISO-format string comparison (not pd.to_datetime) for the same
+    reason - per-call datetime parsing dominated an earlier version of this scan.
+    """
+    since_date_str = pd.to_datetime(since_date).strftime('%Y-%m-%d')
+    needed = ['Date', 'Open', 'High', 'Low', 'Close']
+    corrupted = []
+
+    for entry in os.scandir(folder):
+        if not entry.name.endswith('.csv'):
+            continue
+        ticker = entry.name[:-4]
+        try:
+            header = _read_header(entry.path)
+            if not all(c in header for c in needed):
+                continue
+            col_idx = {name: i for i, name in enumerate(header)}
+            max_idx = max(col_idx[c] for c in needed)
+
+            for raw_line in _tail_lines(entry.path):
+                if raw_line.startswith('Date,') or not raw_line.strip():
+                    continue
+                fields = raw_line.split(',')
+                if len(fields) <= max_idx:
+                    continue
+                row_date_str = fields[col_idx['Date']][:10]
+                if len(row_date_str) != 10 or row_date_str < since_date_str:
+                    continue
+                ohlc = [fields[col_idx[c]] for c in ['Open', 'High', 'Low', 'Close']]
+                is_bad = all(v.strip() in ('', '0', '0.0') for v in ohlc)
+                if is_bad:
+                    corrupted.append(ticker)
+                    break
+        except Exception:
+            continue
+
+    return sorted(set(corrupted))
+
+
+def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='1d'):
+    """
+    Force-redownload OHLCV data on/after `since_date` and overwrite whatever is
+    currently on disk for those rows - for repairing tickers whose data was
+    corrupted by a degraded yfinance API response.
+
+    Runs independently of the normal incremental update path in
+    update_individual_stock_data(): it always downloads through `end_date`
+    (default: today), so it also backfills any days between `since_date` and
+    now for the tickers it touches. It does not update tickers outside the
+    `tickers` list (or auto-detected set) - run the normal daily pipeline
+    separately to update the rest of the universe.
+
+    Args:
+        folder (str): directory containing the per-ticker CSVs (e.g. PARAMS_DIR["MARKET_DATA_DIR_1d"])
+        since_date (str or date): repair rows on/after this date (YYYY-MM-DD)
+        end_date (str, optional): defaults to today
+        tickers (list[str], optional): restrict repair to these tickers; if None, auto-detect
+            corrupted tickers in `folder` via scan_for_corrupted_tickers()
+        interval (str): yfinance interval, default '1d'
+
+    Returns:
+        dict with 'fixed', 'still_broken', 'no_data' ticker lists
+    """
+    since_date_d = pd.to_datetime(since_date).date()
+    end_date = end_date or dt.datetime.now().strftime('%Y-%m-%d')
+
+    if tickers is None:
+        print(f"🔍 Scanning {folder} for tickers with corrupted OHLC on/after {since_date_d}...")
+        t0 = time.time()
+        tickers = scan_for_corrupted_tickers(folder, since_date_d)
+        print(f"   Scan completed in {time.time() - t0:.2f}s — {len(tickers)} corrupted ticker(s) found")
+
+    if not tickers:
+        print("✅ No corrupted tickers found. Nothing to repair.")
+        return {'fixed': [], 'still_broken': [], 'no_data': []}
+
+    fixed, still_broken, no_data = [], [], []
+    ohlc_cols = ['Open', 'High', 'Low', 'Close']
+
+    for ticker in tickers:
+        file_path = os.path.join(folder, f"{ticker}.csv")
+        try:
+            existing_data = None
+            if os.path.isfile(file_path):
+                existing_data = pd.read_csv(file_path, index_col='Date', parse_dates=True)
+                # Drop rows on/after since_date in memory - only written back to
+                # disk if the redownload below actually returns data (see the
+                # new_data.empty check), so a failed/empty API response leaves
+                # the on-disk file (corrupted row included) untouched.
+                # Note: mixed EST/EDT offsets across the year mean pandas can't
+                # unify this into a DatetimeIndex (stays an object Index of
+                # Timestamps), so .index.date isn't available - map per-element.
+                if not existing_data.empty:
+                    row_dates = [ts.date() for ts in existing_data.index]
+                    existing_data = existing_data[[d < since_date_d for d in row_dates]]
+
+            new_data = fetch_ohlcv(ticker, since_date_d.isoformat(), end_date, interval=interval)
+
+            if new_data.empty:
+                print(f"⚠️  {ticker}: no data returned for {since_date_d}..{end_date} (API may still be degraded)")
+                no_data.append(ticker)
+                continue
+
+            bad_mask = new_data[ohlc_cols].isna().any(axis=1) | (new_data[ohlc_cols] == 0).all(axis=1)
+            if bad_mask.any():
+                bad_dates = [d.date().isoformat() for d in new_data.index[bad_mask]]
+                print(f"⚠️  {ticker}: yfinance still returned incomplete OHLC for {bad_dates} — API may still be degraded")
+                still_broken.append(ticker)
+            else:
+                fixed.append(ticker)
+
+            updated_data = pd.concat([existing_data, new_data]) if existing_data is not None else new_data
+            updated_data = updated_data[~updated_data.index.duplicated(keep='last')]
+            updated_data.to_csv(file_path)
+            print(f"   {ticker}: repaired {since_date_d} → {end_date} -> {file_path}")
+
+        except Exception as e:
+            print(f"❌ {ticker}: repair failed - {e}")
+            still_broken.append(ticker)
+
+    print("\n" + "=" * 60)
+    print("REPAIR SUMMARY")
+    print("=" * 60)
+    print(f"✅ Fixed: {len(fixed)} — {fixed}")
+    if still_broken:
+        print(f"⚠️  Still broken (yfinance still incomplete or errored): {len(still_broken)} — {still_broken}")
+    if no_data:
+        print(f"⚠️  No data returned at all: {len(no_data)} — {no_data}")
+    return {'fixed': fixed, 'still_broken': still_broken, 'no_data': no_data}
+
+
 class MarketDataRetriever:
     """
     Dedicated class for retrieving historical market data (OHLCV).
@@ -56,22 +237,7 @@ class MarketDataRetriever:
         Returns:
             pandas.DataFrame: OHLCV data with additional market metrics
         """
-        ticker_obj = yf.Ticker(ticker)
-        ohlc_data = ticker_obj.history(start=start_date, end=end_date, interval=self.config['interval'])
-        
-        # Get additional info for market context
-        info = ticker_obj.info
-        additional_params = [
-            'volume', 'averageDailyVolume10Day', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow',
-            'fiftyDayAverage', 'twoHundredDayAverage', 'marketCap', 'industry', 'sector', 'exchange',
-            'trailingPE', 'forwardPE'  # P/E ratio metrics
-        ]
-    
-        for param in additional_params:
-            if param in info:
-                ohlc_data[param] = info[param]
-        ohlc_data['Symbol'] = ticker
-        return ohlc_data
+        return fetch_ohlcv(ticker, start_date, end_date, interval=self.config['interval'])
 
     def update_individual_stock_data(self, ticker):
         """

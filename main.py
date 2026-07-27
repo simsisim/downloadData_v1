@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import argparse
 from datetime import datetime, timedelta
-from src.get_marketData import run_market_data_retrieval
+from src.get_marketData import run_market_data_retrieval, repair_from_date
 from src.get_financial_data import run_financial_data_retrieval
 from src.get_batchData import run_batch_data_retrieval, _parse_interval_cfg
 from src.get_cboe_putcall import run_cboe_putcall_retrieval
@@ -132,6 +132,12 @@ Examples:
   # Full CANSLIM analysis
   python main.py --preset full_canslim
 
+  # Repair daily data corrupted since 2026-07-24 (auto-detects affected tickers)
+  python main.py --repair-from 2026-07-24
+
+  # Repair specific tickers only
+  python main.py --repair-from 2026-07-24 --repair-tickers AAPL,MSFT
+
 Available presets: quick_test, nasdaq_daily, sp500_full, nasdaq_sp500_daily, portfolio_only, full_canslim
 
 Ticker choice values:
@@ -235,6 +241,17 @@ Ticker choice values:
                        help='End date for all batch intervals YYYY-MM-DD or today')
     parser.add_argument('--batch-period', type=str, dest='batch_period',
                        help='Period for all batch intervals when start is empty (e.g. 5d, 1y)')
+
+    # Daily-data repair mode (standalone - handled before the rest of this
+    # parser's args are consumed, see main())
+    parser.add_argument('--repair-from', type=str, dest='repair_from_date',
+                       help='Standalone repair mode: force-redownload daily OHLCV on/after this date '
+                            '(YYYY-MM-DD) and overwrite corrupted rows. Auto-detects affected tickers '
+                            'unless --repair-tickers is given. Exits after repair; does not run the '
+                            'normal pipeline.')
+    parser.add_argument('--repair-tickers', type=str, dest='repair_tickers',
+                       help='Comma-separated tickers to repair (used with --repair-from). '
+                            'If omitted, corrupted tickers are auto-detected.')
 
     args = parser.parse_args()
 
@@ -568,6 +585,49 @@ def main(config_override=None, preset=None):
     logging.getLogger().setLevel(logging.CRITICAL)
     setup_directories()  # Initialize directories via config
 
+    # ============ DAILY DATA REPAIR MODE (standalone) ============
+    # Checked directly against sys.argv (not the main parser below) so it can
+    # short-circuit before CBOE/ticker-gen/the rest of the pipeline. Use this
+    # to fix rows corrupted by a degraded yfinance API response - it does not
+    # run the normal daily download for the rest of the ticker universe.
+    import sys
+    if '--repair-from' in sys.argv:
+        repair_parser = argparse.ArgumentParser(add_help=False)
+        repair_parser.add_argument('--repair-from', type=str, dest='repair_from_date', required=True)
+        repair_parser.add_argument('--repair-tickers', type=str, dest='repair_tickers', default=None)
+        repair_parser.add_argument('--ticker-choice', type=str, dest='ticker_choice', default=None)
+        repair_args, _ = repair_parser.parse_known_args()
+
+        tickers = None
+        if repair_args.repair_tickers:
+            # Explicit list takes priority over --ticker-choice if both given.
+            tickers = [t.strip().upper() for t in repair_args.repair_tickers.split(',') if t.strip()]
+        elif repair_args.ticker_choice:
+            # Same resolution the normal pipeline uses: generate/read
+            # combined_tickers_<choice>.csv, restrict repair to that universe
+            # instead of scanning every CSV ever downloaded into the folder.
+            print(f"📄 Resolving ticker universe for --ticker-choice {repair_args.ticker_choice}...")
+            unified_config = Config()
+            if not generate_all_ticker_files(unified_config, repair_args.ticker_choice):
+                print(f"❌ Failed to generate ticker files for choice {repair_args.ticker_choice}")
+                return
+            combined_file = os.path.join(PARAMS_DIR["TICKERS_DIR"], f"combined_tickers_{repair_args.ticker_choice}.csv")
+            if not os.path.exists(combined_file):
+                print(f"❌ Expected ticker file not found: {combined_file}")
+                return
+            tickers = pd.read_csv(combined_file)['ticker'].tolist()
+            print(f"   {len(tickers)} ticker(s) in universe {repair_args.ticker_choice}")
+
+        print("\n" + "="*60)
+        print(f"DAILY DATA REPAIR MODE — from {repair_args.repair_from_date}")
+        print("="*60)
+        repair_from_date(
+            PARAMS_DIR["MARKET_DATA_DIR_1d"],
+            repair_args.repair_from_date,
+            tickers=tickers,
+        )
+        return
+
     # ============ CBOE EQUITY PUT/CALL RATIO UPDATE ============
     # Runs unconditionally on every invocation, independent of ticker-choice/
     # batch settings. Failures here must never block the rest of the pipeline.
@@ -710,7 +770,6 @@ def main(config_override=None, preset=None):
     print(f"✅ Combined ticker file ready: {combined_file}")
     
     # Quick validation
-    import pandas as pd
     combined_df = pd.read_csv(combined_file)
     print(f"📊 Total tickers to process: {len(combined_df)}")
     print(f"🔍 Sample tickers: {combined_df['ticker'].head(5).tolist()}")

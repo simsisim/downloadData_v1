@@ -181,12 +181,35 @@ Chart scope (`fin_data_chart_top_n`/`fin_data_chart_max_peers`/`fin_data_chart_q
 
 ---
 
+## Daily data repair (fix corrupted rows, e.g. yfinance API glitches)
+
+Standalone mode — runs instead of the normal pipeline and exits immediately after (no CBOE update, ticker generation, or historical download). Only daily (`1d`) data is supported. It force-redownloads and overwrites rows on/after the given date; if yfinance still returns nothing/bad data for that window, the on-disk file is left untouched and the ticker is reported as still broken.
+
+Ticker scope is resolved in this priority order: `--repair-tickers` (explicit list) > `--ticker-choice` (same universe resolution as the normal download) > neither given (auto-detect by scanning every daily CSV for blank/zero OHLC on/after the date — a few hundred ms even across ~4,700 tickers).
+
+```bash
+# Auto-detect every corrupted ticker across the whole daily folder, from a date
+python main.py --repair-from 2026-07-24
+
+# Restrict to a known universe (NASDAQ 100) instead of the whole folder
+python main.py --repair-from 2026-07-24 --ticker-choice 2
+
+# Restrict to specific tickers only
+python main.py --repair-from 2026-07-24 --repair-tickers AAPL,MSFT
+
+# Quick smoke test against the small test-ticker set
+python main.py --repair-from 2026-07-24 --ticker-choice 8
+```
+
+---
+
 ## Notes
 
 - `--end-date YYYY-MM-DD` caps the end date for **all** slow-pipeline (YF historical) intervals; defaults to today
 - `--batch-only` disables slow YF, TW, and financial pipelines (both `--fin-data` and `--fin-process`) regardless of `user_data.csv`
 - `--fin-data-force-refresh` ignores the incremental-refresh cache (`data/fin_data/tickers/<TICKER>.json`) and re-downloads every ticker in the universe
 - `--fin-process` with no prior `financial_data_<choice>.csv` for that `--ticker-choice` prints a message and skips — it never triggers a download itself
+- `--repair-from` is standalone: when present, it's the only thing that runs — all other flags (`--daily`, `--fin-data`, presets, etc.) are ignored for that invocation
 - `--batch-start` / `--batch-end` / `--batch-period` override date settings for **all** batch intervals
 - Per-interval date tuning (daily vs weekly vs monthly independently) is done in `user_input/user_data.csv`
 - CLI flags always override `user_data.csv` values
