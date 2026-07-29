@@ -149,10 +149,12 @@ def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='
                 # new_data.empty check), so a failed/empty API response leaves
                 # the on-disk file (corrupted row included) untouched.
                 # Note: mixed EST/EDT offsets across the year mean pandas can't
-                # unify this into a DatetimeIndex (stays an object Index of
-                # Timestamps), so .index.date isn't available - map per-element.
+                # unify this into a DatetimeIndex (stays an object Index), and
+                # depending on the pandas version that fallback holds either
+                # Timestamps or raw strings - route through pd.to_datetime so
+                # both cases work the same way.
                 if not existing_data.empty:
-                    row_dates = [ts.date() for ts in existing_data.index]
+                    row_dates = [pd.to_datetime(ts).date() for ts in existing_data.index]
                     existing_data = existing_data[[d < since_date_d for d in row_dates]]
 
             new_data = fetch_ohlcv(ticker, since_date_d.isoformat(), end_date, interval=interval)
