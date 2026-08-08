@@ -63,6 +63,11 @@ def setup_directories():
     os.makedirs(PARAMS_DIR["MARKET_DATA_DIR_1wk"], exist_ok=True)
     os.makedirs(PARAMS_DIR["MARKET_DATA_DIR_1mo"], exist_ok=True)
 
+    # Archive/current tiers for each Yahoo Finance interval (see src/market_data_io.py)
+    for _yf_dir in (PARAMS_DIR["MARKET_DATA_DIR_1d"], PARAMS_DIR["MARKET_DATA_DIR_1wk"], PARAMS_DIR["MARKET_DATA_DIR_1mo"]):
+        os.makedirs(os.path.join(_yf_dir, "archive"), exist_ok=True)
+        os.makedirs(os.path.join(_yf_dir, "current"), exist_ok=True)
+
     # TradingView data directories
     os.makedirs(PARAMS_DIR["MARKET_DATA_TW_DIR_1d"], exist_ok=True)
     os.makedirs(PARAMS_DIR["MARKET_DATA_TW_DIR_1wk"], exist_ok=True)

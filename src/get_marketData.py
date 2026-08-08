@@ -7,28 +7,8 @@ import os
 from src.config import user_choice
 from src.config import PARAMS_DIR
 import logging
-
-
-def fetch_ohlcv(ticker, start_date, end_date, interval='1d'):
-    """
-    Retrieve historical OHLCV data plus market-context fields for a single ticker.
-    Standalone (no MarketDataRetriever instance needed) so repair_from_date()
-    can call it without a ticker-list file.
-    """
-    ticker_obj = yf.Ticker(ticker)
-    ohlc_data = ticker_obj.history(start=start_date, end=end_date, interval=interval)
-
-    info = ticker_obj.info
-    additional_params = [
-        'volume', 'averageDailyVolume10Day', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow',
-        'fiftyDayAverage', 'twoHundredDayAverage', 'marketCap', 'industry', 'sector', 'exchange',
-        'trailingPE', 'forwardPE'
-    ]
-    for param in additional_params:
-        if param in info:
-            ohlc_data[param] = info[param]
-    ohlc_data['Symbol'] = ticker
-    return ohlc_data
+from src import market_data_io
+from src.market_data_io import fetch_ohlcv
 
 
 def _read_header(file_path):
@@ -139,23 +119,15 @@ def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='
     ohlc_cols = ['Open', 'High', 'Low', 'Close']
 
     for ticker in tickers:
-        file_path = os.path.join(folder, f"{ticker}.csv")
         try:
-            existing_data = None
-            if os.path.isfile(file_path):
-                existing_data = pd.read_csv(file_path, index_col='Date', parse_dates=True)
-                # Drop rows on/after since_date in memory - only written back to
-                # disk if the redownload below actually returns data (see the
-                # new_data.empty check), so a failed/empty API response leaves
-                # the on-disk file (corrupted row included) untouched.
-                # Note: mixed EST/EDT offsets across the year mean pandas can't
-                # unify this into a DatetimeIndex (stays an object Index), and
-                # depending on the pandas version that fallback holds either
-                # Timestamps or raw strings - route through pd.to_datetime so
-                # both cases work the same way.
-                if not existing_data.empty:
-                    row_dates = [pd.to_datetime(ts).date() for ts in existing_data.index]
-                    existing_data = existing_data[[d < since_date_d for d in row_dates]]
+            existing_data = market_data_io.load_ohlcv(folder, ticker)
+            # Drop rows on/after since_date in memory - only written back to
+            # disk if the redownload below actually returns data (see the
+            # new_data.empty check), so a failed/empty API response leaves
+            # the on-disk tiers (corrupted row included) untouched.
+            if not existing_data.empty:
+                row_dates = market_data_io.safe_row_years_to_dates(existing_data)
+                existing_data = existing_data[[d < since_date_d for d in row_dates]]
 
             new_data = fetch_ohlcv(ticker, since_date_d.isoformat(), end_date, interval=interval)
 
@@ -172,10 +144,9 @@ def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='
             else:
                 fixed.append(ticker)
 
-            updated_data = pd.concat([existing_data, new_data]) if existing_data is not None else new_data
-            updated_data = updated_data[~updated_data.index.duplicated(keep='last')]
-            updated_data.to_csv(file_path)
-            print(f"   {ticker}: repaired {since_date_d} → {end_date} -> {file_path}")
+            updated_data = pd.concat([existing_data, new_data]) if not existing_data.empty else new_data
+            market_data_io.rebuild_archive_current(folder, ticker, updated_data)
+            print(f"   {ticker}: repaired {since_date_d} → {end_date} -> {market_data_io.legacy_path(folder, ticker)}")
 
         except Exception as e:
             print(f"❌ {ticker}: repair failed - {e}")
@@ -209,6 +180,8 @@ class MarketDataRetriever:
         self.problematic_tickers_file = os.path.join(self.PARAMS_DIR["TICKERS_DIR"], f'problematic_tickers_{safe_user_choice}.csv')
         self.problematic_tickers = []
         self.successful_tickers = []
+        self.split_rebuilds = []
+        self.split_pending = []
         
     def load_tickers(self):
         ticker_data = pd.read_csv(self.config['ticker_file'])
@@ -250,7 +223,6 @@ class MarketDataRetriever:
         """
         try:
             interval_str = self.config['interval'].replace("/", "")
-            file_path = os.path.join(self.config['folder'], f"{ticker}.csv")
             ticker_obj = yf.Ticker(ticker)
             # Handle both Timestamp (old yfinance) and string (new yfinance 1.1.0+)
             latest_yf_idx = ticker_obj.history(period="1d").index[0]
@@ -261,38 +233,42 @@ class MarketDataRetriever:
             else:
                 latest_yf_date = pd.to_datetime(str(latest_yf_idx)).date()
 
-            if os.path.isfile(file_path):
-                # If the file exists, consider it successful regardless of updates
+            latest_file_date = market_data_io.get_latest_date(self.config['folder'], ticker)
+            had_existing_data = latest_file_date is not None
+            if had_existing_data:
+                # Ticker already had data on disk: consider it successful regardless of updates
                 self.successful_tickers.append(ticker)
-                existing_data = pd.read_csv(file_path, index_col='Date', parse_dates=True)
-                if not existing_data.empty:
-                    # Handle both Timestamp and string date formats
-                    latest_file_idx = existing_data.index.max()
-                    if isinstance(latest_file_idx, str):
-                        latest_file_date = pd.to_datetime(latest_file_idx).date()
-                    elif hasattr(latest_file_idx, 'date'):
-                        latest_file_date = latest_file_idx.date()
-                    else:
-                        latest_file_date = pd.to_datetime(str(latest_file_idx)).date()
-                    if latest_file_date >= latest_yf_date:
-                        self.logger.info(f"{ticker} not updated. Latest data already available.")
-                        return
-                    start_date = latest_file_date + timedelta(days=1)
-                else:
-                    start_date = self.config['start_date']
+                if latest_file_date >= latest_yf_date:
+                    self.logger.info(f"{ticker} not updated. Latest data already available.")
+                    return
+                start_date = latest_file_date + timedelta(days=1)
             else:
                 start_date = self.config['start_date']
 
             new_data = self.get_market_data(ticker, start_date, self.config['end_date'])
 
+            # Split detection: only relevant for tickers that already had prior
+            # data on disk - a brand-new ticker's first-ever fetch is a single
+            # already-consistent auto_adjust=True series, no discontinuity risk.
+            if had_existing_data and not new_data.empty:
+                split_rows = new_data[new_data['Stock Splits'] != 0]
+                if not split_rows.empty:
+                    audit_log_path = os.path.join(PARAMS_DIR["DATA_DIR"], "market_data", "split_events.csv")
+                    result = market_data_io.check_and_handle_split(
+                        self.config['folder'], ticker, self.config['interval'],
+                        split_rows, market_data_io.fetch_ohlcv,
+                        self.config['start_date'], self.config['end_date'],
+                        audit_log_path)
+                    if result['status'] == 'rebuilt_ok':
+                        self.split_rebuilds.append(ticker)
+                    else:
+                        self.split_pending.append(ticker)
+                    self.successful_tickers.append(ticker)
+                    return
+
             if not new_data.empty:
-                if os.path.isfile(file_path):
-                    updated_data = pd.concat([existing_data, new_data])
-                    updated_data = updated_data[~updated_data.index.duplicated(keep='last')]
-                else:
-                    updated_data = new_data
-                updated_data.to_csv(file_path)
-                self.logger.info(f"Updated data for {ticker} saved to {file_path}")
+                market_data_io.write_incremental(self.config['folder'], ticker, new_data)
+                self.logger.info(f"Updated data for {ticker} saved to {market_data_io.legacy_path(self.config['folder'], ticker)}")
                 self.logger.info(f"Data updated for {ticker} for the period: {start_date} to {latest_yf_date}")
 
                 self.successful_tickers.append(ticker)
@@ -502,7 +478,15 @@ class MarketDataRetriever:
     
         self.save_problematic_tickers()
         print(f"Total problematic tickers: {len(self.problematic_tickers)}")
-        
+
+        if self.split_rebuilds or self.split_pending:
+            print("\n" + "=" * 60)
+            print("SPLIT REBUILD SUMMARY")
+            print("=" * 60)
+            print(f"🔀 Rebuilt: {len(self.split_rebuilds)} — {self.split_rebuilds}")
+            if self.split_pending:
+                print(f"⚠️  Pending (rebuild failed / will retry next run): {len(self.split_pending)} — {self.split_pending}")
+
         interval = self.config.get("interval", "").lower()
         write_file_info = self.config.get("write_file_info", False)
         

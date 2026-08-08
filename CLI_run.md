@@ -203,6 +203,76 @@ python main.py --repair-from 2026-07-24 --ticker-choice 8
 
 ---
 
+## Data storage: archive/current split
+
+Each ticker's OHLCV history under `data/market_data/{daily,weekly,monthly}/` is
+split into two tiers, transparently to everything above (no CLI flags involved
+— this is automatic on every normal pipeline run):
+
+```
+data/market_data/daily/
+  archive/{TICKER}.csv   # frozen: all rows through Dec 31 of last calendar year
+  current/{TICKER}.csv   # this year's rows only — the only file that changes day to day
+  {TICKER}.csv            # unchanged path, auto-regenerated locally = archive+current combined
+```
+
+Same under `weekly/` and `monthly/`. The flat `{TICKER}.csv` is kept alive as a
+locally materialized cache so anything reading the old single-file-per-ticker
+path (including sibling repos `marketHealth`/`metaData_v1`) needs zero changes.
+
+**Colab/Drive sync**: only `archive/` and `current/` need to travel over a
+Colab→local sync. `archive/` is untouched between year-boundaries (or a split
+rebuild — see below), so a normal day's sync only has to move `current/`'s
+small per-ticker deltas instead of the full multi-year history. The flat
+`{TICKER}.csv` files are a local-only derived cache — never sync those.
+
+**Stock splits**: detected automatically during the normal daily update (a
+non-zero `Stock Splits` value in newly-fetched rows, for a ticker that already
+had prior data). Detection forces a full re-fetch of that ticker's history and
+a full rebuild of both tiers, so `auto_adjust`-adjusted prices stay consistent
+across the split boundary instead of leaving old archive rows unadjusted. Every
+detection and outcome is appended to `data/market_data/split_events.csv`
+(`timestamp, ticker, interval, split_date, split_ratio, rebuild_status,
+rows_before, rows_after`); a run's console output also prints a "SPLIT REBUILD
+SUMMARY" if any fired. A failed re-fetch (still-bad API data) writes nothing
+and the ticker is retried on the next run — it never gets stuck half-adjusted.
+
+`--repair-from` (above) operates against this same archive/current layout
+under the hood — same CLI flags as always, no behavior change from the user's
+side.
+
+### One-time migration (existing data → archive/current)
+
+Only needed once per machine (e.g. after pulling this update on a fresh
+Colab/Drive copy that still has flat per-ticker files). Safe to interrupt and
+rerun — already-migrated tickers are skipped, and the original flat file is
+never modified or deleted.
+
+```bash
+# Migrate everything (daily + weekly + monthly)
+python scripts/migrate_to_archive_current.py
+
+# Preview the split without writing anything
+python scripts/migrate_to_archive_current.py --dry-run
+
+# One timeframe only
+python scripts/migrate_to_archive_current.py --folder data/market_data/daily
+
+# Specific tickers only
+python scripts/migrate_to_archive_current.py --tickers AAPL,MSFT --dry-run
+
+# Re-migrate tickers that already have archive/current tiers
+python scripts/migrate_to_archive_current.py --force
+```
+
+Each ticker is verified after migrating (row count + last close reloaded and
+compared against the original); any mismatch is reported and written to
+`data/market_data/migration_report.csv` without touching the original flat
+file, so a mismatch never causes data loss — investigate and re-run for that
+ticker once resolved.
+
+---
+
 ## Notes
 
 - `--end-date YYYY-MM-DD` caps the end date for **all** slow-pipeline (YF historical) intervals; defaults to today
@@ -210,6 +280,7 @@ python main.py --repair-from 2026-07-24 --ticker-choice 8
 - `--fin-data-force-refresh` ignores the incremental-refresh cache (`data/fin_data/tickers/<TICKER>.json`) and re-downloads every ticker in the universe
 - `--fin-process` with no prior `financial_data_<choice>.csv` for that `--ticker-choice` prints a message and skips — it never triggers a download itself
 - `--repair-from` is standalone: when present, it's the only thing that runs — all other flags (`--daily`, `--fin-data`, presets, etc.) are ignored for that invocation
+- Per-ticker OHLCV storage is split into `archive/`+`current/` tiers (see "Data storage" above) — no CLI flags needed, this is automatic; only relevant if you're syncing data between machines or inspecting files directly
 - `--batch-start` / `--batch-end` / `--batch-period` override date settings for **all** batch intervals
 - Per-interval date tuning (daily vs weekly vs monthly independently) is done in `user_input/user_data.csv`
 - CLI flags always override `user_data.csv` values
