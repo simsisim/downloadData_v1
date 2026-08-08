@@ -110,6 +110,35 @@ def safe_row_years_to_dates(df):
     return pd.to_datetime(df.index, utc=True).date.tolist()
 
 
+def compute_gap_start_date(folder, tickers=None):
+    """
+    The earliest 'latest date already covered' across tickers, +1 day - the
+    date a supplemental download must start from to guarantee no ticker in
+    scope is left with a gap (used by --batch-gap-fill).
+
+    Uses the minimum, not the majority/typical value: a shared start date
+    applies to a whole batch chunk at once, so erring toward "some redundant
+    overlap for already-current tickers" is preferable to "still-stale
+    tickers get skipped". Tickers with no data at all yet are excluded from
+    the scan (a supplemental refresh isn't the right tool for initial
+    full-history backfill - that's the slow pipeline's job). Returns None
+    if none of the given tickers have any data yet.
+    """
+    if tickers is None:
+        current_dir = os.path.join(folder, 'current')
+        archive_dir = os.path.join(folder, 'archive')
+        tickers = set()
+        for d in (current_dir, archive_dir):
+            if os.path.isdir(d):
+                tickers.update(e.name[:-4] for e in os.scandir(d) if e.name.endswith('.csv'))
+
+    latest_dates = [get_latest_date(folder, t) for t in tickers]
+    latest_dates = [d for d in latest_dates if d is not None]
+    if not latest_dates:
+        return None
+    return min(latest_dates) + dt.timedelta(days=1)
+
+
 def materialize_legacy(folder, ticker, combined=None):
     """
     Rewrite the flat folder/{ticker}.csv cache from archive+current.

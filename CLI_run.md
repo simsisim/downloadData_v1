@@ -135,7 +135,28 @@ python main.py --batch-only --batch-daily --batch-ticker-choice 1-2
 
 # TradingView universe (~4,700) + Index/benchmark ETFs combined, daily
 python main.py --batch-only --batch-daily --batch-ticker-choice 0-5
+
+# Gap-fill: auto-compute each interval's start date from the slow-downloaded
+# data instead of guessing a period/date range — downloads only what's
+# actually missing, per interval, in one run (see note below)
+python main.py --batch-only --batch-daily --batch-weekly --batch-monthly --batch-ticker-choice 0-5 --batch-gap-fill
+
+# Gap-fill, quick smoke test against the small test-ticker set
+python main.py --batch-only --batch-daily --batch-weekly --batch-monthly --batch-ticker-choice 8 --batch-gap-fill
 ```
+
+**`--batch-gap-fill`**: for each enabled interval, replaces the configured
+period/start date with one computed from `data/market_data/<interval>/`
+(archive+current) — specifically the *earliest* "latest date already
+covered" across the tickers in scope, +1 day. Using the earliest (not the
+typical/majority) date means the whole run is guaranteed to close every
+ticker's gap, at the cost of some redundant re-fetching for tickers that
+were already more current than the laggard. No more manually checking
+"what's the latest date we have" before every batch run. An explicit
+`--batch-start` still wins over `--batch-gap-fill` if both are given
+(uniform-override behavior takes priority, same as always). If no ticker in
+scope has any data yet, falls back to the configured period/start for that
+interval.
 
 ---
 
@@ -282,6 +303,7 @@ ticker once resolved.
 - `--repair-from` is standalone: when present, it's the only thing that runs — all other flags (`--daily`, `--fin-data`, presets, etc.) are ignored for that invocation
 - Per-ticker OHLCV storage is split into `archive/`+`current/` tiers (see "Data storage" above) — no CLI flags needed, this is automatic; only relevant if you're syncing data between machines or inspecting files directly
 - `--batch-start` / `--batch-end` / `--batch-period` override date settings for **all** batch intervals
+- `--batch-gap-fill` computes a per-interval start date from existing `data/market_data/<interval>/` instead — no manual date lookups (see "Batch pipeline only" above); an explicit `--batch-start` still overrides it
 - Per-interval date tuning (daily vs weekly vs monthly independently) is done in `user_input/user_data.csv`
 - CLI flags always override `user_data.csv` values
 - Priority order: CLI args > preset > `user_data.csv`

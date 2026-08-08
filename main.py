@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from src.get_marketData import run_market_data_retrieval, repair_from_date
 from src.get_financial_data import run_financial_data_retrieval
 from src.get_batchData import run_batch_data_retrieval, _parse_interval_cfg
+from src import market_data_io
 from src.get_cboe_putcall import run_cboe_putcall_retrieval
 from src.config import user_choice, write_file_info, Config
 from src.user_defined_data import read_user_data_legacy, read_user_data
@@ -241,6 +242,11 @@ Ticker choice values:
                        help='End date for all batch intervals YYYY-MM-DD or today')
     parser.add_argument('--batch-period', type=str, dest='batch_period',
                        help='Period for all batch intervals when start is empty (e.g. 5d, 1y)')
+    parser.add_argument('--batch-gap-fill', dest='batch_gap_fill', action='store_true',
+                       help='Auto-compute each enabled batch interval\'s start date from the earliest '
+                            '"latest date already covered" in data/market_data/<interval>/ instead of '
+                            'the configured period/start - downloads only the gap, per interval, in one run. '
+                            'An explicit --batch-start still overrides this if both are given.')
 
     # Daily-data repair mode (standalone - handled before the rest of this
     # parser's args are consumed, see main())
@@ -336,6 +342,7 @@ Ticker choice values:
     if args.batch_end:    batch_overrides['batch_end']    = args.batch_end
     if args.batch_period: batch_overrides['batch_period'] = args.batch_period
     if args.end_date:     batch_overrides['hist_end_date'] = args.end_date
+    if args.batch_gap_fill: batch_overrides['batch_gap_fill'] = True
 
     return args.preset, config_dict, batch_overrides
 
@@ -1004,22 +1011,51 @@ def main(config_override=None, preset=None):
             batch_ticker_file = combined_file  # reuse slow-pipeline universe
         print(f"  Universe: {batch_ticker_file}")
 
-        # Build interval config from CSV settings
+        # Build interval config from CSV settings. --batch-gap-fill overrides
+        # each enabled interval's start date with the actual gap computed from
+        # data/market_data/<interval>/ (archive+current), instead of the
+        # configured period/start - so one run downloads only what's missing,
+        # per interval, without the caller having to check latest dates first.
+        # An explicit --batch-start (uniform across intervals, applied later
+        # inside run_batch_data_retrieval) still wins if both are given.
+        gap_fill = batch_overrides.get('batch_gap_fill', False)
+        gap_fill_tickers = None
+        if gap_fill:
+            try:
+                _raw = pd.read_csv(batch_ticker_file)
+                gap_fill_tickers = (_raw['ticker'] if 'ticker' in _raw.columns else _raw['Symbol']).tolist()
+            except Exception:
+                gap_fill_tickers = None  # fall back to scanning every ticker already on disk
+
+        def _interval_cfg(interval_label, market_data_dir_key, start_date, end_date, period):
+            if not gap_fill:
+                return _parse_interval_cfg(start_date, end_date, period)
+            gap_start = market_data_io.compute_gap_start_date(
+                PARAMS_DIR[market_data_dir_key], tickers=gap_fill_tickers)
+            if gap_start is None:
+                print(f"  Gap-fill {interval_label}: no existing data found — using configured start/period")
+                return _parse_interval_cfg(start_date, end_date, period)
+            print(f"  Gap-fill {interval_label}: starting {gap_start.isoformat()} (earliest ticker gap)")
+            return _parse_interval_cfg(gap_start.isoformat(), end_date, period)
+
         interval_cfg = {}
         if config.yf_batch_daily:
-            interval_cfg["1d"] = _parse_interval_cfg(
+            interval_cfg["1d"] = _interval_cfg(
+                "1d", "MARKET_DATA_DIR_1d",
                 config.yf_batch_daily_start_date,
                 config.yf_batch_daily_end_date,
                 config.yf_batch_daily_period,
             )
         if config.yf_batch_weekly:
-            interval_cfg["1wk"] = _parse_interval_cfg(
+            interval_cfg["1wk"] = _interval_cfg(
+                "1wk", "MARKET_DATA_DIR_1wk",
                 config.yf_batch_weekly_start_date,
                 config.yf_batch_weekly_end_date,
                 config.yf_batch_weekly_period,
             )
         if config.yf_batch_monthly:
-            interval_cfg["1mo"] = _parse_interval_cfg(
+            interval_cfg["1mo"] = _interval_cfg(
+                "1mo", "MARKET_DATA_DIR_1mo",
                 config.yf_batch_monthly_start_date,
                 config.yf_batch_monthly_end_date,
                 config.yf_batch_monthly_period,
