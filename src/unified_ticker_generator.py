@@ -584,24 +584,24 @@ class UnifiedTickerGenerator:
         used_files = []
 
         for choice in choices:
-            # Choice 0 = TradingView universe. _generate_files_for_choice(0) already
-            # regenerated combined_tickers_0.csv from tradingview_universe_bool.csv
-            # before this method is called, so load from that fresh output rather than
-            # the individual_files[0] fallback (SP500/NASDAQ/Russell files).
-            if choice == 0:
-                tw_output = self.tickers_dir / 'combined_tickers_0.csv'
-                if tw_output.exists():
-                    try:
-                        df0 = pd.read_csv(tw_output)
-                        if 'ticker' in df0.columns:
-                            all_tickers.extend(df0['ticker'].tolist())
-                            label = 'combined_tickers_0.csv'
-                            if label not in used_files:
-                                used_files.append(label)
-                            print(f"  • Choice 0: {len(df0)} tickers from TradingView universe")
-                            continue
-                    except Exception as e:
-                        print(f"⚠️  Could not read combined_tickers_0.csv: {e} — falling back")
+            # _generate_files_for_choice() already regenerated combined_tickers_{choice}.csv
+            # for every choice in this combination (choice 0 from tradingview_universe_bool.csv,
+            # others via _generate_files_individual_mode()'s full data/tickers/ -> user_input/ ->
+            # root fallback chain), so reuse that fresh output rather than re-resolving source
+            # files here with the narrower fallback chain below.
+            choice_output = self.tickers_dir / f'combined_tickers_{choice}.csv'
+            if choice_output.exists():
+                try:
+                    df_choice = pd.read_csv(choice_output)
+                    if 'ticker' in df_choice.columns:
+                        all_tickers.extend(df_choice['ticker'].tolist())
+                        label = choice_output.name
+                        if label not in used_files:
+                            used_files.append(label)
+                        print(f"  • Choice {choice}: {len(df_choice)} tickers from {label}")
+                        continue
+                except Exception as e:
+                    print(f"⚠️  Could not read {choice_output.name}: {e} — falling back")
 
             files = self.individual_files.get(choice, [])
             for file in files:

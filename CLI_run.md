@@ -136,6 +136,9 @@ python main.py --batch-only --batch-daily --batch-ticker-choice 1-2
 # TradingView universe (~4,700) + Index/benchmark ETFs combined, daily
 python main.py --batch-only --batch-daily --batch-ticker-choice 0-5
 
+# TradingView universe (~4,700) + Index/benchmark ETFs combined, daily + weekly + monthly
+python main.py --batch-only --batch-daily --batch-weekly --batch-monthly --batch-ticker-choice 0-5
+
 # Gap-fill: auto-compute each interval's start date from the slow-downloaded
 # data instead of guessing a period/date range — downloads only what's
 # actually missing, per interval, in one run (see note below)

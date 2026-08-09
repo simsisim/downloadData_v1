@@ -97,9 +97,11 @@ class TickerRetriever:
         return table['Symbol'].tolist()
               
     def get_indexes_tickers(self):
-       file_path_manual = 'indexes_tickers_manual.csv'
+       from src.user_defined_data import read_user_data
+       config = read_user_data()
+       file_path_manual = os.path.join(config.user_input_path, 'indexes_tickers.csv')
        table = pd.read_csv(file_path_manual)
-       return table['ticker'].tolist() 
+       return table['ticker'].tolist()
    
     def get_portofolio_tickers(self):
        from src.user_defined_data import read_user_data
