@@ -5,8 +5,10 @@ import argparse
 from datetime import datetime, timedelta
 from src.get_marketData import run_market_data_retrieval, repair_from_date
 from src.get_financial_data import run_financial_data_retrieval
-from src.get_batchData import run_batch_data_retrieval, _parse_interval_cfg
+from src.get_batchData import (run_batch_data_retrieval, _parse_interval_cfg,
+                                compute_batch_gap_start_date, run_batch_gap_fill_interval)
 from src import market_data_io
+from src import ticker_manifest
 from src.get_cboe_putcall import run_cboe_putcall_retrieval
 from src.config import user_choice, write_file_info, Config
 from src.user_defined_data import read_user_data_legacy, read_user_data
@@ -1011,59 +1013,77 @@ def main(config_override=None, preset=None):
             batch_ticker_file = combined_file  # reuse slow-pipeline universe
         print(f"  Universe: {batch_ticker_file}")
 
-        # Build interval config from CSV settings. --batch-gap-fill overrides
-        # each enabled interval's start date with the actual gap computed from
-        # data/market_data/<interval>/ (archive+current), instead of the
-        # configured period/start - so one run downloads only what's missing,
-        # per interval, without the caller having to check latest dates first.
-        # An explicit --batch-start (uniform across intervals, applied later
-        # inside run_batch_data_retrieval) still wins if both are given.
+        # --batch-gap-fill splits each enabled interval into two requests
+        # instead of one uniform one: a majority-group request (the whole
+        # universe minus stragglers, narrow range from the majority
+        # ticker's own coverage in data/market_data_batch/<interval>/) and a
+        # straggler-group request (the few tickers behind majority, their
+        # own wider range). A single uniform request whose range is dragged
+        # back to the single worst ticker's gap redundantly re-fetches and
+        # rewrites every already-complete day for the ENTIRE universe just
+        # because one or two tickers lag - see run_batch_gap_fill_interval.
+        # An explicit --batch-start/--batch-period (uniform, CLI-forced)
+        # still wins over gap-fill entirely if given - falls back to the
+        # single-request path below.
         gap_fill = batch_overrides.get('batch_gap_fill', False)
+        explicit_override = bool(batch_overrides.get('batch_start') or batch_overrides.get('batch_period'))
         gap_fill_tickers = None
         if gap_fill:
             try:
                 _raw = pd.read_csv(batch_ticker_file)
                 gap_fill_tickers = (_raw['ticker'] if 'ticker' in _raw.columns else _raw['Symbol']).tolist()
             except Exception:
-                gap_fill_tickers = None  # fall back to scanning every ticker already on disk
+                gap_fill_tickers = None  # can't split without a concrete ticker list - falls back below
 
-        def _interval_cfg(interval_label, market_data_dir_key, start_date, end_date, period):
-            if not gap_fill:
-                return _parse_interval_cfg(start_date, end_date, period)
-            gap_start = market_data_io.compute_gap_start_date(
-                PARAMS_DIR[market_data_dir_key], tickers=gap_fill_tickers)
-            if gap_start is None:
-                print(f"  Gap-fill {interval_label}: no existing data found — using configured start/period")
-                return _parse_interval_cfg(start_date, end_date, period)
-            print(f"  Gap-fill {interval_label}: starting {gap_start.isoformat()} (earliest ticker gap)")
-            return _parse_interval_cfg(gap_start.isoformat(), end_date, period)
-
-        interval_cfg = {}
+        enabled_intervals = []
         if config.yf_batch_daily:
-            interval_cfg["1d"] = _interval_cfg(
-                "1d", "MARKET_DATA_DIR_1d",
-                config.yf_batch_daily_start_date,
-                config.yf_batch_daily_end_date,
-                config.yf_batch_daily_period,
-            )
+            enabled_intervals.append(("1d", "MARKET_DATA_BATCH_DIR_1d",
+                                       config.yf_batch_daily_start_date, config.yf_batch_daily_end_date,
+                                       config.yf_batch_daily_period))
         if config.yf_batch_weekly:
-            interval_cfg["1wk"] = _interval_cfg(
-                "1wk", "MARKET_DATA_DIR_1wk",
-                config.yf_batch_weekly_start_date,
-                config.yf_batch_weekly_end_date,
-                config.yf_batch_weekly_period,
-            )
+            enabled_intervals.append(("1wk", "MARKET_DATA_BATCH_DIR_1wk",
+                                       config.yf_batch_weekly_start_date, config.yf_batch_weekly_end_date,
+                                       config.yf_batch_weekly_period))
         if config.yf_batch_monthly:
-            interval_cfg["1mo"] = _interval_cfg(
-                "1mo", "MARKET_DATA_DIR_1mo",
-                config.yf_batch_monthly_start_date,
-                config.yf_batch_monthly_end_date,
-                config.yf_batch_monthly_period,
-            )
+            enabled_intervals.append(("1mo", "MARKET_DATA_BATCH_DIR_1mo",
+                                       config.yf_batch_monthly_start_date, config.yf_batch_monthly_end_date,
+                                       config.yf_batch_monthly_period))
 
-        if not interval_cfg:
+        if not enabled_intervals:
             print("  No batch intervals enabled — set YF_batch_daily/weekly/monthly to TRUE")
+        elif gap_fill and not explicit_override and gap_fill_tickers:
+            failed_file = os.path.join(PARAMS_DIR["TICKERS_DIR"], "problematic_tickers_batch.csv")
+            manifest = ticker_manifest.load_manifest()
+            for interval_label, dir_key, start_date, end_date, period in enabled_intervals:
+                slow_dir_key = dir_key.replace("_BATCH", "")
+                run_batch_gap_fill_interval(
+                    interval_label, PARAMS_DIR[dir_key], config.yf_batch_output_path,
+                    gap_fill_tickers, manifest,
+                    start_date, end_date, period,
+                    failed_file, use_failed_file=config.yf_batch_use_failed_file,
+                    slow_folder=PARAMS_DIR.get(slow_dir_key),
+                )
+            ticker_manifest.save_manifest(manifest)
+            print(f"  Manifest updated: {ticker_manifest.MANIFEST_PATH}")
         else:
+            # Single uniform request: gap-fill disabled, an explicit
+            # --batch-start/--batch-period override was given, or the
+            # universe couldn't be read (falls back to the old
+            # single-worst-ticker gap-start for --batch-gap-fill).
+            interval_cfg = {}
+            for interval_label, dir_key, start_date, end_date, period in enabled_intervals:
+                if gap_fill and not explicit_override:
+                    gap_start = compute_batch_gap_start_date(
+                        PARAMS_DIR[dir_key], interval_label, tickers=gap_fill_tickers)
+                    if gap_start is None:
+                        print(f"  Gap-fill {interval_label}: no existing batch data found — using configured start/period")
+                        interval_cfg[interval_label] = _parse_interval_cfg(start_date, end_date, period)
+                    else:
+                        print(f"  Gap-fill {interval_label}: starting {gap_start.isoformat()} (earliest ticker gap in batch cache)")
+                        interval_cfg[interval_label] = _parse_interval_cfg(gap_start.isoformat(), end_date, period)
+                else:
+                    interval_cfg[interval_label] = _parse_interval_cfg(start_date, end_date, period)
+
             batch_params = {
                 "ticker_file":    batch_ticker_file,
                 "output_dir":     config.yf_batch_output_path,

@@ -145,7 +145,7 @@ def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='
                 fixed.append(ticker)
 
             updated_data = pd.concat([existing_data, new_data]) if not existing_data.empty else new_data
-            market_data_io.rebuild_archive_current(folder, ticker, updated_data)
+            market_data_io.rebuild_archive_current(folder, ticker, updated_data, interval=interval)
             print(f"   {ticker}: repaired {since_date_d} → {end_date} -> {market_data_io.legacy_path(folder, ticker)}")
 
         except Exception as e:
@@ -267,7 +267,8 @@ class MarketDataRetriever:
                     return
 
             if not new_data.empty:
-                market_data_io.write_incremental(self.config['folder'], ticker, new_data)
+                market_data_io.write_incremental(self.config['folder'], ticker, new_data,
+                                                  interval=self.config['interval'])
                 self.logger.info(f"Updated data for {ticker} saved to {market_data_io.legacy_path(self.config['folder'], ticker)}")
                 self.logger.info(f"Data updated for {ticker} for the period: {start_date} to {latest_yf_date}")
 
