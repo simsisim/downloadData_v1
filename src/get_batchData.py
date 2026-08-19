@@ -5,6 +5,7 @@ from collections import Counter
 import pandas as pd
 import yfinance as yf
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from src import ticker_manifest, market_data_io
 
@@ -14,6 +15,33 @@ MAX_RETRIES = 3
 RETRY_BACKOFF = [30, 60, 120]
 
 INTERVAL_TO_SUBDIR = {'1d': 'daily', '1wk': 'weekly', '1mo': 'monthly'}
+
+US_EASTERN = ZoneInfo("America/New_York")
+US_MARKET_CLOSE = (16, 15)  # 4:00pm ET close + 15min settle buffer before yfinance has the final daily bar
+
+
+def _last_closed_us_trading_date(now=None):
+    """Most recent calendar date (US/Eastern) whose regular session has
+    actually finished as of `now`: today if the US market has already
+    closed (past US_MARKET_CLOSE, US/Eastern), otherwise yesterday. This
+    machine runs on local (e.g. German) time, hours ahead of US market
+    hours, so date.today() alone would treat a US trading day as available
+    hours before it's actually closed. Doesn't special-case
+    weekends/holidays - those already come back empty from yfinance same
+    as before this check existed, harmlessly."""
+    now = (now or datetime.now(US_EASTERN)).astimezone(US_EASTERN)
+    close_today = now.replace(hour=US_MARKET_CLOSE[0], minute=US_MARKET_CLOSE[1], second=0, microsecond=0)
+    return now.date() if now >= close_today else now.date() - timedelta(days=1)
+
+
+def _pending_daily_data(start_iso, now=None):
+    """True if at least one CLOSED US trading session falls on/after
+    `start_iso` as of `now` - i.e. whether a daily gap-fill request
+    starting there could possibly get back new data right now. False means
+    the request's start date is today (or later) and the US market hasn't
+    closed yet, so firing it would just ask yfinance for a session that
+    isn't final."""
+    return date.fromisoformat(start_iso) <= _last_closed_us_trading_date(now)
 
 
 def _parse_interval_cfg(start, end, period):
@@ -554,11 +582,15 @@ def run_batch_gap_fill_interval(interval, batch_dir, output_dir, universe, manif
 
     if majority_group:
         start = (majority + timedelta(days=1)).isoformat()
-        cfg = _parse_interval_cfg(start, configured_end, configured_period)
-        print(f"  Gap-fill {interval} (majority, {len(majority_group)} tickers): starting {start}")
-        result = _run_group("majority", majority_group, cfg, interval, output_dir,
-                             failed_file, use_failed_file, chunk_size)
-        _record_group_outcomes(manifest, batch_dir, interval, majority_group, result, today_iso)
+        if interval == '1d' and not _pending_daily_data(start):
+            print(f"  Gap-fill {interval} (majority, {len(majority_group)} tickers): "
+                  f"US market hasn't closed yet today — nothing new to fetch, skipping")
+        else:
+            cfg = _parse_interval_cfg(start, configured_end, configured_period)
+            print(f"  Gap-fill {interval} (majority, {len(majority_group)} tickers): starting {start}")
+            result = _run_group("majority", majority_group, cfg, interval, output_dir,
+                                 failed_file, use_failed_file, chunk_size)
+            _record_group_outcomes(manifest, batch_dir, interval, majority_group, result, today_iso)
 
     if stragglers:
         # Group by each straggler's OWN last_seen date instead of one
@@ -580,6 +612,10 @@ def run_batch_gap_fill_interval(interval, batch_dir, output_dir, universe, manif
                 by_date.setdefault(d, []).append(t)
         for d, group_tickers in sorted(by_date.items()):
             start = (d + timedelta(days=1)).isoformat()
+            if interval == '1d' and not _pending_daily_data(start):
+                print(f"  Gap-fill {interval} (stragglers @ {d}, {len(group_tickers)} tickers): "
+                      f"US market hasn't closed yet today — skipping")
+                continue
             cfg = _parse_interval_cfg(start, configured_end, configured_period)
             print(f"  Gap-fill {interval} (stragglers @ {d}, {len(group_tickers)} tickers): starting {start}")
             result = _run_group(f"stragglers_{d}", group_tickers, cfg, interval, output_dir,
@@ -600,10 +636,14 @@ def run_batch_gap_fill_interval(interval, batch_dir, output_dir, universe, manif
             # brand-new ticker needing real history, that's the slow
             # pipeline's initial-backfill job, not batch's.
             start = (majority + timedelta(days=1)).isoformat()
-            cfg = _parse_interval_cfg(start, configured_end, configured_period)
-            print(f"  Gap-fill {interval} (stragglers, never seen, {len(never_seen)} tickers): {never_seen}")
-            result = _run_group("stragglers_new", never_seen, cfg, interval, output_dir,
-                                 failed_file, use_failed_file, chunk_size)
-            _record_group_outcomes(manifest, batch_dir, interval, never_seen, result, today_iso)
+            if interval == '1d' and not _pending_daily_data(start):
+                print(f"  Gap-fill {interval} (stragglers, never seen, {len(never_seen)} tickers): "
+                      f"US market hasn't closed yet today — skipping")
+            else:
+                cfg = _parse_interval_cfg(start, configured_end, configured_period)
+                print(f"  Gap-fill {interval} (stragglers, never seen, {len(never_seen)} tickers): {never_seen}")
+                result = _run_group("stragglers_new", never_seen, cfg, interval, output_dir,
+                                     failed_file, use_failed_file, chunk_size)
+                _record_group_outcomes(manifest, batch_dir, interval, never_seen, result, today_iso)
 
     return {"majority_date": majority, "majority_group": len(majority_group), "stragglers": len(stragglers)}
