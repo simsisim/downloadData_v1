@@ -16,6 +16,7 @@ legacy file is regenerated locally from them.
 """
 import os
 import datetime as dt
+import numpy as np
 import pandas as pd
 
 
@@ -29,6 +30,22 @@ def current_path(folder, ticker):
 
 def legacy_path(folder, ticker):
     return os.path.join(folder, f"{ticker}.csv")
+
+
+def shares_path(shares_folder, ticker):
+    return os.path.join(shares_folder, f"{ticker}.csv")
+
+
+def splits_path(splits_folder, ticker):
+    return os.path.join(splits_folder, f"{ticker}.csv")
+
+
+def is_stale(path, max_age_days):
+    """True if `path` doesn't exist, or was last written more than max_age_days ago."""
+    if not os.path.isfile(path):
+        return True
+    age_days = (dt.datetime.now().timestamp() - os.path.getmtime(path)) / 86400
+    return age_days > max_age_days
 
 
 def read_ticker_csv(path):
@@ -99,6 +116,22 @@ def load_ohlcv(folder, ticker):
         return pd.DataFrame()
     combined = pd.concat([archive_df, current_df])
     return _dedupe_sorted(combined)
+
+
+def load_shares_outstanding(shares_folder, ticker):
+    """
+    Raw (as-filed) historical shares-outstanding for `ticker`, sparse and
+    irregularly sampled (a filing-driven series, not one row per trading
+    day). NOT split-adjusted - see historical_market_cap() for why that has
+    to happen at read time rather than being baked in here. Empty
+    DataFrame if never fetched or the ticker had no coverage.
+    """
+    return read_ticker_csv(shares_path(shares_folder, ticker))
+
+
+def load_splits(splits_folder, ticker):
+    """Cached split-ratio history for `ticker`. Empty DataFrame if none on file."""
+    return read_ticker_csv(splits_path(splits_folder, ticker))
 
 
 def get_latest_date(folder, ticker):
@@ -284,7 +317,8 @@ def append_split_audit(audit_log_path, rows):
 
 
 def check_and_handle_split(folder, ticker, interval, split_rows, fetch_fn,
-                            start_date, end_date, audit_log_path):
+                            start_date, end_date, audit_log_path,
+                            splits_folder=None):
     """
     A split was detected in split_rows (rows of newly-fetched data with a
     non-zero 'Stock Splits' value). Force a full re-fetch of the ticker's
@@ -292,6 +326,14 @@ def check_and_handle_split(folder, ticker, interval, split_rows, fetch_fn,
     consistently) and rebuild both tiers from it. Writes nothing if the
     re-fetch comes back empty or with bad OHLC - a partial/bad stitch would
     be a worse outcome than leaving the existing data untouched.
+
+    `splits_folder`: when given, also refreshes this ticker's cached
+    split-ratio table (see fetch_shares_and_splits/historical_market_cap) -
+    best-effort, since a genuinely new split needs to show up there
+    immediately rather than waiting for the next low-frequency
+    shares/splits refresh (see get_marketData.py's SHARES_REFRESH_DAYS
+    gate). Failure here never blocks the price rebuild above, which is the
+    part that actually matters for correctness of the stored OHLCV.
     """
     timestamp = dt.datetime.now().isoformat(timespec='seconds')
     rows_before = len(load_ohlcv(folder, ticker))
@@ -332,7 +374,156 @@ def check_and_handle_split(folder, ticker, interval, split_rows, fetch_fn,
         'split_date': audit_rows[-1]['split_date'], 'split_ratio': audit_rows[-1]['split_ratio'],
         'rebuild_status': 'rebuilt_ok', 'rows_before': rows_before, 'rows_after': rows_after,
     }])
+
+    if splits_folder is not None:
+        try:
+            import yfinance as yf
+            fresh_splits = yf.Ticker(ticker).splits
+            if fresh_splits is not None and not fresh_splits.empty:
+                fresh_splits = fresh_splits.copy()
+                fresh_splits.index = pd.to_datetime(fresh_splits.index, utc=True).tz_localize(None)
+                fresh_splits.index.name = 'Date'
+                fresh_splits.name = 'SplitRatio'
+                _merge_and_write_series(
+                    load_splits(splits_folder, ticker), fresh_splits, 'SplitRatio',
+                    splits_path(splits_folder, ticker))
+        except Exception:
+            pass  # best-effort - the price rebuild above already succeeded
+
     return {'status': 'rebuilt_ok', 'ticker': ticker, 'rows_after': rows_after}
+
+
+def fetch_shares_and_splits(ticker, start_date, end_date):
+    """
+    Real historical shares-outstanding (sparse, filing-driven - NOT one row
+    per trading day) plus the ticker's full split-ratio history, both from
+    yfinance endpoints separate from history()/fetch_ohlcv().
+
+    Returns (shares, splits), each a Series with a tz-naive DatetimeIndex
+    named 'Date': shares is 'SharesOutstanding' (raw, as-filed - no split
+    adjustment - see historical_market_cap()), deduped keep='last' per date
+    (get_shares_full can return same-day duplicates, same rationale as
+    _dedupe_sorted). splits is 'Stock Splits' (ratio per split date), as
+    returned by yf.Ticker.splits - small enough that no dedup/perf handling
+    is needed. Either can come back empty (confirmed: smaller/less-covered
+    tickers can have zero rows) - callers must handle that, not treat it as
+    an error.
+    """
+    import yfinance as yf
+
+    ticker_obj = yf.Ticker(ticker)
+
+    shares = ticker_obj.get_shares_full(start=start_date, end=end_date)
+    if shares is not None and not shares.empty:
+        shares = shares.copy()
+        shares.index = pd.to_datetime(shares.index, utc=True).tz_localize(None).normalize()
+        shares.index.name = 'Date'
+        shares = shares[~shares.index.duplicated(keep='last')].sort_index()
+        shares.name = 'SharesOutstanding'
+    else:
+        shares = pd.Series(dtype='float64', name='SharesOutstanding')
+        shares.index.name = 'Date'
+
+    splits = ticker_obj.splits
+    if splits is not None and not splits.empty:
+        splits = splits.copy()
+        splits.index = pd.to_datetime(splits.index, utc=True).tz_localize(None).normalize()
+        splits.index.name = 'Date'
+        splits.name = 'SplitRatio'
+    else:
+        splits = pd.Series(dtype='float64', name='SplitRatio')
+        splits.index.name = 'Date'
+
+    return shares, splits
+
+
+def _merge_and_write_series(existing_df, new_series, value_col, path):
+    """Shared merge-dedupe-write for the shares/splits stores (small, single-file-per-ticker)."""
+    if new_series.empty:
+        return
+    new_df = new_series.to_frame(value_col)
+    combined = pd.concat([existing_df, new_df]) if not existing_df.empty else new_df
+    combined = _dedupe_sorted(combined)
+    _atomic_write_csv(combined, path)
+
+
+def write_shares_and_splits(shares_folder, splits_folder, ticker, shares, splits):
+    """Merge freshly fetched shares/splits (from fetch_shares_and_splits) into the on-disk stores."""
+    _merge_and_write_series(
+        load_shares_outstanding(shares_folder, ticker), shares, 'SharesOutstanding',
+        shares_path(shares_folder, ticker))
+    _merge_and_write_series(
+        load_splits(splits_folder, ticker), splits, 'SplitRatio',
+        splits_path(splits_folder, ticker))
+
+
+def historical_market_cap(shares_folder, splits_folder, ticker, prices):
+    """
+    Real point-in-time market cap: adjusted_close(t) * adjusted_shares(t).
+
+    Prices from fetch_ohlcv are auto_adjust=True - split-adjusted through
+    ALL splits, including ones after date t. Raw shares from
+    fetch_shares_and_splits are as-filed at the time - NOT adjusted for
+    splits that happen after t. Verified directly (NVDA, 2020 data): the
+    naive product undercounts cap by exactly the cumulative split factor
+    (40x, from the 2021 4:1 and 2024 10:1 splits). Fixed here, once, rather
+    than by every caller: adjusted_shares(t) = raw_shares(t) x product of
+    every split with date > t. Shares are stored raw (not pre-adjusted) so
+    archived data never needs retroactive rewriting when a future split
+    happens - this function just recomputes the factor from whatever the
+    splits store currently holds.
+
+    prices: Series of Close (or DataFrame with a 'Close' column), indexed
+    by date - typically load_weekly/load_daily's output for `ticker`.
+
+    Returns a float Series aligned to prices' index. NaN wherever no
+    shares-outstanding data exists on/before that date - confirmed this
+    happens routinely for smaller tickers, so callers must have a fallback
+    (see common/universe.py's approx_historical_cap in the lkm_rs repo).
+    """
+    close = prices['Close'] if isinstance(prices, pd.DataFrame) else prices
+    dates = pd.DatetimeIndex(pd.to_datetime(close.index)).tz_localize(None)
+
+    shares_df = load_shares_outstanding(shares_folder, ticker)
+    if shares_df.empty:
+        return pd.Series(np.nan, index=prices.index, dtype='float64')
+
+    shares = shares_df['SharesOutstanding'].astype(float).dropna()
+    shares.index = pd.to_datetime(shares.index, utc=True).tz_localize(None)
+    shares = shares.sort_index()
+
+    # Last known raw share count on/before each date; NaN before the first known reading.
+    pos = np.searchsorted(shares.index.values, dates.values, side='right') - 1
+    raw_shares = np.where(pos >= 0, shares.to_numpy()[np.clip(pos, 0, len(shares) - 1)], np.nan)
+
+    splits_df = load_splits(splits_folder, ticker)
+    if not splits_df.empty:
+        splits = splits_df['SplitRatio'].astype(float).dropna()
+        splits.index = pd.to_datetime(splits.index, utc=True).tz_localize(None)
+        splits = splits.sort_index()
+        # factor(t) = product of every split ratio with split_date > t
+        suffix_cumprod = splits.to_numpy()[::-1].cumprod()[::-1]
+        split_pos = np.searchsorted(splits.index.values, dates.values, side='right')
+        factor = np.where(split_pos < len(splits), suffix_cumprod[np.clip(split_pos, 0, len(splits) - 1)], 1.0)
+    else:
+        factor = np.ones(len(dates))
+
+    market_cap = close.to_numpy() * raw_shares * factor
+    return pd.Series(market_cap, index=prices.index)
+
+
+# yf.Ticker.info fields that are a single current-moment value, not a real
+# historical series - stamped onto every row of fetch_ohlcv's output below,
+# so they're renamed with this suffix to make clear they're a download-time
+# snapshot repeated across all dates, not point-in-time history (confirmed
+# directly: the old 'marketCap' name looked like a real per-date column but
+# was actually today's value copied onto years of past rows). Real per-date
+# market cap now comes from historical_market_cap() instead.
+SNAPSHOT_COLUMN_RENAME = {
+    'marketCap': 'marketCap_asOfDownload',
+    'trailingPE': 'trailingPE_asOfDownload',
+    'forwardPE': 'forwardPE_asOfDownload',
+}
 
 
 def fetch_ohlcv(ticker, start_date, end_date, interval='1d'):
@@ -354,6 +545,6 @@ def fetch_ohlcv(ticker, start_date, end_date, interval='1d'):
     ]
     for param in additional_params:
         if param in info:
-            ohlc_data[param] = info[param]
+            ohlc_data[SNAPSHOT_COLUMN_RENAME.get(param, param)] = info[param]
     ohlc_data['Symbol'] = ticker
     return ohlc_data

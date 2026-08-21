@@ -48,11 +48,12 @@ YF_batch_monthly_period,5y,Used when monthly_start_date is empty
 # FINANCIAL DATA DOWNLOAD,,
 # --------------------------,,
 fin_data_download,FALSE,Enable financial data download (raw CANSI data from yfinance/etc)
-YF_fin_data,FALSE,Download financial data from YFinance
+YF_fin_data,TRUE,Download financial data from YFinance
 TW_fin_data,FALSE,Download financial data from TradingView
 Zacks_fin_data,FALSE,Download financial data from Zacks (future)
 fin_data_refresh_days,7,Skip re-downloading a ticker if its data is fresher than this many days
 fin_data_force_refresh,FALSE,Ignore freshness check and re-download every ticker
+fin_data_max_workers,4,Concurrent yfinance fetches (1 = old sequential behavior)
 ,,
 # FINANCIAL DATA PROCESSING (charts, filters),
 # --------------------------------------------,,
@@ -67,7 +68,7 @@ write_info_file,TRUE,Write detailed info files during processing
 ticker_info_TW,TRUE,Get ticker info from TradingView universe file
 ticker_info_TW_file,tradingview_universe_bool.csv,File name for TradingView ticker info
 ticker_info_YF,FALSE,Download ticker info from YFinance
-ticker_choice,8,Ticker combination choice (use single numbers or dash-separated)
+ticker_choice,0-8,Ticker combination choice (use single numbers or dash-separated)
 ,,
 # TICKER GROUP CHOICES (ticker_choice values),,
 # ==========================================,,

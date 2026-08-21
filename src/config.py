@@ -13,6 +13,12 @@ PARAMS_DIR = {
     "MARKET_DATA_DIR_1wk": os.path.join("data", "market_data/weekly/"),
     "MARKET_DATA_DIR_1mo": os.path.join("data", "market_data/monthly/"),
 
+    # Real per-date shares-outstanding + split history (see market_data_io.py
+    # fetch_shares_and_splits/historical_market_cap). Interval-agnostic - one
+    # store shared by daily/weekly/monthly, not nested under any of them.
+    "MARKET_DATA_SHARES_DIR": os.path.join("data", "market_data", "shares_outstanding"),
+    "MARKET_DATA_SPLITS_DIR": os.path.join("data", "market_data", "splits"),
+
     # TradingView data directories
     "MARKET_DATA_TW_DIR": "data/market_data_tw",
     "MARKET_DATA_TW_DIR_1d": os.path.join("data", "market_data_tw/daily/"),
@@ -67,6 +73,10 @@ def setup_directories():
     for _yf_dir in (PARAMS_DIR["MARKET_DATA_DIR_1d"], PARAMS_DIR["MARKET_DATA_DIR_1wk"], PARAMS_DIR["MARKET_DATA_DIR_1mo"]):
         os.makedirs(os.path.join(_yf_dir, "archive"), exist_ok=True)
         os.makedirs(os.path.join(_yf_dir, "current"), exist_ok=True)
+
+    # Shares-outstanding + splits stores (see src/market_data_io.py)
+    os.makedirs(PARAMS_DIR["MARKET_DATA_SHARES_DIR"], exist_ok=True)
+    os.makedirs(PARAMS_DIR["MARKET_DATA_SPLITS_DIR"], exist_ok=True)
 
     # TradingView data directories
     os.makedirs(PARAMS_DIR["MARKET_DATA_TW_DIR_1d"], exist_ok=True)

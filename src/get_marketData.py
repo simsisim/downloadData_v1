@@ -10,6 +10,15 @@ import logging
 from src import market_data_io
 from src.market_data_io import fetch_ohlcv
 
+# Shares-outstanding/splits change a few times a year at most (real filing
+# events), so refetching yf.Ticker.get_shares_full's whole series on every
+# daily run would be pure waste against every other ticker's price update -
+# refreshed at this cadence instead once a ticker already has data on file
+# (see MarketDataRetriever._update_shares_and_splits). Mirrors
+# get_financial_data.py's FinancialDataRetriever refresh_days pattern for
+# the same reason (fundamentals also change slowly).
+SHARES_REFRESH_DAYS = 30
+
 
 def _read_header(file_path):
     """Read just the first line of a CSV - O(1) regardless of file size."""
@@ -214,6 +223,36 @@ class MarketDataRetriever:
         """
         return fetch_ohlcv(ticker, start_date, end_date, interval=self.config['interval'])
 
+    def _update_shares_and_splits(self, ticker, had_existing_data):
+        """
+        Real per-date shares-outstanding + split history for `ticker` (see
+        market_data_io.fetch_shares_and_splits/historical_market_cap).
+        Interval-agnostic real-world data, so only pulled from the daily
+        ('1d') run even though MarketDataRetriever also runs for weekly/
+        monthly - avoids fetching the same data 3x per ticker per pipeline
+        invocation (mirrors update_data()'s existing write_file_info
+        interval=='1d' gate for the same reason).
+
+        On a ticker's first-ever fetch, pulls the full configured date
+        range; afterward, only refetches once the cached file is older than
+        SHARES_REFRESH_DAYS - see that constant's docstring for why a daily
+        refetch would be wasteful.
+        """
+        if self.config['interval'] != '1d':
+            return
+
+        shares_folder = self.config['shares_folder']
+        splits_folder = self.config['splits_folder']
+
+        if had_existing_data:
+            shares_file = market_data_io.shares_path(shares_folder, ticker)
+            if not market_data_io.is_stale(shares_file, SHARES_REFRESH_DAYS):
+                return
+
+        shares, splits = market_data_io.fetch_shares_and_splits(
+            ticker, self.config['start_date'], self.config['end_date'])
+        market_data_io.write_shares_and_splits(shares_folder, splits_folder, ticker, shares, splits)
+
     def update_individual_stock_data(self, ticker):
         """
         Update historical market data for an individual stock
@@ -247,6 +286,16 @@ class MarketDataRetriever:
 
             new_data = self.get_market_data(ticker, start_date, self.config['end_date'])
 
+            # Real shares-outstanding/splits: interval-agnostic (same real data
+            # regardless of daily/weekly/monthly bars), so only fetched once per
+            # ticker via the '1d' run - see the interval check inside. Failure
+            # here must never block the price update below.
+            if self.config.get('shares_folder') and self.config.get('splits_folder'):
+                try:
+                    self._update_shares_and_splits(ticker, had_existing_data)
+                except Exception as e:
+                    self.logger.info(f"{ticker}: shares/splits update failed - {e}")
+
             # Split detection: only relevant for tickers that already had prior
             # data on disk - a brand-new ticker's first-ever fetch is a single
             # already-consistent auto_adjust=True series, no discontinuity risk.
@@ -258,7 +307,7 @@ class MarketDataRetriever:
                         self.config['folder'], ticker, self.config['interval'],
                         split_rows, market_data_io.fetch_ohlcv,
                         self.config['start_date'], self.config['end_date'],
-                        audit_log_path)
+                        audit_log_path, splits_folder=self.config.get('splits_folder'))
                     if result['status'] == 'rebuilt_ok':
                         self.split_rebuilds.append(ticker)
                     else:

@@ -34,6 +34,12 @@ class UserConfiguration:
     zacks_fin_data: bool = False
     fin_data_refresh_days: int = 7
     fin_data_force_refresh: bool = False
+    # Concurrent yfinance fetches per FinancialDataRetriever run - each ticker's
+    # ~10s cost is almost entirely network wait, not CPU, so overlapping several
+    # tickers gives a near-linear speedup (measured ~4x at 5 workers). 1 = old
+    # fully-sequential behavior. Kept modest by default to limit rate-limit risk
+    # at full-universe scale, which a small burst test can't fully rule out.
+    fin_data_max_workers: int = 4
 
     # Financial data processing (charts, filters) - independent of download
     fin_data_process: bool = False
@@ -192,6 +198,7 @@ def read_user_data(file_path: str = 'user_input/user_data.csv') -> UserConfigura
             'Zacks_fin_data': ('zacks_fin_data', parse_boolean),
             'fin_data_refresh_days': ('fin_data_refresh_days', int),
             'fin_data_force_refresh': ('fin_data_force_refresh', parse_boolean),
+            'fin_data_max_workers': ('fin_data_max_workers', int),
             'fin_data_process': ('fin_data_process', parse_boolean),
             'fin_data_chart_top_n': ('fin_data_chart_top_n', int),
             'fin_data_chart_max_peers': ('fin_data_chart_max_peers', int),

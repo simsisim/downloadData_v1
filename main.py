@@ -818,7 +818,12 @@ def main(config_override=None, preset=None):
                     'write_file_info': write_file_info,
                     'ticker_info_TW': config.ticker_info_TW,
                     'ticker_info_TW_file': config.ticker_info_TW_file,
-                    'ticker_info_YF': config.ticker_info_YF
+                    'ticker_info_YF': config.ticker_info_YF,
+                    # Real shares-outstanding/splits are interval-agnostic and
+                    # only fetched from this daily run - see
+                    # MarketDataRetriever._update_shares_and_splits.
+                    'shares_folder': PARAMS_DIR["MARKET_DATA_SHARES_DIR"],
+                    'splits_folder': PARAMS_DIR["MARKET_DATA_SPLITS_DIR"],
                 }
                 logging.info(f"Downloading daily market data for combined tickers from choice: {config.ticker_choice}")
                 run_market_data_retrieval(daily_params)
@@ -953,6 +958,10 @@ def main(config_override=None, preset=None):
                 # already fresher than this many days (fundamentals change slowly).
                 'refresh_days': config.fin_data_refresh_days,
                 'force_refresh': config.fin_data_force_refresh,
+                # Concurrent yfinance fetches - each ticker's cost is almost
+                # entirely network wait, not CPU (profiled directly), so this
+                # gives a near-linear speedup. 1 = old fully-sequential path.
+                'max_workers': config.fin_data_max_workers,
             }
 
             print("Starting comprehensive financial data collection...")

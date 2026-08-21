@@ -5,6 +5,7 @@ import time
 import os
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.config import user_choice, PARAMS_DIR
 
 
@@ -81,6 +82,15 @@ class FinancialDataRetriever:
         # need to burn 7-10 yfinance calls/ticker on data that hasn't changed).
         self.refresh_days = int(self.config.get('refresh_days', 7))
         self.force_refresh = bool(self.config.get('force_refresh', False))
+
+        # Concurrent fetches: each ticker's ~10s cost is almost entirely network
+        # wait (profiled directly - see get_comprehensive_financial_data's 8-11
+        # separate yfinance/HTTP calls), not CPU, so overlapping several tickers'
+        # I/O gives a near-linear speedup (measured ~4x at 5 workers on a live
+        # test). 1 = fully sequential, identical to the old behavior. Kept
+        # modest by default since a short burst test can't fully rule out
+        # Yahoo rate-limiting under sustained full-universe load.
+        self.max_workers = max(1, int(self.config.get('max_workers', 1)))
 
     @staticmethod
     def _get_row_by_exact_name(df, row_name):
@@ -904,10 +914,32 @@ class FinancialDataRetriever:
     #        financial_data['canslim_score_percentage'] = 0
     #        financial_data['canslim_breakdown'] = str({'error': str(e)})
     
+    def _fetch_and_cache_one(self, ticker, delay_between_requests):
+        """
+        Fetch one ticker's comprehensive financial data, cache it if successful,
+        and pace it with `delay_between_requests`. Safe to call from a worker
+        thread: each ticker only ever touches its own cache file (see
+        _ticker_cache_path), so concurrent calls for different tickers never
+        share mutable state - only the caller's own aggregation (list/counters)
+        needs to happen back on the main thread.
+
+        Returns ('fetched', financial_data) or ('failed', error_message).
+        """
+        try:
+            financial_data = self.get_comprehensive_financial_data(ticker)
+            if 'error' not in financial_data:
+                self._save_ticker_cache(ticker, financial_data)
+                time.sleep(delay_between_requests)
+                return ('fetched', financial_data)
+            time.sleep(delay_between_requests)
+            return ('failed', financial_data.get('error', 'Unknown error'))
+        except Exception as e:
+            return ('failed', str(e))
+
     def generate_financial_data_file(self, ticker_file_path, delay_between_requests=1):
         """
         Generate comprehensive financial data file for CANSLIM analysis
-        
+
         Args:
             ticker_file_path (str): Path to the CSV file containing tickers
             delay_between_requests (float): Delay in seconds between API requests
@@ -935,6 +967,11 @@ class FinancialDataRetriever:
         fetched_count = 0
         failed_count = 0
 
+        # Freshness check is a cheap local file read - resolved up front for
+        # every ticker (no threading needed here), leaving only the tickers
+        # that actually need a real fetch to go through the (possibly
+        # concurrent) network path below.
+        to_fetch = []
         for i, ticker in enumerate(tickers_list, 1):
             cached = None if self.force_refresh else self._load_ticker_cache(ticker)
             if cached is not None and self._is_fresh(cached.get('last_updated')):
@@ -942,40 +979,71 @@ class FinancialDataRetriever:
                 reused_count += 1
                 if i <= 3:
                     print(f"  ♻️  {ticker}: reused cached data (fresh)")
-                continue
+            else:
+                to_fetch.append(ticker)
 
-            try:
-                print(f"Processing financial data for {ticker} ({i}/{len(tickers_list)})")
-                financial_data = self.get_comprehensive_financial_data(ticker)
+        total_to_fetch = len(to_fetch)
+        if reused_count:
+            print(f"♻️  {reused_count}/{len(tickers_list)} tickers reused from cache (fresh) - "
+                  f"{total_to_fetch} need a real fetch")
 
-                if 'error' not in financial_data:
-                    self._save_ticker_cache(ticker, financial_data)
-                    financial_data_list.append(financial_data)
+        if self.max_workers <= 1:
+            # Sequential path - identical behavior to the pre-concurrency version.
+            for i, ticker in enumerate(to_fetch, 1):
+                print(f"Processing financial data for {ticker} ({i}/{total_to_fetch})")
+                status, result = self._fetch_and_cache_one(ticker, delay_between_requests)
+                if status == 'fetched':
+                    financial_data_list.append(result)
                     fetched_count += 1
-                    # Show sample of collected data for first few tickers
-                    #if i <= 3:
-                    #    score = financial_data.get('canslim_score', 'N/A')
-                    #    q_growth = financial_data.get('earningsQuarterlyGrowth', 'N/A')
-                    #    print(f"  ✅ {ticker}: CANSLIM Score={score}, Q Growth={q_growth}")
                     if i <= 3:
                         print(f"  ✅ {ticker}: Financial data collected")
                 else:
                     failed_count += 1
-                    print(f"  ⚠️ Error with {ticker}: {financial_data.get('error', 'Unknown error')}")
+                    print(f"  ⚠️ Error with {ticker}: {result}")
 
-                # Add delay to avoid overwhelming the API
-                time.sleep(delay_between_requests)
-
-                # Longer break every 50 tickers
                 if i % 50 == 0:
-                    print(f"Processed {i} tickers. Taking a longer break...")
+                    print(f"Processed {i}/{total_to_fetch} tickers. Taking a longer break...")
                     time.sleep(10)
+        else:
+            # Concurrent path. Submitted in batches of 50 (not all at once) so
+            # the periodic "longer break" genuinely throttles request issuance -
+            # a ThreadPoolExecutor starts pulling from its queue the moment
+            # tasks are submitted, so submitting everything up front and only
+            # pausing the result-consuming loop would let workers keep firing
+            # straight through any intended pause. Waiting for each batch to
+            # fully drain before submitting the next, and only then sleeping,
+            # keeps that safety margin real. Within a batch, up to
+            # self.max_workers tickers are genuinely fetched in parallel.
+            print(f"⚡ Fetching {total_to_fetch} tickers with {self.max_workers} concurrent workers...")
+            batch_size = 50
+            completed = 0
+            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+                for batch_start in range(0, total_to_fetch, batch_size):
+                    batch = to_fetch[batch_start:batch_start + batch_size]
+                    futures = {
+                        executor.submit(self._fetch_and_cache_one, ticker, delay_between_requests): ticker
+                        for ticker in batch
+                    }
+                    for future in as_completed(futures):
+                        ticker = futures[future]
+                        completed += 1
+                        try:
+                            status, result = future.result()
+                        except Exception as e:
+                            status, result = 'failed', str(e)
 
-            except Exception as e:
-                failed_count += 1
-                self.logger.error(f"Error processing financial data for {ticker}: {str(e)}")
-                print(f"  ❌ Exception processing {ticker}: {str(e)}")
-                continue
+                        if status == 'fetched':
+                            financial_data_list.append(result)
+                            fetched_count += 1
+                            if completed <= 3:
+                                print(f"  ✅ {ticker}: Financial data collected ({completed}/{total_to_fetch})")
+                        else:
+                            failed_count += 1
+                            print(f"  ⚠️ Error with {ticker}: {result} ({completed}/{total_to_fetch})")
+
+                    if completed < total_to_fetch:
+                        print(f"Processed {completed}/{total_to_fetch} tickers. Taking a longer break...")
+                        time.sleep(10)
 
         print(f"\n📊 Summary: {reused_count} reused (fresh), {fetched_count} fetched fresh, {failed_count} failed")
         
@@ -1238,7 +1306,12 @@ def run_financial_data_retrieval(ticker_file_path, config=None):
         config (dict): Configuration dictionary
     """
     retriever = FinancialDataRetriever(config)
-    retriever.generate_financial_data_file(ticker_file_path)
+    # config['delay_between_requests'] was previously never passed here, so it
+    # silently had no effect - generate_financial_data_file always ran with its
+    # own hardcoded default (1s) regardless of what main.py's financial_config
+    # requested (1.5s). Fixed while touching this call site for max_workers.
+    delay = (config or {}).get('delay_between_requests', 1)
+    retriever.generate_financial_data_file(ticker_file_path, delay_between_requests=delay)
 
 
 def migrate_existing_financial_data_to_cache(config=None):
