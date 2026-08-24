@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import pandas as pd
 import argparse
 from datetime import datetime, timedelta
@@ -590,8 +591,14 @@ def main(config_override=None, preset=None):
         python main.py --ticker-choice 2 --daily --weekly
     """
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    # all messages are suppressed
-    logging.getLogger().setLevel(logging.CRITICAL)
+    # Silence noisy third-party libraries only - the project's own loggers
+    # (src.get_marketData etc., all `logging.getLogger(__name__)`) inherit
+    # root's INFO level and need to stay audible: that's the only place the
+    # per-ticker "Updated data for X" / "X not updated" success trail is
+    # recorded, and until this fix it was being discarded entirely because
+    # root itself was dropped to CRITICAL.
+    for _noisy in ('yfinance', 'urllib3', 'requests', 'peewee'):
+        logging.getLogger(_noisy).setLevel(logging.WARNING)
     setup_directories()  # Initialize directories via config
 
     # ============ DAILY DATA REPAIR MODE (standalone) ============
@@ -1150,5 +1157,35 @@ def main(config_override=None, preset=None):
         print("⏭️ Financial data processing - SKIPPED")
     print('Finished')
 
+class _Tee:
+    """Writes to multiple streams at once (e.g. the real terminal + a log
+    file) - lets a plain `print()`-based CLI run get a persistent log
+    without every caller having to remember `> file 2>&1` by hand. Only
+    wired up below for actual script invocation (`python main.py ...`), not
+    when main() is imported and called as a function (e.g. the
+    Colab-friendly `main({'ticker_choice': '2', ...})` usage documented in
+    main()'s docstring) - that caller owns its own stdout/stderr and
+    shouldn't have them silently redirected as a side effect of calling in."""
+
+    def __init__(self, *streams):
+        self._streams = streams
+
+    def write(self, data):
+        for s in self._streams:
+            s.write(data)
+
+    def flush(self):
+        for s in self._streams:
+            s.flush()
+
+
 if __name__ == "__main__":
+    logs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+    os.makedirs(logs_dir, exist_ok=True)
+    log_path = os.path.join(logs_dir, f"main_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+    log_file = open(log_path, "w", encoding="utf-8", buffering=1)  # line-buffered so `tail -f` updates live
+    sys.stdout = _Tee(sys.stdout, log_file)
+    sys.stderr = _Tee(sys.stderr, log_file)
+    print(f"Logging to {log_path}")
+
     main()

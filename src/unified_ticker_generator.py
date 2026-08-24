@@ -228,16 +228,28 @@ class UnifiedTickerGenerator:
             return False
     
     def _verify_individual_files(self):
-        """Verify that individual ticker files are available."""
+        """
+        Verify that individual ticker files are available.
+
+        Checks the same locations _generate_files_individual_mode() falls back
+        to (data/tickers/, then user_input/, then repo root) so a file that
+        only lives in user_input/ (e.g. indexes_tickers.csv, tracked in git)
+        isn't misreported as missing just because data/tickers/ doesn't have
+        its own copy.
+        """
         print("🔍 Verifying individual ticker files...")
-        
+
+        user_input_dir = getattr(self.config, 'user_input_path', 'user_input')
+
         available_files = []
         missing_files = []
-        
+
         for choice, files in self.individual_files.items():
             for file in files:
-                file_path = self.tickers_dir / file
-                if file_path.exists():
+                candidates = (self.tickers_dir / file,
+                              Path(user_input_dir) / file,
+                              Path(file))
+                if any(p.exists() for p in candidates):
                     available_files.append(f"{choice}:{file}")
                 else:
                     missing_files.append(f"{choice}:{file}")
