@@ -68,7 +68,7 @@ write_info_file,TRUE,Write detailed info files during processing
 ticker_info_TW,TRUE,Get ticker info from TradingView universe file
 ticker_info_TW_file,tradingview_universe_bool.csv,File name for TradingView ticker info
 ticker_info_YF,FALSE,Download ticker info from YFinance
-ticker_choice,0-8,Ticker combination choice (use single numbers or dash-separated)
+ticker_choice,0-5,Ticker combination choice (use single numbers or dash-separated)
 ,,
 # TICKER GROUP CHOICES (ticker_choice values),,
 # ==========================================,,
