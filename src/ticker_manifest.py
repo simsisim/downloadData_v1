@@ -1,5 +1,5 @@
 """
-Shared manifest I/O for data/tickers/tickers_latestDate_downloads.csv - the
+Shared manifest I/O for data/gapfill/tickers_latestDate_downloads.csv - the
 per-ticker tracking sheet both the slow pipeline (scripts/sync_stragglers.py)
 and the batch pipeline (src/get_batchData.py's gap-fill path) consult and
 update.
@@ -25,7 +25,7 @@ import pandas as pd
 
 from src.config import PARAMS_DIR
 
-MANIFEST_PATH = os.path.join(PARAMS_DIR["TICKERS_DIR"], "tickers_latestDate_downloads.csv")
+MANIFEST_PATH = os.path.join(PARAMS_DIR["GAPFILL_DIR"], "tickers_latestDate_downloads.csv")
 
 SLOW_INTERVALS = ('1d', '1wk', '1mo')
 DATE_COLUMNS = (

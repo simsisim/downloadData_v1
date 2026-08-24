@@ -9,6 +9,7 @@ from src.config import PARAMS_DIR
 import logging
 from src import market_data_io
 from src.market_data_io import fetch_ohlcv
+from src import ticker_manifest
 
 # Shares-outstanding/splits change a few times a year at most (real filing
 # events), so refetching yf.Ticker.get_shares_full's whole series on every
@@ -580,3 +581,32 @@ def run_market_data_retrieval(config):
     """
     retriever = MarketDataRetriever(config)
     retriever.update_data()
+    _update_manifest_after_run(config, retriever)
+
+
+def _update_manifest_after_run(config, retriever):
+    """Keep data/gapfill/tickers_latestDate_downloads.csv current after
+    EVERY slow-pipeline run, not just scripts/sync_stragglers.py's - this
+    function is the one place both main.py's normal --daily/--weekly/
+    --monthly flow and sync_stragglers.py funnel through, so hooking the
+    manifest update here means it can't go stale just because a particular
+    caller/CLI mode forgot to update it separately (see [[project-batch-
+    slow-pipeline-integrity]] memory - that's exactly how it went stale
+    before this fix)."""
+    interval = config.get("interval")
+    folder = config.get("folder")
+    if interval not in ticker_manifest.SLOW_INTERVALS or not folder:
+        return
+
+    manifest = ticker_manifest.load_manifest()
+    today = dt.date.today().isoformat()
+    date_col = ticker_manifest.slow_date_col(interval)
+    failed = {p['ticker'] for p in retriever.problematic_tickers}
+
+    for ticker in retriever.tickers_list:
+        latest_date = market_data_io.get_latest_date(folder, ticker)
+        ticker_manifest.set_date(manifest, ticker, date_col, latest_date)
+        ticker_manifest.record_outcome(manifest, ticker, is_success=(ticker not in failed), today=today)
+
+    ticker_manifest.save_manifest(manifest)
+    print(f"Manifest updated: {ticker_manifest.MANIFEST_PATH}")

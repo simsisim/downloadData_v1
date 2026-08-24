@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from src import ticker_manifest, market_data_io
+from src.config import PARAMS_DIR
 
 CHUNK_SIZE = 100
 SLEEP_BETWEEN_CHUNKS = 3
@@ -373,6 +374,20 @@ def run_batch_data_retrieval(params):
     all_downloaded   = set()
     interval_results = {}
 
+    # Manifest bookkeeping shares the same update_failed gate as the failed-
+    # tickers-file block below: when False, this is a sub-call from
+    # run_batch_gap_fill_interval's _run_group, which already records
+    # outcomes into the caller's own manifest object via
+    # _record_group_outcomes - doing it again here would just be a
+    # redundant duplicate write (idempotent, but wasteful). When True (the
+    # plain/direct call path - e.g. main.py's non-gap-fill batch branch),
+    # nothing else updates the manifest for this call, so this is the only
+    # place it happens - previously that path never touched the manifest
+    # at all, letting last_data_date_*_batch and the failure streak go
+    # stale for anyone not using --batch-gap-fill.
+    manifest = ticker_manifest.load_manifest() if update_failed else None
+    today_iso = datetime.now().strftime("%Y-%m-%d")
+
     for interval, (start_date, end_date, period, use_range) in interval_cfg.items():
         subdir  = INTERVAL_TO_SUBDIR.get(interval, interval)
         out_dir = os.path.join(output_dir, subdir)
@@ -431,6 +446,9 @@ def run_batch_data_retrieval(params):
         succeeded = set(r["Symbol"] for r in results)
         interval_results[interval] = {"attempted": attempted, "succeeded": succeeded}
 
+        if update_failed:
+            _record_group_outcomes(manifest, out_dir, interval, tickers, interval_results[interval], today_iso)
+
         if not results:
             print(f"  No data collected for {interval}")
             continue
@@ -467,6 +485,10 @@ def run_batch_data_retrieval(params):
             combined.to_csv(failed_file, index=False)
             print(f"\n  Failed tickers: {len(newly_failed)} added to {failed_file}")
 
+    if update_failed:
+        ticker_manifest.save_manifest(manifest)
+        print(f"  Manifest updated: {ticker_manifest.MANIFEST_PATH}")
+
     return interval_results
 
 
@@ -475,8 +497,15 @@ def _run_group(label, tickers, interval_cfg_single, interval, output_dir,
     """One run_batch_data_retrieval call scoped to `tickers` - used by
     run_batch_gap_fill_interval to issue the majority-group and
     straggler-group requests separately. Failure bookkeeping is left to the
-    caller (via the shared manifest), not problematic_tickers_batch.csv."""
-    tmp_file = os.path.join(os.path.dirname(failed_file), f"_batch_gapfill_{interval}_{label}.csv")
+    caller (via the shared manifest), not problematic_tickers_batch.csv.
+
+    Scratch ticker lists live under PARAMS_DIR["GAPFILL_DIR"] - shared
+    with the slow pipeline's equivalent straggler-sync scratch files (see
+    scripts/sync_stragglers.py) rather than TICKERS_DIR (ticker universe
+    definitions) or a pipeline-specific market_data*/ subfolder."""
+    tmp_dir = PARAMS_DIR["GAPFILL_DIR"]
+    os.makedirs(tmp_dir, exist_ok=True)
+    tmp_file = os.path.join(tmp_dir, f"_batch_gapfill_{interval}_{label}.csv")
     pd.DataFrame({"Symbol": tickers}).to_csv(tmp_file, index=False)
     params = {
         "ticker_file": tmp_file,

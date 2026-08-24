@@ -27,8 +27,8 @@ python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 2 --
 # Daily only — S&P 500
 python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 1 --no-fin-data --no-fin-process
 
-# Daily only — TradingView universe (all ~4,700)
-python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 0 --no-fin-data --no-fin-process
+# Daily only — TradingView universe (all ~4,700) + indexes
+python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 0-5 --no-fin-data --no-fin-process
 
 # Weekly only — NASDAQ 100
 python main.py --hist-data --no-daily --weekly --no-monthly --ticker-choice 2 --no-fin-data --no-fin-process
@@ -294,6 +294,47 @@ compared against the original); any mismatch is reported and written to
 `data/market_data/migration_report.csv` without touching the original flat
 file, so a mismatch never causes data loss — investigate and re-run for that
 ticker once resolved.
+
+---
+
+## Running long jobs in the background (nohup + logging)
+
+A first-time backfill against a large ticker group (e.g. `0-5`, ~4,900
+tickers once the index/`^YH` group is included) can take hours — the slow
+pipeline fetches one ticker at a time with built-in pacing delays. Don't run
+these in the foreground of a session you might close.
+
+Every `python main.py ...` invocation automatically writes a full copy of its
+console output to `logs/main_<timestamp>.log` — this happens unconditionally,
+no manual redirect needed to get a persistent log.
+
+To also survive your terminal closing (SSH drop, closed window, etc.), detach
+the process:
+
+```bash
+nohup python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 0-5 --no-fin-data --no-fin-process > /dev/null 2>&1 &
+disown
+```
+
+- **`nohup`** — "no hang up": makes the process ignore the `SIGHUP` signal the
+  shell sends it when the terminal closes. Without it, closing the terminal
+  kills the still-running job.
+- **`&`** — runs the command in the background, returning control of the
+  terminal immediately instead of blocking until it finishes.
+- **`disown`** — removes the just-backgrounded job from the shell's own job
+  table, so the shell no longer treats it as a child it owns. Some shells
+  still kill background jobs on exit even with `nohup` depending on
+  configuration — `disown` closes that gap.
+- **`> /dev/null 2>&1`** — discards `nohup`'s own default output file
+  (`nohup.out`), since `main.py` already writes its own timestamped log under
+  `logs/` regardless of how it's launched.
+
+Check on it anytime:
+
+```bash
+tail -f logs/main_*.log      # live-follow the most recent log
+ps aux | grep main.py        # confirm it's still running
+```
 
 ---
 

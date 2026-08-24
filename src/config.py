@@ -8,7 +8,16 @@ PARAMS_DIR = {
     "DATA_DIR": "data",
     "TICKERS_DIR": os.path.join("data", "tickers"),
 
+    # Shared scratch space for gap-fill/straggler ticker lists and their
+    # per-run byproducts (problematic/clean-ticker files) - used by BOTH the
+    # slow pipeline (scripts/sync_stragglers.py) and the batch pipeline
+    # (src/get_batchData.py's _run_group). Deliberately NOT nested under
+    # market_data/ or market_data_batch/ - it belongs to neither pipeline
+    # specifically, just to the gap-fill/straggler mechanism both share.
+    "GAPFILL_DIR": os.path.join("data", "gapfill"),
+
     # Yahoo Finance data directories
+    "MARKET_DATA_DIR": os.path.join("data", "market_data"),
     "MARKET_DATA_DIR_1d": os.path.join("data", "market_data/daily/"),
     "MARKET_DATA_DIR_1wk": os.path.join("data", "market_data/weekly/"),
     "MARKET_DATA_DIR_1mo": os.path.join("data", "market_data/monthly/"),

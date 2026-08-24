@@ -19,7 +19,7 @@ attempt), that's left to the next manually-triggered full slow-pipeline run.
 
 Maintains ONE unified manifest (src/ticker_manifest.py) shared with the
 batch pipeline's own gap-fill path across all three intervals -
-data/tickers/tickers_latestDate_downloads.csv - rather than one file per
+data/gapfill/tickers_latestDate_downloads.csv - rather than one file per
 interval: last_data_date_1d / _1wk / _1mo track each interval separately,
 but last_attempt_date and consecutive_failures are shared per ticker, and
 across pipelines. Delisting is a fact about the ticker, not about "daily"
@@ -88,16 +88,26 @@ def run_slow_sync(stragglers, folder, interval, start_date):
     already current. Only the former is a real delisting signal; conflating
     "didn't advance" with "actually failed" would flag perfectly healthy
     tickers that just happen to sit off the universe's majority date."""
-    tmp_ticker_file = os.path.join(PARAMS_DIR["TICKERS_DIR"], f"_stragglers_{interval}_sync.csv")
+    # Scratch files for this run live under PARAMS_DIR["GAPFILL_DIR"] -
+    # shared with the batch pipeline's equivalent scratch files (see
+    # src/get_batchData.py's _run_group) rather than TICKERS_DIR (ticker
+    # universe definitions) or a pipeline-specific market_data/ subfolder.
+    tmp_dir = PARAMS_DIR["GAPFILL_DIR"]
+    os.makedirs(tmp_dir, exist_ok=True)
+
+    tmp_ticker_file = os.path.join(tmp_dir, f"_stragglers_{interval}_sync.csv")
     pd.DataFrame({'ticker': stragglers}).to_csv(tmp_ticker_file, index=False)
 
     # Tag output/clean-ticker files distinctly per interval so this doesn't
     # collide with whatever combined_tickers_clean_<choice>.csv the main
-    # pipeline (or another interval's sync) writes.
+    # pipeline (or another interval's sync) writes. get_marketData always
+    # writes these into TICKERS_DIR itself (shared code path with the real
+    # pipeline, not worth threading an output-dir override through) - moved
+    # into tmp_dir right after the run instead.
     tag = f"stragglers_{interval}"
     get_marketData.user_choice = tag
 
-    problematic_file = os.path.join(PARAMS_DIR["TICKERS_DIR"], f"problematic_tickers_{tag}.csv")
+    problematic_file = os.path.join(tmp_dir, f"problematic_tickers_{tag}.csv")
     if os.path.isfile(problematic_file):
         os.remove(problematic_file)  # stale from a prior run - don't misattribute its contents to this one
 
@@ -110,6 +120,14 @@ def run_slow_sync(stragglers, folder, interval, start_date):
         'write_file_info': False,
     }
     get_marketData.run_market_data_retrieval(config)
+
+    # get_marketData wrote these (if at all) into TICKERS_DIR under the tag
+    # name - relocate them into tmp_dir alongside this run's other scratch
+    # files.
+    for fname in (f"problematic_tickers_{tag}.csv", f"combined_tickers_clean_{tag}.csv"):
+        src_path = os.path.join(PARAMS_DIR["TICKERS_DIR"], fname)
+        if os.path.isfile(src_path):
+            os.replace(src_path, os.path.join(tmp_dir, fname))
 
     if os.path.isfile(problematic_file):
         return set(pd.read_csv(problematic_file)['ticker'].astype(str))
@@ -203,7 +221,17 @@ def main():
             continue
         dir_key, start_date = INTERVALS[interval]
         folder = PARAMS_DIR[dir_key]
-        latest, outcome = sync_interval(interval, folder, start_date, universe, args.max_stragglers)
+        try:
+            latest, outcome = sync_interval(interval, folder, start_date, universe, args.max_stragglers)
+        except Exception as e:
+            # Don't let one interval's failure (e.g. a bad local CSV during
+            # the plain disk scan, not just the network fetch) discard
+            # progress already made scanning/syncing the OTHER intervals -
+            # save_manifest() only runs once, after this whole loop, so an
+            # unguarded exception here used to lose everything, not just
+            # this interval.
+            print(f"{interval}: sync_interval raised (non-fatal, skipping this interval): {e}")
+            continue
 
         for t, d in latest.items():
             ticker_manifest.set_date(manifest, t, DATE_COL[interval], d)

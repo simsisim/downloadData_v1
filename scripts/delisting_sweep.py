@@ -2,7 +2,7 @@
 Delisting sweep: flags tickers that have been failing the slow-pipeline
 straggler sync (scripts/sync_stragglers.py) continuously for a long time.
 
-Reads data/tickers/tickers_latestDate_downloads.csv (the manifest
+Reads data/gapfill/tickers_latestDate_downloads.csv (the manifest
 sync_stragglers.py maintains) and looks at, per ticker, first_failure_date -
 the date its CURRENT unbroken failure streak began (cleared back to
 nothing the moment it ever advances again in any interval) - and
@@ -43,8 +43,8 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config import PARAMS_DIR
+from src.ticker_manifest import MANIFEST_PATH
 
-MANIFEST_PATH = os.path.join(PARAMS_DIR["TICKERS_DIR"], "tickers_latestDate_downloads.csv")
 DELISTED_PATH = os.path.join(PARAMS_DIR["TICKERS_DIR"], "delisted_tickers.csv")
 
 
