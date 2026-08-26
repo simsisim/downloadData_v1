@@ -44,8 +44,16 @@ def _tail_lines(file_path, max_bytes=8192):
 
 def scan_for_corrupted_tickers(folder, since_date):
     """
-    Find CSVs in `folder` with rows on/after `since_date` whose Open/High/Low/Close
+    Find CSVs with rows on/after `since_date` whose Open/High/Low/Close
     are blank or all-zero (signature of a degraded yfinance API response).
+
+    `folder` is the base per-interval dir (e.g. PARAMS_DIR["MARKET_DATA_DIR_1d"]);
+    actual per-ticker files live in its archive/current split (see
+    market_data_io.py). Since `since_date` repairs only ever target recent
+    dates, the affected rows are always in the current-year tier - archive/
+    is frozen through last Dec 31 and never needs scanning here. Scanning
+    `folder` itself (pre-tiering behaviour) silently finds nothing, since
+    per-ticker CSVs no longer live there directly.
 
     Deliberately avoids pandas.read_csv per file (~24ms/file, ~2min for ~4.7k
     tickers in this project) in favor of a raw tail-read (~0.01ms/file) since we
@@ -57,7 +65,8 @@ def scan_for_corrupted_tickers(folder, since_date):
     needed = ['Date', 'Open', 'High', 'Low', 'Close']
     corrupted = []
 
-    for entry in os.scandir(folder):
+    current_folder = os.path.join(folder, 'current')
+    for entry in os.scandir(current_folder):
         if not entry.name.endswith('.csv'):
             continue
         ticker = entry.name[:-4]

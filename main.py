@@ -36,6 +36,22 @@ except ImportError as e:
     print(f"Warning: Could not import TradingViewTickerProcessor: {e}")
     TRADINGVIEW_PROCESSOR_AVAILABLE = False
 
+# Import Yahoo sector/industry universe enrichment
+try:
+    from src.enrich_universe_yf import enrich as enrich_universe_yf, INPUT_FILE as _ENRICH_INPUT_FILE
+    ENRICH_UNIVERSE_YF_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Could not import enrich_universe_yf: {e}")
+    ENRICH_UNIVERSE_YF_AVAILABLE = False
+
+# Import ^YH index ticker verification/auto-repair
+try:
+    from src.verify_index_tickers import verify_and_repair as verify_index_tickers
+    VERIFY_INDEX_TICKERS_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Could not import verify_index_tickers: {e}")
+    VERIFY_INDEX_TICKERS_AVAILABLE = False
+
 
 # ============================================================================
 # CONFIGURATION PRESETS
@@ -1116,6 +1132,36 @@ def main(config_override=None, preset=None):
         print("  To enable: Set YF_batch_data = TRUE in user_input/user_data.csv")
         print("  Or use CLI: python main.py --batch-data --batch-daily")
 
+    # ============ ^YH INDEX TICKER VERIFICATION / AUTO-REPAIR ============
+    # Runs after historical market data retrieval so it sees today's rows.
+    # Scopes the existing, general-purpose degraded-API repair mechanism
+    # (scan_for_corrupted_tickers/repair_from_date) to the ^YH industry/
+    # sector tickers specifically - no new download path or folder.
+    if VERIFY_INDEX_TICKERS_AVAILABLE:
+        print("\n" + "="*60)
+        print("^YH INDEX TICKER VERIFICATION")
+        print("="*60)
+        try:
+            verify_index_tickers()
+        except Exception as e:
+            print(f"❌ Error verifying ^YH index tickers: {e}")
+
+    # ============ UNIVERSE ENRICHMENT (Yahoo sector/industry) ============
+    # Runs last so it reads sector/industry off price files already refreshed
+    # by the historical market data retrieval step above. TradingView and
+    # Yahoo use different classification schemes (verified divergent, not
+    # just differently formatted) - this adds Yahoo's alongside TradingView's
+    # rather than replacing it. No new API calls: reads columns
+    # update_individual_stock_data() already writes on every price update.
+    if ENRICH_UNIVERSE_YF_AVAILABLE and os.path.exists(_ENRICH_INPUT_FILE):
+        print("\n" + "="*60)
+        print("UNIVERSE ENRICHMENT (Yahoo sector/industry)")
+        print("="*60)
+        try:
+            enrich_universe_yf()
+        except Exception as e:
+            print(f"❌ Error enriching universe with Yahoo sector/industry: {e}")
+
     print("\n" + "="*60)
     print("ALL DATA COLLECTION COMPLETED")
     print("="*60)
@@ -1180,7 +1226,7 @@ class _Tee:
 
 
 if __name__ == "__main__":
-    logs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+    logs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), PARAMS_DIR["LOGS_DIR"])
     os.makedirs(logs_dir, exist_ok=True)
     log_path = os.path.join(logs_dir, f"main_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
     log_file = open(log_path, "w", encoding="utf-8", buffering=1)  # line-buffered so `tail -f` updates live

@@ -6,6 +6,7 @@ from src.user_defined_data import read_user_data_legacy, read_user_data, _get_de
 # Directory configuration
 PARAMS_DIR = {
     "DATA_DIR": "data",
+    "LOGS_DIR": os.path.join("data", "logs"),
     "TICKERS_DIR": os.path.join("data", "tickers"),
 
     # Shared scratch space for gap-fill/straggler ticker lists and their
