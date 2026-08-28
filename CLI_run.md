@@ -312,10 +312,16 @@ To also survive your terminal closing (SSH drop, closed window, etc.), detach
 the process:
 
 ```bash
-nohup python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 0-5 --no-fin-data --no-fin-process > /dev/null 2>&1 &
+cd /home/imagda/_invest2024/python/downloadData_v1 && \
+nohup python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 0-5 --no-fin-data --no-fin-process > logs/nohup_$(date +%Y%m%d_%H%M%S).out 2>&1 &
 disown
 ```
 
+- **`cd <absolute path> && ...`** — always start from the project root, chained
+  with `&&` so a failed `cd` aborts before `nohup` runs. A relative `cd` that
+  silently fails (wrong starting directory) will otherwise launch `python
+  main.py` in the wrong place, where it dies instantly with `No such file or
+  directory` — and with output going nowhere you'd never see the error.
 - **`nohup`** — "no hang up": makes the process ignore the `SIGHUP` signal the
   shell sends it when the terminal closes. Without it, closing the terminal
   kills the still-running job.
@@ -325,9 +331,11 @@ disown
   table, so the shell no longer treats it as a child it owns. Some shells
   still kill background jobs on exit even with `nohup` depending on
   configuration — `disown` closes that gap.
-- **`> /dev/null 2>&1`** — discards `nohup`'s own default output file
-  (`nohup.out`), since `main.py` already writes its own timestamped log under
-  `logs/` regardless of how it's launched.
+- **`> logs/nohup_<timestamp>.out 2>&1`** — captures `nohup`'s own stdout/stderr
+  (startup errors, traceback before logging is set up, `No such file or
+  directory`) to a real file instead of discarding it to `/dev/null`. `main.py`
+  still writes its own timestamped `logs/main_<timestamp>.log` once it's
+  running; this catches the failures that happen *before* that point.
 
 Check on it anytime:
 
