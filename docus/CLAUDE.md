@@ -63,7 +63,11 @@ pip install -r requirements.txt
 
 **src/visualize_financial_data.py**: O'Neil/IBD-style EPS trend charts (log-scale quarterly EPS vs. same-industry/sector peers), saved to `data/charts/eps_trend/`
 
-**src/process_financial_data.py**: Processing stage (charts today, filters/screening planned) - reads already-downloaded financial data, independent of the download stage
+**src/process_financial_data.py**: Processing stage - reads already-downloaded financial data (independent of the download stage), runs the CANSLIM O'Neil screen (`src/canslim_screen.py`) and generates EPS-trend charts. Writes `canslim_metrics_<choice>.csv` (all tickers, all values/flags), `canslim_screened_<choice>.csv` (preset survivors, ranked), and persists to `data/fin_data/fin_data.db`.
+
+**src/canslim_screen.py**: Pure DataFrame->DataFrame CANSLIM O'Neil screen. `C` and `A` are hard gates, `N`/`S`/`I` are scored support; `L`/`M` are out of scope (need price/index data). Named presets (`classic` = O'Neil canonical 25/25/17, `aggressive`, `relaxed`) + per-knob overrides from `user_data.csv`. No thresholds baked upstream - `python -m src.canslim_screen --preset X` re-screens straight from `fin_data.db` in seconds. See `docus/CANSLIM_SCREEN_IMPLEMENTATION_PLAN.md` and `docus/CANSLIM_METHODOLOGY_AND_IMPLEMENTATIONS.md`.
+
+**src/fin_data_store.py**: SQLite `data/fin_data/fin_data.db` - `financials` (one dated row per ticker per run) + `canslim_screen` (per preset). Dated snapshots accumulate the history the raw CSVs discard (institutional-holder trend, threshold back-testing). `.db` is git-ignored; `backfill_from_csvs()` seeds it from existing CSVs.
 
 **src/get_tickers.py**: Ticker collection from various sources:
 - Downloads from NASDAQ, Wikipedia, S&P 500 lists
@@ -131,6 +135,10 @@ The financial data retrieval focuses on CANSLIM methodology - deliberately scope
 - **S**: Supply and demand - share-count trend classification (`supply_trend`: shrinking/stable/diluting) and buyback evidence (`buyback_active`)
 - **I**: Institutional sponsorship level (`sponsorship_level`: healthy/over_owned/low)
 - A simple composite (`cansi_criteria_met` / `cansi_criteria_available` / `cansi_letters_passed`) counts how many of the above pass - not a full weighted score
+
+**Two CANSLIM layers, kept separate:**
+- `cansi_*` columns (in `get_financial_data.py`, computed at fetch time) - the original loose C/A/N/S/I *quality composite*, no pass/fail screen. Unchanged; other consumers depend on it.
+- `canslim_*` columns + `canslim_screened_<choice>.csv` (in `src/canslim_screen.py`, applied at processing time) - the O'Neil-canonical *screen*: C = quarterly EPS **and** sales +25% YoY (base-EPS floor, +1000% cap); A = 3-yr EPS CAGR +25% **and** each year up **and** ROE >=17% (falls back to `info` ROE, waived for buyback-negative equity); N/S/I scored as support (>= `canslim_min_support` of 3). Validated against `dashboard-screener/src/leaders/canslim.py` (a dashboard-equivalent config matches ~90% of its list). `dashboard-screener` has its **own** independent C-A-I reimplementation - see `docus/CANSLIM_METHODOLOGY_AND_IMPLEMENTATIONS.md` for the full comparison.
 
 ### Error Handling
 

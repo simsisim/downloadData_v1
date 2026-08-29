@@ -258,6 +258,30 @@ already in the data, "⏳ after force-refresh" = needs the 2026-08-29 run,
 
 ---
 
+## Using the screen with L and M
+
+`canslim_screened_<choice>.csv` is C-A-N-S-I only. To approximate full CANSLIM:
+
+**L — relative strength.** Intersect the survivors with a price-based leader
+list:
+- `dashboard-screener/src/leaders/minervini.py` → `in_minervini` (its criterion
+  8 is IBD RS percentile ≥ 70), or its `rs_pct` column directly, or
+- any RS Rating ≥ 80 source.
+```python
+canslim = pd.read_csv("data/fin_data/canslim_screened_0_5.csv")
+leaders = minervini_df[minervini_df["in_minervini"]]        # or rs_pct >= 70
+final = canslim[canslim["ticker"].isin(leaders["ticker"])]
+```
+
+**M — market direction.** Not per-ticker. Gate the *use* of the list: only act
+on it while the general market (S&P 500 / Nasdaq Composite) is in a confirmed
+uptrend — e.g. index above its 50-day and 200-day MA and distribution-day count
+low. If the market is in a correction, the screen still runs but you sit out.
+
+**N (qualitative) and S (volume/demand).** The screen covers near-new-high (N)
+and share-supply/debt (S). New products/management (N) and up-day volume surges
+(S) are manual / price-data checks on the shortlist.
+
 ## 8. File map
 
 | Concern | File |

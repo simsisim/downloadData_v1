@@ -203,6 +203,36 @@ python main.py --fin-data --fin-process --no-hist-data --ticker-choice 1
 
 Chart scope (`fin_data_chart_top_n`/`fin_data_chart_max_peers`/`fin_data_chart_quarters`) is set in `user_data.csv`, not on the CLI.
 
+### CANSLIM O'Neil screen
+
+The processing stage (`--fin-process`) runs the CANSLIM fundamental screen when
+`canslim_screen_enabled=TRUE` (default). It writes:
+
+| file | contents |
+|---|---|
+| `data/fin_data/canslim_metrics_<choice>.csv` | every ticker, every C/A/N/S/I value + pass-flag + score + per-letter reason — the file to hand-filter |
+| `data/fin_data/canslim_screened_<choice>.csv` | the preset survivors, ranked by C magnitude |
+| `data/fin_data/fin_data.db` | `financials` (dated snapshots) + `canslim_screen` (per preset); the queryable archive |
+
+Preset (`classic` = O'Neil canonical 25/25/17, `aggressive`, `relaxed`) and per-knob
+overrides are in `user_data.csv` (`canslim_preset`, `canslim_c_min_eps_yoy`, …).
+
+```bash
+# Re-run the screen with a different preset straight from fin_data.db —
+# no fetch, no --fin-process, seconds:
+python -m src.canslim_screen --preset aggressive
+python -m src.canslim_screen --preset relaxed --out /tmp/relaxed.csv
+
+# Seed fin_data.db from existing financial_data_*.csv files (one-time):
+python -c "from src.fin_data_store import backfill_from_csvs as b; b()"
+```
+
+**Scope:** the screen gates on **C** and **A** (hard) and scores **N/S/I** as
+support. **L** (relative strength) and **M** (market timing) are not fundamental
+— intersect `canslim_screened` with a price-based leader list for L, and only
+consume the list in a confirmed market uptrend for M. See
+`docus/CANSLIM_SCREEN_IMPLEMENTATION_PLAN.md`.
+
 ---
 
 ## Daily data repair (fix corrupted rows, e.g. yfinance API glitches)

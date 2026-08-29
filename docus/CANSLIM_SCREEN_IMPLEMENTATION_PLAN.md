@@ -287,20 +287,42 @@ sales gate in C rejects ~everything. A `dashboard-screener`-equivalent config
 (C=EPS only, A=CAGR only, +I floor) gives 131 vs their 141 — core C/A/I logic
 confirmed.
 
-**M2 — after tonight's force-refresh:**
-- confirm corrected revenue in the new snapshot (`q1_revenue > q1_net_income`, MSFT 4Q ≈ annual)
-- add `canslim_c_sales_yoy` / `canslim_a_sales_cagr_3y`; wire sales into `C_pass`
-- run full `--fin-data --fin-process`; produce the 3 CSVs
+**M2 — DONE 2026-08-29.** Force-refresh run finished ~18:52 (~1h40m): 4146
+full fetch / 67 failed (universe `0-5` = 4213). `financial_data_0_5.csv`
+(4146×340). Revenue verified (NVDA q1 $81.6B, MSFT $90B; every sample
+`q1_revenue > q1_net_income`). 252/4146 still `revenue_suspect` — genuine
+(NI > revenue for holding cos / funds / one-time gains), correctly N/A'd.
+`next_earnings_date` populated 3304/4146. `fin_data.db` has 2 `financials`
+snapshots (2026-08-21: 3813, 2026-08-29: 4146). CSVs + all-3-preset
+`canslim_screen` rows written.
 
-**M3 — validate + tune:**
-- compare `canslim_screened` (`classic`) with `dashboard-screener/leaders_canslim.csv` (141 names, 2026-08-24) — expect a subset (we add sales + consistency + support); explain every drop via `*_reason`
-- spot-check known names (NVDA and any classic CANSLIM winners in-universe)
-- adjust preset defaults if `classic` is absurdly tight/loose
-- write findings into `CANSLIM_METHODOLOGY_AND_IMPLEMENTATIONS.md`
+**M3 — DONE 2026-08-29** (commit `f401a4b`).
+- Validated vs `dashboard-screener/results/2026-08-29/leaders_canslim.csv`
+  (141): a dashboard-equivalent config (C=EPS only, A=CAGR only, I floor)
+  matches **127/141** — core C/A/I logic confirmed. All strict-`classic`
+  survivors are a clean subset of that list.
+- **N/A tail checked, not a bug:** 43% `eps_na` for C = 986 loss-makers +
+  1006 loss-year-ago + 649/916 missing + 110 index/ETF tickers. The $0.05
+  base-EPS floor blocks only ~12 net tickers.
+- **Fix: `c_max_eps_yoy`** (classic 10.0 / aggr 8.0 / relaxed 25.0) — reject
+  > +1000% quarterly EPS YoY (SBLK +371,564%, NEXA +6,235%: near-zero-base
+  cyclical turnarounds via `earningsQuarterlyGrowth`). Flagged
+  `eps_yoy_extreme`.
+- **Fix: ROE fallback + waiver** — use `info['returnOnEquity']` when the
+  statement ratio is N/A; waive the ROE sub-check for a profitable company
+  with negative book equity from buybacks (BKNG/DELL/GTX). Brought DELL
+  (rank 1) + USAC into `classic`.
+- **`classic` = 10** (DELL, DHT, NVDA, STRL, SLDE, MRX, FTNT, USAC, ANET,
+  GCT); aggressive 3; relaxed 154. 33 unit tests.
 
-**M4 — handoff:**
-- `dashboard-screener`: repoint `config.FIN_DATA_CSV` to `financial_data_0_5.csv` (or read `fin_data.db`); optionally intersect `canslim_screened` with `minervini.py` `in_minervini` for the L.
-- document the L/M intersection recipe.
+**M4 — docs done; dashboard-screener repoint = user action.**
+- `docus/CLAUDE.md`, `CLI_run.md`, both CANSLIM docs updated.
+- **TODO (other repo, needs user):** repoint
+  `dashboard-screener/config.py` `FIN_DATA_CSV` from `financial_data_0_8.csv`
+  → `financial_data_0_5.csv` (or point it at `fin_data.db`). Not done here —
+  that repo is not ours to edit unprompted.
+- **L/M intersection recipe** — see
+  `CANSLIM_METHODOLOGY_AND_IMPLEMENTATIONS.md` §"Using the screen with L and M".
 
 ---
 
