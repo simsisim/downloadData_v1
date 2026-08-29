@@ -3,6 +3,7 @@ import pandas as pd
 import datetime as dt
 import time
 import os
+import re
 import json
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -77,11 +78,27 @@ class FinancialDataRetriever:
         # and costs just 1 extra request/ticker (vs. 3 for sponsorship detail).
         self.earnings_history_limit = int(self.config.get('earnings_history_limit', 12))
 
-        # Incremental refresh: skip re-fetching a ticker if its stored data is
-        # already fresher than this many days (fundamentals change slowly - no
-        # need to burn 7-10 yfinance calls/ticker on data that hasn't changed).
+        # Incremental / earnings-aware refresh. A ticker's statement data (q*, y*,
+        # qh*) can only change when a new quarter is reported, which happens ~4x
+        # a year on a schedule Yahoo tells us (info['earningsTimestamp']). So
+        # each run picks one of three tiers per ticker (see _decide_refresh_tier):
+        #   skip  - not near an earnings date -> keep the cache file untouched,
+        #           0 network calls.
+        #   light - inside the earnings window but no new quarter yet -> 1 call
+        #           (.info) to refresh price/valuation fields only.
+        #   full  - new quarter posted / new ticker / stale past backstop /
+        #           force_refresh -> the full ~10-call rebuild.
+        # refresh_days is now only the skip<->full fallback for tickers whose
+        # next earnings date is unknown.
         self.refresh_days = int(self.config.get('refresh_days', 7))
         self.force_refresh = bool(self.config.get('force_refresh', False))
+        # Hard ceiling: refetch everything for a ticker this many days after its
+        # last full fetch no matter what, so restatements / schema drift / a
+        # missed earnings date can't leave a cache permanently stale.
+        self.backstop_days = int(self.config.get('backstop_days', 120))
+        # Open the light/full check window this many days before the scheduled
+        # earnings date (companies sometimes report early; estimated dates move).
+        self.earnings_buffer_days = int(self.config.get('earnings_buffer_days', 3))
 
         # Concurrent fetches: each ticker's ~10s cost is almost entirely network
         # wait (profiled directly - see get_comprehensive_financial_data's 8-11
@@ -98,6 +115,139 @@ class FinancialDataRetriever:
         if df is None or df.empty or row_name not in df.index:
             return None
         return df.loc[row_name]
+
+    @staticmethod
+    def _get_row_first_of(df, row_names):
+        """
+        Return a Series for the first exact row name in `row_names` that exists
+        in the statement, or None. Used instead of a substring match: yfinance
+        income statements carry several rows sharing a word - e.g. 'Total
+        Revenue', 'Operating Revenue', 'Cost Of Revenue', 'Reconciled Cost Of
+        Revenue' all contain 'Revenue', and 'Total Operating Income As Reported'
+        vs 'Operating Income' both contain 'Operating Income'. A
+        str.contains(...).iloc[0] picks whichever happens to sort first, which
+        for NVDA meant 'Reconciled Cost Of Revenue' was stored as revenue.
+        """
+        if df is None or df.empty:
+            return None
+        for name in row_names:
+            if name in df.index:
+                return df.loc[name]
+        return None
+
+    @staticmethod
+    def _extract_info_fields(info):
+        """
+        All fields sourced from ticker.info (one HTTP call). Split out from
+        get_comprehensive_financial_data so the 'light' refresh path can update
+        just these - price / valuation / analyst / share-count figures that
+        drift continuously - without re-pulling the six statement frames.
+        The statement-derived keys (q*, y*, qh*) are never touched here.
+        """
+        info = info or {}
+        fields = {
+            # ---- basic company info ----
+            'sector': info.get('sector', 'N/A'),
+            'industry': info.get('industry', 'N/A'),
+            'marketCap': info.get('marketCap', 'N/A'),
+            'enterpriseValue': info.get('enterpriseValue', 'N/A'),
+            'shortName': info.get('shortName', 'N/A'),
+            'longName': info.get('longName', 'N/A'),
+            'exchange': info.get('fullExchangeName', 'N/A'),
+            'country': info.get('country', 'N/A'),
+            'currency': info.get('currency', 'N/A'),
+            # ---- C - current earnings ----
+            'currentRatio': info.get('currentRatio', 'N/A'),
+            'quickRatio': info.get('quickRatio', 'N/A'),
+            'trailingEps': info.get('trailingEps', 'N/A'),
+            'forwardEps': info.get('forwardEps', 'N/A'),
+            'trailingPE': info.get('trailingPE', 'N/A'),
+            'forwardPE': info.get('forwardPE', 'N/A'),
+            'pegRatio': info.get('pegRatio', 'N/A'),
+            'earningsGrowth': info.get('earningsGrowth', 'N/A'),
+            'revenueGrowth': info.get('revenueGrowth', 'N/A'),
+            'earningsQuarterlyGrowth': info.get('earningsQuarterlyGrowth', 'N/A'),
+            'revenueQuarterlyGrowth': info.get('revenueQuarterlyGrowth', 'N/A'),
+            # ---- A - annual earnings ----
+            'returnOnEquity': info.get('returnOnEquity', 'N/A'),
+            'returnOnAssets': info.get('returnOnAssets', 'N/A'),
+            'grossMargins': info.get('grossMargins', 'N/A'),
+            'operatingMargins': info.get('operatingMargins', 'N/A'),
+            'profitMargins': info.get('profitMargins', 'N/A'),
+            'ebitdaMargins': info.get('ebitdaMargins', 'N/A'),
+            # ---- N - new highs ----
+            'fiftyTwoWeekHighChangePercent': info.get('fiftyTwoWeekHighChangePercent', 'N/A'),
+            'allTimeHigh': info.get('allTimeHigh', 'N/A'),
+            'firstTradeDateMilliseconds': info.get('firstTradeDateMilliseconds', 'N/A'),
+            # ---- S - supply / demand ----
+            'sharesOutstanding': info.get('sharesOutstanding', 'N/A'),
+            'floatShares': info.get('floatShares', 'N/A'),
+            'sharesShort': info.get('sharesShort', 'N/A'),
+            'shortRatio': info.get('shortRatio', 'N/A'),
+            'shortPercentOfFloat': info.get('shortPercentOfFloat', 'N/A'),
+            'heldPercentInsiders': info.get('heldPercentInsiders', 'N/A'),
+            # ---- L - leader / laggard ----
+            'beta': info.get('beta', 'N/A'),
+            'averageVolume': info.get('averageVolume', 'N/A'),
+            'averageVolume10days': info.get('averageVolume10days', 'N/A'),
+            'fiftyTwoWeekHigh': info.get('fiftyTwoWeekHigh', 'N/A'),
+            'fiftyTwoWeekLow': info.get('fiftyTwoWeekLow', 'N/A'),
+            'fiftyDayAverage': info.get('fiftyDayAverage', 'N/A'),
+            'twoHundredDayAverage': info.get('twoHundredDayAverage', 'N/A'),
+            # ---- I - institutional sponsorship ----
+            'heldPercentInstitutions': info.get('heldPercentInstitutions', 'N/A'),
+            'bookValue': info.get('bookValue', 'N/A'),
+            'priceToBook': info.get('priceToBook', 'N/A'),
+            'recommendationKey': info.get('recommendationKey', 'N/A'),
+            'numberOfAnalystOpinions': info.get('numberOfAnalystOpinions', 'N/A'),
+            'targetHighPrice': info.get('targetHighPrice', 'N/A'),
+            'targetLowPrice': info.get('targetLowPrice', 'N/A'),
+            'targetMeanPrice': info.get('targetMeanPrice', 'N/A'),
+            # ---- M - market direction & fundamentals ----
+            'debtToEquity': info.get('debtToEquity', 'N/A'),
+            'totalDebt': info.get('totalDebt', 'N/A'),
+            'totalCash': info.get('totalCash', 'N/A'),
+            'freeCashflow': info.get('freeCashflow', 'N/A'),
+            'operatingCashflow': info.get('operatingCashflow', 'N/A'),
+            'revenuePerShare': info.get('revenuePerShare', 'N/A'),
+            'totalRevenue': info.get('totalRevenue', 'N/A'),
+            'enterpriseToRevenue': info.get('enterpriseToRevenue', 'N/A'),
+            'enterpriseToEbitda': info.get('enterpriseToEbitda', 'N/A'),
+            'mostRecentQuarter': info.get('mostRecentQuarter', 'N/A'),
+            'netIncomeToCommon': info.get('netIncomeToCommon', 'N/A'),
+            # ---- earnings-aware refresh bookkeeping ----
+            'mostRecentQuarterDate': FinancialDataRetriever._epoch_to_date_str(
+                info.get('mostRecentQuarter')),
+            'next_earnings_date': FinancialDataRetriever._epoch_to_date_str(
+                info.get('earningsTimestamp') or info.get('earningsTimestampStart')),
+            'next_earnings_is_estimate': bool(info.get('isEarningsDateEstimate', False)),
+        }
+
+        # N - years since IPO/listing, derived from firstTradeDateMilliseconds
+        first_trade_ms = info.get('firstTradeDateMilliseconds', None)
+        if first_trade_ms:
+            first_trade_date = dt.datetime.fromtimestamp(first_trade_ms / 1000)
+            fields['yearsSincePublic'] = round(
+                (dt.datetime.now() - first_trade_date).days / 365.25, 1)
+        else:
+            fields['yearsSincePublic'] = 'N/A'
+        return fields
+
+    @staticmethod
+    def _epoch_to_date_str(epoch):
+        """Unix seconds -> 'YYYY-MM-DD', or 'N/A' if missing/unparseable."""
+        try:
+            return dt.datetime.fromtimestamp(int(epoch)).strftime('%Y-%m-%d')
+        except (TypeError, ValueError, OSError, OverflowError):
+            return 'N/A'
+
+    @staticmethod
+    def _is_future_date(s):
+        """True if s is a 'YYYY-MM-DD' string strictly after today."""
+        try:
+            return dt.datetime.strptime(str(s), '%Y-%m-%d').date() > dt.date.today()
+        except (TypeError, ValueError):
+            return False
 
     def _ticker_cache_path(self, ticker):
         return os.path.join(self.PARAMS_DIR["FIN_DATA_TICKERS_DIR"], f"{ticker}.json")
@@ -131,13 +281,126 @@ class FinancialDataRetriever:
         except Exception as e:
             self.logger.warning(f"Could not save cache for {ticker}: {str(e)}")
 
-    def _is_fresh(self, last_updated_str):
-        """True if a stored 'last_updated' timestamp is within self.refresh_days of now."""
+    @staticmethod
+    def _parse_last_updated(s):
+        """Stored 'last_updated' string -> datetime, or None if unparseable."""
         try:
-            last_updated = dt.datetime.strptime(str(last_updated_str), '%Y-%m-%d %H:%M:%S')
+            return dt.datetime.strptime(str(s), '%Y-%m-%d %H:%M:%S')
         except (ValueError, TypeError):
-            return False
-        return (dt.datetime.now() - last_updated) <= dt.timedelta(days=self.refresh_days)
+            return None
+
+    @staticmethod
+    def _as_epoch(v):
+        """int epoch or None (handles 'N/A', None, floats, numeric strings)."""
+        try:
+            return int(float(v))
+        except (TypeError, ValueError):
+            return None
+
+    def _decide_refresh_tier(self, cached):
+        """
+        Pick the refresh tier for one ticker from its cache alone (no network):
+          'full'  - rebuild everything (~10 calls)
+          'light' - refresh ticker.info fields only (1 call); may escalate to
+                    'full' if that call shows a new quarter posted
+          'skip'  - keep the cache file untouched (0 calls)
+        See the __init__ note for the rationale.
+        """
+        if self.force_refresh or not cached or 'error' in cached:
+            return 'full'
+
+        lu = self._parse_last_updated(cached.get('last_updated'))
+        if lu is None or (dt.datetime.now() - lu) > dt.timedelta(days=self.backstop_days):
+            return 'full'
+
+        # Statement data only moves when a new quarter is reported. Yahoo tells
+        # us when that's next scheduled - stay in 'skip' until we're within
+        # earnings_buffer_days of it.
+        try:
+            ned = dt.datetime.strptime(
+                str(cached.get('next_earnings_date')), '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            # Unknown schedule (e.g. a cache from before this field existed, or a
+            # ticker Yahoo has no earnings calendar for). If the cache still
+            # looks complete, spend 1 'light' call - it backfills
+            # next_earnings_date and catches a new quarter - rather than the full
+            # ~10. Only genuinely stale/thin caches get the full rebuild.
+            age = dt.datetime.now() - lu
+            if age <= dt.timedelta(days=self.refresh_days):
+                return 'skip'
+            looks_complete = (self._as_epoch(cached.get('mostRecentQuarter')) is not None
+                              and cached.get('q1_date') not in (None, 'N/A'))
+            return 'light' if looks_complete else 'full'
+
+        today = dt.date.today()
+        if today < ned - dt.timedelta(days=self.earnings_buffer_days):
+            return 'skip'
+        return 'light'
+
+    def _recompute_derived(self, financial_data):
+        """Re-run the pure dict->dict CANSLIM calcs (no network)."""
+        self._calculate_eps_growth(financial_data)
+        self._calculate_annual_quality(financial_data)
+        self._calculate_n_flags(financial_data)
+        self._calculate_supply_trend(financial_data)
+        self._calculate_sponsorship_level(financial_data)
+        self._calculate_cansi_score(financial_data)
+
+    def _light_refresh_one(self, ticker, cached, delay_between_requests):
+        """
+        'light' tier: 2 cheap calls - ticker.info and ticker.get_earnings_dates.
+        Overwrites the info-derived fields and the qh* earnings-surprise history
+        (both genuinely move between statement releases: prices, estimate
+        revisions, the just-reported actual), and sets an authoritative
+        next_earnings_date. Every statement field (q*, y*) is kept as-is.
+        Returns ('light', merged) on success, ('needs_full', None) if info shows
+        a newly reported quarter (caller re-queues it for a full fetch), or
+        ('failed', msg) on error (caller keeps the old cache as-is).
+        """
+        try:
+            ticker_obj = yf.Ticker(ticker)
+            info = ticker_obj.info
+        except Exception as e:
+            return ('failed', str(e))
+
+        new_info = self._extract_info_fields(info)
+        old_mrq = self._as_epoch(cached.get('mostRecentQuarter'))
+        new_mrq = self._as_epoch(new_info.get('mostRecentQuarter'))
+        if old_mrq is not None and new_mrq is not None and new_mrq > old_mrq:
+            # A new quarter posted - needs the full statement rebuild. Don't
+            # spend the second call.
+            return ('needs_full', None)
+
+        merged = dict(cached)
+        merged.update(new_info)
+
+        # Authoritative next_earnings_date + refreshed qh* history (1 more call).
+        # Clear the old qh* keys first so a shorter new history can't leave stale
+        # trailing quarters behind. _extract_earnings_history overwrites
+        # next_earnings_date from the earliest upcoming row and rewrites
+        # qh1..qhN; if it can't (no data / error) it leaves the info value and
+        # the qh* keys simply stay cleared until the next full fetch.
+        qh_before = {k: v for k, v in merged.items() if re.match(r'qh\d+_', k)}
+        for k in qh_before:
+            merged.pop(k, None)
+        self._extract_earnings_history(merged, ticker_obj)
+        if not any(re.match(r'qh\d+_', k) for k in merged):
+            merged.update(qh_before)  # extraction failed - restore what we had
+        time.sleep(delay_between_requests)
+
+        # Guard against info['earningsTimestamp'] being the *last* earnings date
+        # (it sometimes is) when get_earnings_dates gave us nothing better.
+        if not self._is_future_date(merged.get('next_earnings_date')):
+            merged['next_earnings_date'] = (
+                cached['next_earnings_date']
+                if self._is_future_date(cached.get('next_earnings_date'))
+                else 'N/A')
+
+        merged['last_updated'] = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        merged.pop('error', None)
+        self._recompute_derived(merged)
+        self._save_ticker_cache(ticker, merged)
+        return ('light', merged)
 
     def load_tickers_from_file(self, ticker_file_path):
         """Load tickers from a CSV file"""
@@ -174,92 +437,8 @@ class FinancialDataRetriever:
             financial_data = {
                 'ticker': ticker,
                 'last_updated': dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                
-                # ============ BASIC COMPANY INFO ============
-                'sector': info.get('sector', 'N/A'),
-                'industry': info.get('industry', 'N/A'),
-                'marketCap': info.get('marketCap', 'N/A'),
-                'enterpriseValue': info.get('enterpriseValue', 'N/A'),
-                'shortName': info.get('shortName', 'N/A'),
-                'longName': info.get('longName', 'N/A'),
-                'exchange': info.get('fullExchangeName', 'N/A'),
-                'country': info.get('country', 'N/A'),
-                'currency': info.get('currency', 'N/A'),
-                
-                # ============ C - CURRENT EARNINGS ============
-                'currentRatio': info.get('currentRatio', 'N/A'),
-                'quickRatio': info.get('quickRatio', 'N/A'),
-                'trailingEps': info.get('trailingEps', 'N/A'),
-                'forwardEps': info.get('forwardEps', 'N/A'),
-                'trailingPE': info.get('trailingPE', 'N/A'),
-                'forwardPE': info.get('forwardPE', 'N/A'),
-                'pegRatio': info.get('pegRatio', 'N/A'),
-                'earningsGrowth': info.get('earningsGrowth', 'N/A'),
-                'revenueGrowth': info.get('revenueGrowth', 'N/A'),
-                'earningsQuarterlyGrowth': info.get('earningsQuarterlyGrowth', 'N/A'),
-                'revenueQuarterlyGrowth': info.get('revenueQuarterlyGrowth', 'N/A'),
-                
-                # ============ A - ANNUAL EARNINGS ============
-                'returnOnEquity': info.get('returnOnEquity', 'N/A'),
-                'returnOnAssets': info.get('returnOnAssets', 'N/A'),
-                'grossMargins': info.get('grossMargins', 'N/A'),
-                'operatingMargins': info.get('operatingMargins', 'N/A'),
-                'profitMargins': info.get('profitMargins', 'N/A'),
-                'ebitdaMargins': info.get('ebitdaMargins', 'N/A'),
-                
-                # ============ N - NEW (PRODUCTS/MANAGEMENT/NEW HIGHS) ============
-                'fiftyTwoWeekHighChangePercent': info.get('fiftyTwoWeekHighChangePercent', 'N/A'),
-                'allTimeHigh': info.get('allTimeHigh', 'N/A'),
-                'firstTradeDateMilliseconds': info.get('firstTradeDateMilliseconds', 'N/A'),
-
-                # ============ S - SUPPLY/DEMAND ============
-                'sharesOutstanding': info.get('sharesOutstanding', 'N/A'),
-                'floatShares': info.get('floatShares', 'N/A'),
-                'sharesShort': info.get('sharesShort', 'N/A'),
-                'shortRatio': info.get('shortRatio', 'N/A'),
-                'shortPercentOfFloat': info.get('shortPercentOfFloat', 'N/A'),
-                'heldPercentInsiders': info.get('heldPercentInsiders', 'N/A'),
-
-                # ============ L - LEADER/LAGGARD ============
-                'beta': info.get('beta', 'N/A'),
-                'averageVolume': info.get('averageVolume', 'N/A'),
-                'averageVolume10days': info.get('averageVolume10days', 'N/A'),
-                'fiftyTwoWeekHigh': info.get('fiftyTwoWeekHigh', 'N/A'),
-                'fiftyTwoWeekLow': info.get('fiftyTwoWeekLow', 'N/A'),
-                'fiftyDayAverage': info.get('fiftyDayAverage', 'N/A'),
-                'twoHundredDayAverage': info.get('twoHundredDayAverage', 'N/A'),
-
-                # ============ I - INSTITUTIONAL SPONSORSHIP ============
-                'heldPercentInstitutions': info.get('heldPercentInstitutions', 'N/A'),
-                'bookValue': info.get('bookValue', 'N/A'),
-                'priceToBook': info.get('priceToBook', 'N/A'),
-                'recommendationKey': info.get('recommendationKey', 'N/A'),
-                'numberOfAnalystOpinions': info.get('numberOfAnalystOpinions', 'N/A'),
-                'targetHighPrice': info.get('targetHighPrice', 'N/A'),
-                'targetLowPrice': info.get('targetLowPrice', 'N/A'),
-                'targetMeanPrice': info.get('targetMeanPrice', 'N/A'),
-
-                # ============ M - MARKET DIRECTION & FUNDAMENTALS ============
-                'debtToEquity': info.get('debtToEquity', 'N/A'),
-                'totalDebt': info.get('totalDebt', 'N/A'),
-                'totalCash': info.get('totalCash', 'N/A'),
-                'freeCashflow': info.get('freeCashflow', 'N/A'),
-                'operatingCashflow': info.get('operatingCashflow', 'N/A'),
-                'revenuePerShare': info.get('revenuePerShare', 'N/A'),
-                'totalRevenue': info.get('totalRevenue', 'N/A'),
-                'enterpriseToRevenue': info.get('enterpriseToRevenue', 'N/A'),
-                'enterpriseToEbitda': info.get('enterpriseToEbitda', 'N/A'),
-                'mostRecentQuarter': info.get('mostRecentQuarter', 'N/A'),
-                'netIncomeToCommon': info.get('netIncomeToCommon', 'N/A'),
             }
-            
-            # N - derive years since IPO/listing from firstTradeDateMilliseconds
-            first_trade_ms = info.get('firstTradeDateMilliseconds', None)
-            if first_trade_ms:
-                first_trade_date = dt.datetime.fromtimestamp(first_trade_ms / 1000)
-                financial_data['yearsSincePublic'] = round((dt.datetime.now() - first_trade_date).days / 365.25, 1)
-            else:
-                financial_data['yearsSincePublic'] = 'N/A'
+            financial_data.update(self._extract_info_fields(info))
 
             # ============ EXTENDED QUARTERLY DATA (8-12 quarters) ============
             self._extract_quarterly_data(financial_data, quarterly_income_stmt, quarterly_balance_sheet, quarterly_cashflow)
@@ -311,43 +490,41 @@ class FinancialDataRetriever:
     def _extract_quarterly_data(self, financial_data, quarterly_income_stmt, quarterly_balance_sheet, quarterly_cashflow):
         """Extract extended quarterly data (up to 12 quarters)"""
         
-        # Extract quarterly earnings (Net Income)
-        if not quarterly_income_stmt.empty:
-            net_income_rows = quarterly_income_stmt.loc[
-                quarterly_income_stmt.index.str.contains('Net Income', case=False, na=False)
-            ]
-            
-            if not net_income_rows.empty:
-                net_income_data = net_income_rows.iloc[0]
-                
-                # Get up to 12 quarters of earnings data
-                for i, (date, net_income) in enumerate(net_income_data.items()):
-                    if i < self.quarters_to_collect:
-                        quarter_key = f'q{i+1}_net_income'
-                        financial_data[quarter_key] = net_income if pd.notna(net_income) else 'N/A'
-                        financial_data[f'q{i+1}_date'] = date.strftime('%Y-%m-%d') if pd.notna(date) else 'N/A'
-        
-        # Extract quarterly revenue
-        if not quarterly_income_stmt.empty:
-            revenue_rows = quarterly_income_stmt.loc[
-                quarterly_income_stmt.index.str.contains('Total Revenue|Revenue', case=False, na=False)
-            ]
-            if not revenue_rows.empty:
-                revenue_data = revenue_rows.iloc[0]
-                for i, (date, value) in enumerate(revenue_data.items()):
-                    if i < self.quarters_to_collect:
-                        financial_data[f'q{i+1}_revenue'] = value if pd.notna(value) else 'N/A'
-        
-        # Extract quarterly operating income
-        if not quarterly_income_stmt.empty:
-            operating_income_rows = quarterly_income_stmt.loc[
-                quarterly_income_stmt.index.str.contains('Operating Income', case=False, na=False)
-            ]
-            if not operating_income_rows.empty:
-                operating_data = operating_income_rows.iloc[0]
-                for i, (date, value) in enumerate(operating_data.items()):
-                    if i < self.quarters_to_collect:
-                        financial_data[f'q{i+1}_operating_income'] = value if pd.notna(value) else 'N/A'
+        # Extract quarterly earnings (Net Income). Exact-name lookup, not a
+        # substring match: 'Net Income From Continuing Operation Net Minority
+        # Interest' etc. also contain 'Net Income' and sort first.
+        net_income_data = self._get_row_first_of(quarterly_income_stmt, [
+            'Net Income',
+            'Net Income Common Stockholders',
+            'Net Income From Continuing Operation Net Minority Interest',
+        ])
+        if net_income_data is not None:
+            # Get up to 12 quarters of earnings data
+            for i, (date, net_income) in enumerate(net_income_data.items()):
+                if i < self.quarters_to_collect:
+                    quarter_key = f'q{i+1}_net_income'
+                    financial_data[quarter_key] = net_income if pd.notna(net_income) else 'N/A'
+                    financial_data[f'q{i+1}_date'] = date.strftime('%Y-%m-%d') if pd.notna(date) else 'N/A'
+
+        # Extract quarterly revenue. 'Cost Of Revenue' / 'Reconciled Cost Of
+        # Revenue' also contain 'Revenue' - a substring match picked those.
+        revenue_data = self._get_row_first_of(quarterly_income_stmt, [
+            'Total Revenue', 'Operating Revenue',
+        ])
+        if revenue_data is not None:
+            for i, (date, value) in enumerate(revenue_data.items()):
+                if i < self.quarters_to_collect:
+                    financial_data[f'q{i+1}_revenue'] = value if pd.notna(value) else 'N/A'
+
+        # Extract quarterly operating income. 'Total Operating Income As
+        # Reported' also contains 'Operating Income'.
+        operating_data = self._get_row_first_of(quarterly_income_stmt, [
+            'Operating Income', 'Total Operating Income As Reported',
+        ])
+        if operating_data is not None:
+            for i, (date, value) in enumerate(operating_data.items()):
+                if i < self.quarters_to_collect:
+                    financial_data[f'q{i+1}_operating_income'] = value if pd.notna(value) else 'N/A'
 
         # C - Extract quarterly diluted EPS (YoY comparison + acceleration checks)
         eps_data = self._get_row_by_exact_name(quarterly_income_stmt, 'Diluted EPS')
@@ -373,32 +550,29 @@ class FinancialDataRetriever:
     def _extract_annual_data(self, financial_data, annual_income_stmt, annual_balance_sheet, annual_cashflow):
         """Extract extended annual data (up to 5 years)"""
         
-        # Extract annual earnings (Net Income)
-        if not annual_income_stmt.empty:
-            annual_net_income_rows = annual_income_stmt.loc[
-                annual_income_stmt.index.str.contains('Net Income', case=False, na=False)
-            ]
-            
-            if not annual_net_income_rows.empty:
-                annual_net_income_data = annual_net_income_rows.iloc[0]
-                
-                # Get up to 5 years of earnings data
-                for i, (year, net_income) in enumerate(annual_net_income_data.items()):
-                    if i < self.years_to_collect:
-                        year_key = f'y{i+1}_net_income'
-                        financial_data[year_key] = net_income if pd.notna(net_income) else 'N/A'
-                        financial_data[f'y{i+1}_year'] = year.strftime('%Y') if pd.notna(year) else 'N/A'
-        
-        # Extract annual revenue
-        if not annual_income_stmt.empty:
-            revenue_rows = annual_income_stmt.loc[
-                annual_income_stmt.index.str.contains('Total Revenue|Revenue', case=False, na=False)
-            ]
-            if not revenue_rows.empty:
-                revenue_data = revenue_rows.iloc[0]
-                for i, (year, value) in enumerate(revenue_data.items()):
-                    if i < self.years_to_collect:
-                        financial_data[f'y{i+1}_revenue'] = value if pd.notna(value) else 'N/A'
+        # Extract annual earnings (Net Income). Exact-name lookup - see the
+        # matching note in _extract_quarterly_data.
+        annual_net_income_data = self._get_row_first_of(annual_income_stmt, [
+            'Net Income',
+            'Net Income Common Stockholders',
+            'Net Income From Continuing Operation Net Minority Interest',
+        ])
+        if annual_net_income_data is not None:
+            # Get up to 5 years of earnings data
+            for i, (year, net_income) in enumerate(annual_net_income_data.items()):
+                if i < self.years_to_collect:
+                    year_key = f'y{i+1}_net_income'
+                    financial_data[year_key] = net_income if pd.notna(net_income) else 'N/A'
+                    financial_data[f'y{i+1}_year'] = year.strftime('%Y') if pd.notna(year) else 'N/A'
+
+        # Extract annual revenue (not 'Cost Of Revenue' / 'Reconciled Cost Of Revenue').
+        revenue_data = self._get_row_first_of(annual_income_stmt, [
+            'Total Revenue', 'Operating Revenue',
+        ])
+        if revenue_data is not None:
+            for i, (year, value) in enumerate(revenue_data.items()):
+                if i < self.years_to_collect:
+                    financial_data[f'y{i+1}_revenue'] = value if pd.notna(value) else 'N/A'
 
         # A - Extract annual diluted EPS (3-5yr growth consistency check)
         annual_eps_data = self._get_row_by_exact_name(annual_income_stmt, 'Diluted EPS')
@@ -480,6 +654,18 @@ class FinancialDataRetriever:
 
         if earnings_dates is None or earnings_dates.empty:
             return
+
+        # Authoritative next earnings date: the earliest not-yet-reported row.
+        # This overrides info['earningsTimestamp'], which for some tickers is the
+        # LAST earnings date rather than the next one. Only fall back to whatever
+        # _extract_info_fields set if get_earnings_dates has no upcoming row.
+        now = pd.Timestamp.now(tz=earnings_dates.index.tz)
+        upcoming = earnings_dates[(earnings_dates['Reported EPS'].isna())
+                                  & (earnings_dates.index >= now)]
+        if not upcoming.empty:
+            financial_data['next_earnings_date'] = upcoming.index.min().strftime('%Y-%m-%d')
+        elif not self._is_future_date(financial_data.get('next_earnings_date')):
+            financial_data['next_earnings_date'] = 'N/A'
 
         # Drop future/upcoming rows (estimate present, nothing reported yet)
         reported = earnings_dates[earnings_dates['Reported EPS'].notna()]
@@ -936,6 +1122,54 @@ class FinancialDataRetriever:
         except Exception as e:
             return ('failed', str(e))
 
+    def _run_light_phase(self, to_light, delay_between_requests):
+        """
+        Run the 'light' (info-only) refresh for a list of (ticker, cached) pairs.
+        Yields (ticker, data, result) where result is 'light' (data = merged
+        cache), 'needs_full' (data = None, caller re-queues for a full fetch) or
+        'failed' (data = the original cache, kept as-is). Concurrency and the
+        periodic throttle mirror the full-fetch path.
+        """
+        batch_size = 50
+        if self.max_workers <= 1:
+            for i, (ticker, cached) in enumerate(to_light, 1):
+                status, result = self._light_refresh_one(ticker, cached, delay_between_requests)
+                if status == 'light':
+                    yield (ticker, result, 'light')
+                elif status == 'needs_full':
+                    yield (ticker, None, 'needs_full')
+                else:
+                    self.logger.warning(f"light refresh failed for {ticker}: {result}")
+                    yield (ticker, cached, 'failed')
+                if i % batch_size == 0 and i < len(to_light):
+                    time.sleep(10)
+            return
+
+        done = 0
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            for start in range(0, len(to_light), batch_size):
+                chunk = to_light[start:start + batch_size]
+                futures = {
+                    executor.submit(self._light_refresh_one, tk, cd, delay_between_requests): (tk, cd)
+                    for tk, cd in chunk
+                }
+                for future in as_completed(futures):
+                    tk, cd = futures[future]
+                    done += 1
+                    try:
+                        status, result = future.result()
+                    except Exception as e:
+                        status, result = 'failed', str(e)
+                    if status == 'light':
+                        yield (tk, result, 'light')
+                    elif status == 'needs_full':
+                        yield (tk, None, 'needs_full')
+                    else:
+                        self.logger.warning(f"light refresh failed for {tk}: {result}")
+                        yield (tk, cd, 'failed')
+                if done < len(to_light):
+                    time.sleep(10)
+
     def generate_financial_data_file(self, ticker_file_path, delay_between_requests=1):
         """
         Generate comprehensive financial data file for CANSLIM analysis
@@ -952,40 +1186,55 @@ class FinancialDataRetriever:
             print("No tickers found to process.")
             return
 
-        # Incremental refresh: reuse a ticker's cached data if it's still fresh,
-        # instead of re-fetching everyone. The cache is per-ticker (data/fin_data/
-        # tickers/<TICKER>.json) and independent of ticker_choice, so a ticker
-        # already fresh under one ticker_choice is recognized as fresh under any
-        # other choice that also includes it - not just within the same choice's
-        # file. A ticker with no cache file (new to the universe) always gets
-        # fetched fresh, same as one whose cache is stale.
+        # Earnings-aware incremental refresh. The per-ticker cache
+        # (data/fin_data/tickers/<TICKER>.json) is independent of ticker_choice,
+        # so a ticker refreshed under one choice counts under any other that
+        # includes it. Each ticker is triaged from its cache alone (cheap local
+        # read, no network) into one of three tiers - see _decide_refresh_tier:
+        #   skip  -> keep the cache file as-is (0 calls)
+        #   light -> refresh ticker.info fields only (1 call)
+        #   full  -> full rebuild (~10 calls)
         if self.force_refresh:
             print("🔄 force_refresh=True: ignoring freshness, re-fetching every ticker")
 
         financial_data_list = []
-        reused_count = 0
+        skipped_count = 0
+        light_count = 0
         fetched_count = 0
         failed_count = 0
 
-        # Freshness check is a cheap local file read - resolved up front for
-        # every ticker (no threading needed here), leaving only the tickers
-        # that actually need a real fetch to go through the (possibly
-        # concurrent) network path below.
-        to_fetch = []
+        to_fetch = []            # tickers needing a full rebuild
+        to_light = []            # (ticker, cached) needing an info-only refresh
         for i, ticker in enumerate(tickers_list, 1):
             cached = None if self.force_refresh else self._load_ticker_cache(ticker)
-            if cached is not None and self._is_fresh(cached.get('last_updated')):
+            tier = self._decide_refresh_tier(cached)
+            if tier == 'skip':
                 financial_data_list.append(cached)
-                reused_count += 1
+                skipped_count += 1
                 if i <= 3:
-                    print(f"  ♻️  {ticker}: reused cached data (fresh)")
+                    print(f"  ⏭️  {ticker}: skipped (no earnings due, cache kept)")
+            elif tier == 'light':
+                to_light.append((ticker, cached))
             else:
                 to_fetch.append(ticker)
 
+        if to_light:
+            print(f"🔃 {len(to_light)} ticker(s) in an earnings window - info-only refresh first")
+            for ticker, cached, result in self._run_light_phase(to_light, delay_between_requests):
+                if result == 'light':
+                    financial_data_list.append(cached)
+                    light_count += 1
+                elif result == 'needs_full':
+                    to_fetch.append(ticker)
+                else:  # failed - keep the existing cache, don't lose the ticker
+                    financial_data_list.append(cached)
+                    failed_count += 1
+
         total_to_fetch = len(to_fetch)
-        if reused_count:
-            print(f"♻️  {reused_count}/{len(tickers_list)} tickers reused from cache (fresh) - "
-                  f"{total_to_fetch} need a real fetch")
+        if skipped_count or light_count:
+            print(f"⏭️  {skipped_count} skipped, 🔃 {light_count} info-only, "
+                  f"⬇️  {total_to_fetch} need a full fetch "
+                  f"(of {len(tickers_list)} total)")
 
         if self.max_workers <= 1:
             # Sequential path - identical behavior to the pre-concurrency version.
@@ -1045,7 +1294,8 @@ class FinancialDataRetriever:
                         print(f"Processed {completed}/{total_to_fetch} tickers. Taking a longer break...")
                         time.sleep(10)
 
-        print(f"\n📊 Summary: {reused_count} reused (fresh), {fetched_count} fetched fresh, {failed_count} failed")
+        print(f"\n📊 Summary: {skipped_count} skipped (no earnings due), {light_count} info-only refresh, "
+              f"{fetched_count} full fetch, {failed_count} failed")
         
         if financial_data_list:
             # Save comprehensive data
@@ -1054,6 +1304,21 @@ class FinancialDataRetriever:
             print(f"✅ Financial data saved to {self.financial_data_file}")
             print(f"Generated financial data for {len(financial_data_list)} tickers")
             print(f"Dataframe shape: {financial_df.shape}")
+
+            # Persist this run as a dated snapshot in fin_data.db (history ->
+            # institutional-holder trend, threshold back-testing). The CSV above
+            # stays the interchange file; the DB is the archive.
+            try:
+                from src import fin_data_store
+                snap = pd.to_datetime(
+                    financial_df.get('last_updated'), errors='coerce'
+                ).max()
+                snap = snap.date().isoformat() if pd.notna(snap) \
+                    else dt.date.today().isoformat()
+                n = fin_data_store.write_snapshot(financial_df, snap)
+                print(f"🗄️  fin_data.db snapshot {snap}: {n} rows")
+            except Exception as e:
+                self.logger.warning(f"could not write fin_data.db snapshot: {e}")
             
             # Create summary file - BASIC IMPLEMENTATION (without CANSLIM calculations)
             print("\n" + "="*50)

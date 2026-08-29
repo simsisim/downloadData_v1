@@ -33,7 +33,31 @@ class UserConfiguration:
     tw_fin_data: bool = False
     zacks_fin_data: bool = False
     fin_data_refresh_days: int = 7
+    # Force a full refetch this many days after a ticker's last full fetch no
+    # matter what (heals restatements / schema drift / a missed earnings date).
+    fin_data_backstop_days: int = 120
+    # Open the light/full refresh window this many days before a scheduled
+    # earnings date (companies report early; estimated dates move).
+    fin_data_earnings_buffer_days: int = 3
     fin_data_force_refresh: bool = False
+    # CANSLIM O'Neil fundamental screen (runs in the fin-data processing stage).
+    # See docus/CANSLIM_SCREEN_IMPLEMENTATION_PLAN.md. Values are computed
+    # threshold-free at fetch time; the preset is applied here, and any
+    # canslim_* override below that is left blank falls back to the preset.
+    canslim_screen_enabled: bool = True
+    canslim_preset: str = "classic"          # classic | aggressive | relaxed
+    canslim_c_min_eps_yoy: float | None = None
+    canslim_c_min_sales_yoy: float | None = None
+    canslim_c_require_sales: bool | None = None
+    canslim_a_min_cagr: float | None = None
+    canslim_a_require_each_year_up: bool | None = None
+    canslim_a_min_roe: float | None = None
+    canslim_a_min_cashflow_ratio: float | None = None
+    canslim_n_min_pct_from_high: float | None = None
+    canslim_s_max_debt_equity: float | None = None
+    canslim_i_min_inst: float | None = None
+    canslim_i_max_inst: float | None = None
+    canslim_min_support: int | None = None
     # Concurrent yfinance fetches per FinancialDataRetriever run - each ticker's
     # ~10s cost is almost entirely network wait, not CPU, so overlapping several
     # tickers gives a near-linear speedup (measured ~4x at 5 workers). 1 = old
@@ -87,6 +111,23 @@ def parse_boolean(value: str) -> bool:
     
     value_str = str(value).strip().lower()
     return value_str in ['true', '1', 'yes', 'on']
+
+
+def opt_float(value):
+    """float, or None for a blank cell (used for optional threshold overrides)."""
+    s = str(value).strip()
+    return None if s == '' else float(s)
+
+
+def opt_int(value):
+    s = str(value).strip()
+    return None if s == '' else int(float(s))
+
+
+def opt_bool(value):
+    """bool, or None for a blank cell."""
+    s = str(value).strip()
+    return None if s == '' else parse_boolean(s)
 
 
 def _get_default_ticker_filenames() -> dict:
@@ -197,7 +238,23 @@ def read_user_data(file_path: str = 'user_input/user_data.csv') -> UserConfigura
             'TW_fin_data': ('tw_fin_data', parse_boolean),
             'Zacks_fin_data': ('zacks_fin_data', parse_boolean),
             'fin_data_refresh_days': ('fin_data_refresh_days', int),
+            'fin_data_backstop_days': ('fin_data_backstop_days', int),
+            'fin_data_earnings_buffer_days': ('fin_data_earnings_buffer_days', int),
             'fin_data_force_refresh': ('fin_data_force_refresh', parse_boolean),
+            'canslim_screen_enabled': ('canslim_screen_enabled', parse_boolean),
+            'canslim_preset': ('canslim_preset', str),
+            'canslim_c_min_eps_yoy': ('canslim_c_min_eps_yoy', opt_float),
+            'canslim_c_min_sales_yoy': ('canslim_c_min_sales_yoy', opt_float),
+            'canslim_c_require_sales': ('canslim_c_require_sales', opt_bool),
+            'canslim_a_min_cagr': ('canslim_a_min_cagr', opt_float),
+            'canslim_a_require_each_year_up': ('canslim_a_require_each_year_up', opt_bool),
+            'canslim_a_min_roe': ('canslim_a_min_roe', opt_float),
+            'canslim_a_min_cashflow_ratio': ('canslim_a_min_cashflow_ratio', opt_float),
+            'canslim_n_min_pct_from_high': ('canslim_n_min_pct_from_high', opt_float),
+            'canslim_s_max_debt_equity': ('canslim_s_max_debt_equity', opt_float),
+            'canslim_i_min_inst': ('canslim_i_min_inst', opt_float),
+            'canslim_i_max_inst': ('canslim_i_max_inst', opt_float),
+            'canslim_min_support': ('canslim_min_support', opt_int),
             'fin_data_max_workers': ('fin_data_max_workers', int),
             'fin_data_process': ('fin_data_process', parse_boolean),
             'fin_data_chart_top_n': ('fin_data_chart_top_n', int),
