@@ -1304,6 +1304,21 @@ class FinancialDataRetriever:
             print(f"✅ Financial data saved to {self.financial_data_file}")
             print(f"Generated financial data for {len(financial_data_list)} tickers")
             print(f"Dataframe shape: {financial_df.shape}")
+
+            # Persist this run as a dated snapshot in fin_data.db (history ->
+            # institutional-holder trend, threshold back-testing). The CSV above
+            # stays the interchange file; the DB is the archive.
+            try:
+                from src import fin_data_store
+                snap = pd.to_datetime(
+                    financial_df.get('last_updated'), errors='coerce'
+                ).max()
+                snap = snap.date().isoformat() if pd.notna(snap) \
+                    else dt.date.today().isoformat()
+                n = fin_data_store.write_snapshot(financial_df, snap)
+                print(f"🗄️  fin_data.db snapshot {snap}: {n} rows")
+            except Exception as e:
+                self.logger.warning(f"could not write fin_data.db snapshot: {e}")
             
             # Create summary file - BASIC IMPLEMENTATION (without CANSLIM calculations)
             print("\n" + "="*50)

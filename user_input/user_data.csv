@@ -64,6 +64,22 @@ fin_data_chart_top_n,10,Number of top CANSI-scoring tickers to chart
 fin_data_chart_max_peers,4,Number of industry/sector peers to overlay per chart
 fin_data_chart_quarters,8,Number of trailing quarters to show in EPS trend charts
 ,,
+# CANSLIM O Neil screen (fin-data processing stage; see docus/CANSLIM_SCREEN_IMPLEMENTATION_PLAN.md),,
+canslim_screen_enabled,TRUE,Run the CANSLIM O Neil fundamental screen during fin-data processing
+canslim_preset,classic,Threshold preset: classic (O Neil canonical) | aggressive | relaxed
+canslim_c_min_eps_yoy,,Override latest-quarter EPS YoY min (blank = preset)
+canslim_c_min_sales_yoy,,Override latest-quarter sales YoY min (blank = preset)
+canslim_c_require_sales,,Override require the sales gate in C (blank = preset)
+canslim_a_min_cagr,,Override 3-year annual EPS CAGR min (blank = preset)
+canslim_a_require_each_year_up,,Override require EPS up every year for A (blank = preset)
+canslim_a_min_roe,,Override latest fiscal-year ROE min (blank = preset)
+canslim_a_min_cashflow_ratio,,Override cash-flow-per-share vs EPS ratio min quality flag (blank = preset)
+canslim_n_min_pct_from_high,,Override max distance below the 52-week high as a negative fraction (blank = preset)
+canslim_s_max_debt_equity,,Override max debtToEquity in yfinance x100 units (blank = preset)
+canslim_i_min_inst,,Override institutional ownership floor (blank = preset)
+canslim_i_max_inst,,Override institutional ownership ceiling (blank = preset)
+canslim_min_support,,Override min number of N/S/I support letters required (blank = preset)
+,,
 # GENERAL SETTINGS,,
 # ----------------,,
 write_info_file,TRUE,Write detailed info files during processing
