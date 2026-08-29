@@ -33,6 +33,12 @@ class UserConfiguration:
     tw_fin_data: bool = False
     zacks_fin_data: bool = False
     fin_data_refresh_days: int = 7
+    # Force a full refetch this many days after a ticker's last full fetch no
+    # matter what (heals restatements / schema drift / a missed earnings date).
+    fin_data_backstop_days: int = 120
+    # Open the light/full refresh window this many days before a scheduled
+    # earnings date (companies report early; estimated dates move).
+    fin_data_earnings_buffer_days: int = 3
     fin_data_force_refresh: bool = False
     # Concurrent yfinance fetches per FinancialDataRetriever run - each ticker's
     # ~10s cost is almost entirely network wait, not CPU, so overlapping several
@@ -197,6 +203,8 @@ def read_user_data(file_path: str = 'user_input/user_data.csv') -> UserConfigura
             'TW_fin_data': ('tw_fin_data', parse_boolean),
             'Zacks_fin_data': ('zacks_fin_data', parse_boolean),
             'fin_data_refresh_days': ('fin_data_refresh_days', int),
+            'fin_data_backstop_days': ('fin_data_backstop_days', int),
+            'fin_data_earnings_buffer_days': ('fin_data_earnings_buffer_days', int),
             'fin_data_force_refresh': ('fin_data_force_refresh', parse_boolean),
             'fin_data_max_workers': ('fin_data_max_workers', int),
             'fin_data_process': ('fin_data_process', parse_boolean),

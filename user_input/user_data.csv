@@ -51,7 +51,9 @@ fin_data_download,FALSE,Enable financial data download (raw CANSI data from yfin
 YF_fin_data,TRUE,Download financial data from YFinance
 TW_fin_data,FALSE,Download financial data from TradingView
 Zacks_fin_data,FALSE,Download financial data from Zacks (future)
-fin_data_refresh_days,7,Skip re-downloading a ticker if its data is fresher than this many days
+fin_data_refresh_days,7,Fallback time gate (days) for tickers with no known next-earnings date
+fin_data_backstop_days,120,Force a full refetch this many days after a ticker's last full fetch regardless
+fin_data_earnings_buffer_days,3,Start checking for a new quarter this many days before the scheduled earnings date
 fin_data_force_refresh,FALSE,Ignore freshness check and re-download every ticker
 fin_data_max_workers,4,Concurrent yfinance fetches (1 = old sequential behavior)
 ,,

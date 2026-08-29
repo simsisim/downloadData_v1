@@ -977,9 +977,14 @@ def main(config_override=None, preset=None):
                 'yf_enabled': config.yf_fin_data,
                 'tw_enabled': config.tw_fin_data,
                 'zacks_enabled': config.zacks_fin_data,
-                # Incremental refresh: skip re-downloading tickers whose data is
-                # already fresher than this many days (fundamentals change slowly).
+                # Earnings-aware incremental refresh. refresh_days is now only the
+                # fallback time gate for tickers with no known next-earnings date;
+                # backstop_days forces a full refetch that long after the last one
+                # regardless; earnings_buffer_days opens the check window that many
+                # days before a scheduled earnings date.
                 'refresh_days': config.fin_data_refresh_days,
+                'backstop_days': config.fin_data_backstop_days,
+                'earnings_buffer_days': config.fin_data_earnings_buffer_days,
                 'force_refresh': config.fin_data_force_refresh,
                 # Concurrent yfinance fetches - each ticker's cost is almost
                 # entirely network wait, not CPU (profiled directly), so this
@@ -989,8 +994,10 @@ def main(config_override=None, preset=None):
 
             print("Starting comprehensive financial data collection...")
             print("This will collect 8-12 quarters and 5+ years of financial history for CANSLIM analysis")
-            print(f"Incremental refresh: tickers fresher than {config.fin_data_refresh_days} days will be reused"
-                  f"{' (forced full refresh)' if config.fin_data_force_refresh else ''}\n")
+            print(f"Earnings-aware refresh: tickers skip until {config.fin_data_earnings_buffer_days}d "
+                  f"before their next earnings date; full refetch forced after "
+                  f"{config.fin_data_backstop_days}d"
+                  f"{' (force_refresh=TRUE: refetching everything)' if config.fin_data_force_refresh else ''}\n")
 
             # Run financial data retrieval separately
             run_financial_data_retrieval(combined_file, financial_config)
