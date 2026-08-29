@@ -38,6 +38,9 @@ import pandas as pd
 PRESETS: dict[str, dict] = {
     "classic": {
         "c_min_eps_yoy": 0.25,          # C: latest quarter diluted EPS YoY
+        "c_max_eps_yoy": 10.0,        # C: reject > +1000% YoY - a jump that
+                                       #    large is a near-zero base or a
+                                       #    one-time item, not O'Neil growth
         "c_min_sales_yoy": 0.25,        # C: latest quarter revenue YoY
         "c_require_sales": True,        # C: sales YoY is a hard part of C
         "c_min_base_eps": 0.05,        # C: year-ago quarter EPS floor (kills
@@ -55,6 +58,7 @@ PRESETS: dict[str, dict] = {
     },
     "aggressive": {
         "c_min_eps_yoy": 0.40,
+        "c_max_eps_yoy": 8.0,
         "c_min_sales_yoy": 0.25,
         "c_require_sales": True,
         "c_min_base_eps": 0.05,
@@ -71,6 +75,7 @@ PRESETS: dict[str, dict] = {
     },
     "relaxed": {
         "c_min_eps_yoy": 0.20,
+        "c_max_eps_yoy": 25.0,
         "c_min_sales_yoy": 0.15,
         "c_require_sales": False,
         "c_min_base_eps": 0.02,
@@ -96,7 +101,8 @@ REQUIRED_INPUT_COLUMNS = [
     "q1_eps_growth_yoy", "q2_eps_growth_yoy", "q3_eps_growth_yoy",
     "eps_growth_accelerating",
     "y1_eps", "y2_eps", "y3_eps", "y4_eps", "y1_net_income", "y4_net_income",
-    "y1_revenue", "y4_revenue", "y1_roe", "y1_cashflow_vs_eps_ratio",
+    "y1_revenue", "y4_revenue", "y1_roe", "returnOnEquity",
+    "y1_stockholders_equity", "y1_cashflow_vs_eps_ratio",
     "fiftyTwoWeekHighChangePercent", "supply_trend", "debtToEquity",
     "heldPercentInstitutions",
 ]
@@ -232,6 +238,13 @@ def apply_screen(
     )
     c_eps_yoy = c_eps_yoy.fillna(eqg)
 
+    # upper guard: a > +1000%-ish quarter is a near-zero base or a one-time
+    # item (e.g. SBLK +371,564%, NEXA +6,235% — both cyclical turnarounds
+    # yfinance's earningsQuarterlyGrowth reports off a tiny base), not the
+    # sustainable improvement O'Neil's C is about. Mask -> C fails, reason set.
+    eps_yoy_extreme = c_eps_yoy > t["c_max_eps_yoy"]
+    c_eps_yoy = c_eps_yoy.mask(eps_yoy_extreme.fillna(False))
+
     # sales YoY — guard against the stale-revenue extraction bug: if the stored
     # "revenue" is below net income the row is pre-fix COGS, not revenue
     q1r, q5r = _num(df, "q1_revenue"), _num(df, "q5_revenue")
@@ -251,6 +264,7 @@ def apply_screen(
     c_reason = pd.Series("ok", index=idx, dtype="object")
     c_reason = c_reason.mask(~c_eps_ok.fillna(False) & c_eps_yoy.notna(), "eps_below_threshold")
     c_reason = c_reason.mask(c_eps_yoy.isna(), "eps_na")
+    c_reason = c_reason.mask(eps_yoy_extreme.fillna(False), "eps_yoy_extreme")
     c_reason = c_reason.mask(bad_order, "bad_quarter_order")
     if t["c_require_sales"]:
         c_reason = c_reason.mask(C_pass.eq(False) & c_eps_ok.fillna(False) & rev_suspect, "revenue_suspect")
@@ -267,13 +281,22 @@ def apply_screen(
     have_all_years = y1.notna() & y2.notna() & y3.notna() & y4.notna()
     a_each_up = _tribool((y1 > y2) & (y2 > y3) & (y3 > y4), have_all_years)
 
-    a_roe = _num(df, "y1_roe")
+    # ROE: statement-based (net income / equity), falling back to yfinance's
+    # own returnOnEquity. Then a waiver: a profitable company whose book equity
+    # is NEGATIVE from years of buybacks (BKNG, DELL, GTX...) has an undefined
+    # simple ROE, but that is the extreme of capital return, not a failure — so
+    # if it earns money and the growth gate already passed, don't reject on ROE.
+    a_roe = _num(df, "y1_roe").fillna(_num(df, "returnOnEquity"))
+    y1_ni = _num(df, "y1_net_income")
+    y1_eq = _num(df, "y1_stockholders_equity")
+    roe_waived = a_roe.isna() & (y1_ni > 0) & (y1_eq < 0)
+
     a_cfr = _num(df, "y1_cashflow_vs_eps_ratio")
     a_sales_cagr = _cagr(_num(df, "y1_revenue"), _num(df, "y4_revenue"), 3)
 
     a_growth_ok = a_cagr >= t["a_min_cagr"]
-    a_roe_ok = a_roe >= t["a_min_roe"]
-    A_pass = a_growth_ok.fillna(False) & a_roe_ok.fillna(False)
+    a_roe_ok = (a_roe >= t["a_min_roe"]).fillna(False) | roe_waived
+    A_pass = a_growth_ok.fillna(False) & a_roe_ok
     if t["a_require_each_year_up"]:
         A_pass = A_pass & a_each_up.fillna(False).astype(bool)
 
@@ -284,7 +307,7 @@ def apply_screen(
     a_each_up_false = a_each_up.fillna(False).astype(bool).eq(False) & ~a_each_up_isna
     a_reason = a_reason.mask(a_cagr.isna(), "growth_na")
     a_reason = a_reason.mask(a_cagr.notna() & ~a_growth_ok_f, "growth_below_threshold")
-    a_reason = a_reason.mask(A_pass.eq(False) & a_growth_ok_f & a_roe.isna(), "roe_na")
+    a_reason = a_reason.mask(A_pass.eq(False) & a_growth_ok_f & a_roe.isna() & ~roe_waived, "roe_na")
     a_reason = a_reason.mask(A_pass.eq(False) & a_growth_ok_f & a_roe.notna() & ~a_roe_ok_f, "roe_below_threshold")
     if t["a_require_each_year_up"]:
         a_reason = a_reason.mask(A_pass.eq(False) & a_growth_ok_f & a_roe_ok_f & a_each_up_isna, "consistency_na")

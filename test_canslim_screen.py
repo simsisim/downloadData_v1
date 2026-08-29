@@ -113,6 +113,16 @@ def test_c_base_eps_floor_blocks_near_zero_base():
     assert not bool(r["canslim_C_pass"])
 
 
+def test_c_extreme_yoy_rejected():
+    row = _base_row()
+    row["q1_eps"], row["q5_eps"] = 60.0, 0.10   # +59,900% -> near-zero-base artifact
+    row["earningsQuarterlyGrowth"] = np.nan
+    r = _screen_one(row)
+    assert pd.isna(r["canslim_c_eps_yoy"])
+    assert r["canslim_c_reason"] == "eps_yoy_extreme"
+    assert not bool(r["canslim_C_pass"])
+
+
 def test_c_bad_quarter_order_rejected():
     row = _base_row()
     row["q1_date"], row["q5_date"] = "2025-06-30", "2026-06-30"  # q1 older than q5
@@ -200,6 +210,36 @@ def test_a_each_year_up_not_required_in_relaxed():
     r = _screen_one(row, preset="relaxed")
     # relaxed a_min_cagr 0.18, a_min_roe 0.12, no consistency
     assert bool(r["canslim_A_pass"])
+
+
+def test_a_roe_falls_back_to_info_return_on_equity():
+    row = _base_row()
+    row["y1_roe"] = np.nan
+    row["returnOnEquity"] = 0.22
+    r = _screen_one(row)
+    assert bool(r["canslim_A_pass"])
+
+
+def test_a_roe_waived_for_buyback_negative_equity():
+    row = _base_row()
+    row["y1_roe"] = np.nan
+    row["returnOnEquity"] = np.nan
+    row["y1_net_income"] = 5_000.0            # profitable
+    row["y1_stockholders_equity"] = -2_000.0  # negative book equity from buybacks
+    r = _screen_one(row)
+    assert bool(r["canslim_A_pass"])          # ROE sub-check waived
+    assert r["canslim_a_reason"] == "ok"
+
+
+def test_a_roe_not_waived_when_unprofitable():
+    row = _base_row()
+    row["y1_roe"] = np.nan
+    row["returnOnEquity"] = np.nan
+    row["y1_net_income"] = -100.0             # losing money
+    row["y1_stockholders_equity"] = -2_000.0
+    r = _screen_one(row)
+    assert not bool(r["canslim_A_pass"])
+    assert r["canslim_a_reason"] == "roe_na"
 
 
 def test_a_cashflow_is_flag_not_gate():
