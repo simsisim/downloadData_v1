@@ -14,10 +14,15 @@ single full-history file per ticker keep working unmodified. Only
 archive/ and current/ need to travel over a Colab-to-local sync; the
 legacy file is regenerated locally from them.
 """
+import logging
 import os
 import datetime as dt
 import numpy as np
 import pandas as pd
+
+from src import period_calendar
+
+logger = logging.getLogger(__name__)
 
 
 def archive_path(folder, ticker):
@@ -202,23 +207,25 @@ def _partition_by_year(df, this_year):
     return df[stays_mask], df[~stays_mask]
 
 
-def normalize_fetch_dates(df, interval):
+def normalize_fetch_dates(df, interval, strict=False):
     """
     Snap a FRESHLY FETCHED weekly/monthly DataFrame's index down to its
     period's canonical start (Monday 00:00 for '1wk', the 1st for '1mo').
 
-    yfinance dates a CLOSED period consistently this way already (a no-op
-    here - shifting by 0 days for an already-Monday/1st date), but dates a
-    still-OPEN current period - or a partial period at the very start of a
-    query range - by whatever the actual latest/query-start trading day
-    happened to be instead. So the same evolving bar gets a different Date
-    depending on when, or with what start date, it's fetched, and without
-    this, every incremental update potentially files it under a brand new
-    stray date instead of updating the one true row for that period (see
-    src/get_batchData.py's _normalize_period_date for the equivalent batch
-    fix, and the investigation in project memory that found this - real
-    examples: data/market_data/monthly/current/AAPL.csv had stray
-    2026-05-20 and 2026-07-17 rows alongside the correct month-start rows).
+    When the fetch `start` was period-aligned (see
+    period_calendar.align_fetch_start, which fetch_ohlcv now applies), a
+    CLOSED weekly bar already lands on its Monday and a monthly bar on the
+    1st -- this is then a pure no-op.
+
+    It is NOT safe to rely on for a MISaligned fetch: yfinance anchors a
+    weekly series to the weekday of a non-Monday `start`, producing bars
+    that straddle two calendar weeks, and `d - d.weekday()` then snaps each
+    onto the WRONG Monday (historically a week early - the -7 shift that
+    corrupted every weekly archive built with the hard-coded
+    start='2000-01-01', a Saturday). So this now WARNS (or raises, with
+    strict=True) when it sees a non-canonical input bar: that means the
+    fetch start was not aligned and the data is probably mislabelled at
+    source. The shift is still applied as a best effort.
 
     Only ever call this on freshly fetched data (a real, homogeneous
     tz-aware DatetimeIndex) - never on data read back from disk, which is
@@ -228,6 +235,17 @@ def normalize_fetch_dates(df, interval):
     if interval not in ('1wk', '1mo') or df.empty:
         return df
     idx = pd.DatetimeIndex(df.index)
+    noncanon = (idx.weekday != 0) if interval == '1wk' else (idx.day != 1)
+    if noncanon.any():
+        examples = [str(d.date()) for d in idx[noncanon]][:5]
+        msg = (f"normalize_fetch_dates: {int(noncanon.sum())} {interval} bar(s) "
+               f"are not on the canonical period start (e.g. {examples}). The "
+               f"fetch `start` was not period-aligned - see "
+               f"period_calendar.align_fetch_start. Snapping anyway, but the "
+               f"result may be mislabelled by up to a week.")
+        if strict:
+            raise ValueError(msg)
+        logger.warning(msg)
     shift_days = idx.weekday if interval == '1wk' else (idx.day - 1)
     df = df.copy()
     df.index = (idx - pd.to_timedelta(shift_days, unit='D')).normalize()
@@ -260,6 +278,8 @@ def write_incremental(folder, ticker, new_rows, interval=None):
     this_year = dt.date.today().year
 
     new_rows = normalize_fetch_dates(new_rows, interval)
+    # Never persist the still-open week/month - its volume is still growing.
+    new_rows = period_calendar.drop_incomplete_periods(new_rows, interval)
     existing_current = read_ticker_csv(current_path(folder, ticker))
     candidate = pd.concat([existing_current, new_rows]) if not existing_current.empty else new_rows
     candidate = _dedupe_sorted(candidate)
@@ -288,6 +308,7 @@ def rebuild_archive_current(folder, ticker, full_data, interval=None):
     """
     this_year = dt.date.today().year
     full_data = normalize_fetch_dates(full_data, interval)
+    full_data = period_calendar.drop_incomplete_periods(full_data, interval)
     full_data = _dedupe_sorted(full_data)
     stays, rolls = _partition_by_year(full_data, this_year)
 
@@ -531,8 +552,15 @@ def fetch_ohlcv(ticker, start_date, end_date, interval='1d'):
     Retrieve historical OHLCV data plus market-context fields for a single ticker.
     Standalone (no MarketDataRetriever instance needed) so repair_from_date()
     and split rebuilds can call it directly.
+
+    For '1wk'/'1mo', start_date is snapped back to its period boundary
+    (Monday / the 1st) first: yfinance anchors a period series to the
+    weekday/day-of-month of `start`, so a non-aligned start silently yields
+    bars that straddle calendar weeks. See period_calendar.align_fetch_start.
     """
     import yfinance as yf
+
+    start_date = period_calendar.align_fetch_start(start_date, interval)
 
     ticker_obj = yf.Ticker(ticker)
     ohlc_data = ticker_obj.history(start=start_date, end=end_date, interval=interval)

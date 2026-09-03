@@ -7,7 +7,7 @@ import yfinance as yf
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from src import ticker_manifest, market_data_io
+from src import ticker_manifest, market_data_io, period_calendar
 from src.config import PARAMS_DIR
 
 CHUNK_SIZE = 100
@@ -96,6 +96,9 @@ def _extract_rows(df, chunk, interval):
             continue
         for bar_date, row in sub.iterrows():
             norm_date = _normalize_period_date(bar_date.date(), interval)
+            # Drop the still-open week/month - its volume is still growing.
+            if not period_calendar.is_period_complete(norm_date, interval):
+                continue
             rows.append({
                 "Date":      norm_date.isoformat(),
                 "Symbol":    t,
@@ -389,6 +392,10 @@ def run_batch_data_retrieval(params):
     today_iso = datetime.now().strftime("%Y-%m-%d")
 
     for interval, (start_date, end_date, period, use_range) in interval_cfg.items():
+        # yfinance anchors a '1wk'/'1mo' series to the weekday/day-of-month of
+        # `start`; a non-aligned start yields bars that straddle calendar weeks.
+        if use_range:
+            start_date = period_calendar.align_fetch_start(start_date, interval)
         subdir  = INTERVAL_TO_SUBDIR.get(interval, interval)
         out_dir = os.path.join(output_dir, subdir)
         os.makedirs(out_dir, exist_ok=True)
