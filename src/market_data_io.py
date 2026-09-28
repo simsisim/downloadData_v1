@@ -394,6 +394,28 @@ def append_split_audit(audit_log_path, rows):
     df.to_csv(audit_log_path, mode='a', header=write_header, index=False)
 
 
+def split_already_rebuilt(audit_log_path, ticker, interval, split_rows):
+    """
+    True if every split in split_rows already has a 'rebuilt_ok' entry for
+    this ticker/interval in the audit log. An incremental fetch keeps
+    re-including the split bar (the still-open week/month is re-fetched
+    every run until it closes), which re-triggered a full-history rebuild
+    each time - IESC's weekly history was rebuilt 5x for one 2026-08-24
+    split. The first rebuild already re-adjusted the whole series, so later
+    sightings of the same split need no rebuild.
+    """
+    if not os.path.isfile(audit_log_path):
+        return False
+    try:
+        log = pd.read_csv(audit_log_path, dtype=str)
+    except Exception:
+        return False
+    done = set(log.loc[(log['ticker'] == ticker) & (log['interval'] == interval)
+                       & (log['rebuild_status'] == 'rebuilt_ok'), 'split_date'])
+    wanted = {pd.to_datetime(d).date().isoformat() for d in split_rows.index}
+    return wanted <= done
+
+
 def check_and_handle_split(folder, ticker, interval, split_rows, fetch_fn,
                             start_date, end_date, audit_log_path,
                             splits_folder=None):
@@ -413,6 +435,9 @@ def check_and_handle_split(folder, ticker, interval, split_rows, fetch_fn,
     gate). Failure here never blocks the price rebuild above, which is the
     part that actually matters for correctness of the stored OHLCV.
     """
+    if split_already_rebuilt(audit_log_path, ticker, interval, split_rows):
+        return {'status': 'already_rebuilt', 'ticker': ticker}
+
     timestamp = dt.datetime.now().isoformat(timespec='seconds')
     rows_before = len(load_ohlcv(folder, ticker))
 

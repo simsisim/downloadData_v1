@@ -153,3 +153,29 @@ def test_repair_with_split_in_range_does_full_rebuild(tmp_path, monkeypatch):
     res = gm.repair_from_date(str(tmp_path), "2026-09-22", tickers=["AAA"])
     assert calls == [("AAA", SESSIONS[0])]
     assert res["fixed"] == ["AAA"]
+
+
+def test_split_rebuild_runs_once_per_split(tmp_path):
+    # IESC: the open week carrying the split was re-fetched every run and
+    # triggered a full rebuild each time (5x). Second sighting must skip.
+    from src import market_data_io as mio
+    _write(tmp_path, "AAA", SESSIONS)
+    audit = str(tmp_path / "split_events.csv")
+    split_rows = _bars(["2026-09-22"])
+    split_rows["Stock Splits"] = 2.0
+    fetches = []
+
+    def fetch(t, s, e, interval="1d"):
+        fetches.append(s)
+        return _bars(SESSIONS)
+
+    r1 = mio.check_and_handle_split(str(tmp_path), "AAA", "1d", split_rows, fetch, SESSIONS[0], SESSIONS[-1], audit)
+    r2 = mio.check_and_handle_split(str(tmp_path), "AAA", "1d", split_rows, fetch, SESSIONS[0], SESSIONS[-1], audit)
+    assert (r1["status"], r2["status"]) == ("rebuilt_ok", "already_rebuilt")
+    assert len(fetches) == 1
+
+    # a different (new) split for the same ticker still rebuilds
+    other = _bars(["2026-09-24"]); other["Stock Splits"] = 3.0
+    assert mio.check_and_handle_split(str(tmp_path), "AAA", "1d", other, fetch, SESSIONS[0], SESSIONS[-1], audit)["status"] == "rebuilt_ok"
+    # ...but not for another interval's record
+    assert not mio.split_already_rebuilt(audit, "AAA", "1wk", split_rows)

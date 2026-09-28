@@ -345,9 +345,10 @@ def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='
                         first.isoformat(), end_date,
                         os.path.join(PARAMS_DIR["DATA_DIR"], "market_data", "split_events.csv"),
                         splits_folder=PARAMS_DIR.get("MARKET_DATA_SPLITS_DIR") if interval == '1d' else None)
-                    print(f"   {ticker}: split in repaired range -> full rebuild from {first}: {res['status']}")
-                    (fixed if res['status'] == 'rebuilt_ok' else still_broken).append(ticker)
-                    continue
+                    if res['status'] != 'already_rebuilt':
+                        print(f"   {ticker}: split in repaired range -> full rebuild from {first}: {res['status']}")
+                        (fixed if res['status'] == 'rebuilt_ok' else still_broken).append(ticker)
+                        continue
 
             # Merge, don't replace: an existing row on/after since_date is
             # dropped only if the redownload has that date, or the row itself
@@ -527,12 +528,15 @@ class MarketDataRetriever:
                         split_rows, market_data_io.fetch_ohlcv,
                         self.config['start_date'], self.config['end_date'],
                         audit_log_path, splits_folder=self.config.get('splits_folder'))
-                    if result['status'] == 'rebuilt_ok':
-                        self.split_rebuilds.append(ticker)
-                    else:
-                        self.split_pending.append(ticker)
-                    self.successful_tickers.append(ticker)
-                    return
+                    # already_rebuilt: nothing to redo - fall through to the
+                    # normal incremental write of the (already adjusted) new rows.
+                    if result['status'] != 'already_rebuilt':
+                        if result['status'] == 'rebuilt_ok':
+                            self.split_rebuilds.append(ticker)
+                        else:
+                            self.split_pending.append(ticker)
+                        self.successful_tickers.append(ticker)
+                        return
 
             if had_existing_data and self.config['interval'] == '1d' and not new_data.empty:
                 n_fetched = len(new_data)
