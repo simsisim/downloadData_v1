@@ -14,8 +14,10 @@ single full-history file per ticker keep working unmodified. Only
 archive/ and current/ need to travel over a Colab-to-local sync; the
 legacy file is regenerated locally from them.
 """
+import glob
 import logging
 import os
+import tarfile
 import datetime as dt
 import numpy as np
 import pandas as pd
@@ -298,18 +300,73 @@ def write_incremental(folder, ticker, new_rows, interval=None):
     return {'rolled_rows': len(rolls), 'current_rows': len(stays)}
 
 
-def rebuild_archive_current(folder, ticker, full_data, interval=None):
+BACKUP_DIR = os.path.join("data", "backups")
+BACKUP_KEEP = 8
+
+
+def backup_current(folder, label, max_age_days=None, backup_dir=BACKUP_DIR, keep=BACKUP_KEEP):
+    """
+    Snapshot `folder`/current/ to backup_dir/<folder-name>_current_<stamp>_<label>.tar.gz
+    (~23MB / ~3s for daily) and prune to the newest `keep` snapshots for
+    that folder. Called before any bulk rewrite (repair_from_date) and as a
+    periodic safety net: pass max_age_days to skip if a snapshot that
+    recent already exists. archive/ (prior years, ~1GB) isn't included -
+    bulk repairs only touch recent dates, which live in current/.
+
+    Returns the snapshot path, or None if skipped.
+    """
+    src = os.path.join(folder, 'current')
+    if not os.path.isdir(src):
+        return None
+    prefix = f"{os.path.basename(os.path.normpath(folder))}_current_"
+    existing = sorted(glob.glob(os.path.join(backup_dir, prefix + "*.tar.gz")), key=os.path.getmtime)
+    if max_age_days is not None and existing:
+        age = dt.datetime.now().timestamp() - os.path.getmtime(existing[-1])
+        if age < max_age_days * 86400:
+            return None
+
+    os.makedirs(backup_dir, exist_ok=True)
+    path = os.path.join(backup_dir, f"{prefix}{dt.datetime.now():%Y%m%d-%H%M%S}_{label}.tar.gz")
+    with tarfile.open(path + ".tmp", "w:gz") as tar:
+        tar.add(src, arcname="current")
+    os.replace(path + ".tmp", path)
+    for old in (existing + [path])[:-keep]:
+        os.remove(old)
+    print(f"💾 Backed up {src} -> {path}")
+    return path
+
+
+class DataLossRefused(RuntimeError):
+    """rebuild_archive_current() would have dropped dates already on disk."""
+
+
+def rebuild_archive_current(folder, ticker, full_data, interval=None, allow_row_loss=False):
     """
     Full overwrite of both tiers from a freshly fetched complete history,
     partitioned by calendar year. Used for split-triggered rebuilds and by
     repair_from_date (which already holds the complete corrected series).
 
     `interval`: see write_incremental - passed through to normalize_fetch_dates.
+
+    Shrink guard: raises DataLossRefused (writing nothing) if any date
+    already on disk is absent from `full_data`, unless allow_row_loss=True.
+    A "complete" fetch isn't always complete - Yahoo keeps only a few days
+    for delisted/acquired tickers - and an overwrite built from one wiped
+    14 tickers' Aug-Sep 2026 rows with no backup to restore from.
     """
     this_year = dt.date.today().year
     full_data = normalize_fetch_dates(full_data, interval)
     full_data = period_calendar.drop_incomplete_periods(full_data, interval)
     full_data = _dedupe_sorted(full_data)
+
+    if not allow_row_loss:
+        on_disk = set(safe_row_years_to_dates(load_ohlcv(folder, ticker)))
+        lost = sorted(on_disk - set(safe_row_years_to_dates(full_data)))
+        if lost:
+            raise DataLossRefused(
+                f"{ticker}: rebuild would drop {len(lost)} existing row(s) "
+                f"({lost[0]} .. {lost[-1]}) - refused, nothing written")
+
     stays, rolls = _partition_by_year(full_data, this_year)
 
     _atomic_write_csv(rolls, archive_path(folder, ticker))
@@ -388,7 +445,16 @@ def check_and_handle_split(folder, ticker, interval, split_rows, fetch_fn,
         }])
         return {'status': 'rebuild_failed_bad_data', 'ticker': ticker}
 
-    result = rebuild_archive_current(folder, ticker, full_data, interval=interval)
+    try:
+        result = rebuild_archive_current(folder, ticker, full_data, interval=interval)
+    except DataLossRefused as e:
+        logger.warning(str(e))
+        append_split_audit(audit_log_path, [{
+            'timestamp': timestamp, 'ticker': ticker, 'interval': interval,
+            'split_date': audit_rows[-1]['split_date'], 'split_ratio': audit_rows[-1]['split_ratio'],
+            'rebuild_status': 'rebuild_refused_row_loss', 'rows_before': rows_before, 'rows_after': 0,
+        }])
+        return {'status': 'rebuild_refused_row_loss', 'ticker': ticker}
     rows_after = result['archive_rows'] + result['current_rows']
     append_split_audit(audit_log_path, [{
         'timestamp': timestamp, 'ticker': ticker, 'interval': interval,

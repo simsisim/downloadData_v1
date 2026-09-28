@@ -13,6 +13,7 @@ requests>=2.31.0
 
 # Date/Time Handling
 python-dateutil>=2.8.2
+pandas_market_calendars>=4.0  # NYSE sessions for the missing-day check (optional; falls back to a heuristic)
 
 # Optional: Progress bars
 tqdm>=4.65.0

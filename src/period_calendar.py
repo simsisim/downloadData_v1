@@ -105,6 +105,20 @@ def last_closed_us_trading_date(now=None) -> _dt.date:
     return now.date() if now >= close_today else now.date() - _dt.timedelta(days=1)
 
 
+def nyse_trading_days(start, end) -> list[str] | None:
+    """
+    ISO dates of NYSE sessions in [start, end], from pandas_market_calendars.
+    Returns None if that package isn't installed - callers fall back to
+    inferring sessions from the data itself (see scan_for_missing_days).
+    """
+    try:
+        import pandas_market_calendars as mcal
+    except ImportError:
+        return None
+    sched = mcal.get_calendar("NYSE").schedule(start_date=_as_date(start), end_date=_as_date(end))
+    return [d.date().isoformat() for d in sched.index]
+
+
 def is_period_complete(p_start, interval: str, as_of=None) -> bool:
     """
     True if the period starting `p_start` has fully closed as of `as_of`

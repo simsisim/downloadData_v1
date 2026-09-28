@@ -13,35 +13,23 @@ https://www.cboe.com/markets/us/options/market-statistics/daily/?dt=2026-07-14
 -
 
 
-- [ ] **Backfill missing daily bars 2026-09-22 and 2026-08-11** (found 2026-09-28
-      from dashboard-screener: 95% of tickers had empty 50-day indicators).
-      Per-ticker files in data/market_data/daily/current/ are missing whole days:
-        2026-09-22 → only 372 / 4,164 files have it
-        2026-08-11 → only 2,848 / 4,164 files have it
-      The normal daily update only appends after the last date, so it never
-      fills a hole; `--repair-from` auto-detect only finds *blank* rows, not
-      *missing* rows → pass the tickers explicitly.
-      Already done + verified (2026-09-28): A, AA, AACI (rows before 08-11
-      untouched, header same, 08-11 and 09-22 now present).
-      Steps:
-        1. Build the list (tickers missing either day, but current as of 09-25):
-             cd data/market_data/daily/current
-             ls *.csv | sed 's/\.csv$//' | sort > /tmp/all.txt
-             grep -l "^2026-09-22" *.csv | sed 's/\.csv$//' | sort > /tmp/has0922.txt
-             grep -l "^2026-08-11" *.csv | sed 's/\.csv$//' | sort > /tmp/has0811.txt
-             grep -l "^2026-09-25" *.csv | sed 's/\.csv$//' | sort > /tmp/has0925.txt
-             sort -u <(comm -23 /tmp/all.txt /tmp/has0922.txt) \
-                     <(comm -23 /tmp/all.txt /tmp/has0811.txt) \
-               | comm -12 - /tmp/has0925.txt > /tmp/repair.txt   # ~3,776 tickers
-        2. Run (long — per-ticker yfinance, one call each):
-             cd ../../../..   # back to downloadData_v1/
-             python3 main.py --repair-from 2026-08-11 \
-               --repair-tickers "$(paste -sd, /tmp/repair.txt)" 2>&1 | tee logs/repair_0811.log
-        3. Check the REPAIR SUMMARY (still_broken / no_data), then re-run the
-           step-1 greps: both dates should be in ~4,140 files like other days.
-      Then: re-run dashboard-screener's run_screeners.py (see its TODO.md).
+- [x] **Backfill missing daily bars 2026-09-22 and 2026-08-11** — DONE 2026-09-28.
+      3,775 / 3,776 tickers repaired via `--repair-from 2026-08-11 --repair-tickers ...`
+      (GRAF: delisted, no data). Now 08-11 in 4,148 and 09-22 in 4,138 / 4,164 files.
+      Log: logs/repair_0811.log.
+      Still to do: re-run dashboard-screener's run_screeners.py (see its TODO.md).
 
-- [ ] **Detect missing mid-series days** (root cause of the above going unnoticed):
-      add a check — e.g. in the daily update or scan_for_corrupted_tickers —
-      that flags a trading day present in most files but missing in many,
-      and offers the `--repair-from` command for them.
+- [x] **Detect missing mid-series days** — DONE 2026-09-28.
+      scan_for_missing_days() (NYSE calendar via pandas_market_calendars) +
+      fill_missing_days() run as "DAILY DATA GAP CHECK" after every daily update
+      (last 30 days); `--repair-from DATE` auto-detect now includes missing days.
+      Gaps yfinance can't fill → data/market_data/daily/missing_days_unfillable.json.
+      Also fixed repair_from_date() to merge instead of replacing the whole range.
+      Known unfillable: every ^YH index on 2026-09-17/18 (Yahoo has no bar).
+      DATA LOSS (before the merge fix): 14 delisted/acquired tickers lost rows
+      2026-08-03..~08-21 (AACB APGE BBCQ CMII CRNX EQR FBRX ISSC JABRU LBRDA NCSM
+      NHIC RMAX TBPH) — Yahoo only serves their last few days; no local backup
+      past 2026-07-31.
+      Root cause (found 2026-09-28): the 09-24 run asked Yahoo for 09-22..09-23 and got
+      only 09-23; appending it hid the gap. Fixed with hold_back_at_gap(); plus shrink
+      guard in rebuild_archive_current() and tar.gz backups in data/backups/.
