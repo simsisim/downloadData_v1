@@ -4,12 +4,13 @@ import datetime as dt
 from datetime import timedelta
 import time
 import os
+import json
 from src.config import user_choice
 from src.config import PARAMS_DIR
 import logging
 from src import market_data_io
 from src.market_data_io import fetch_ohlcv
-from src import ticker_manifest
+from src import ticker_manifest, period_calendar
 
 # Shares-outstanding/splits change a few times a year at most (real filing
 # events), so refetching yf.Ticker.get_shares_full's whole series on every
@@ -97,6 +98,183 @@ def scan_for_corrupted_tickers(folder, since_date):
     return sorted(set(corrupted))
 
 
+def scan_for_missing_days(folder, since_date, until_date=None):
+    """
+    Find CSVs with whole trading days missing on/after `since_date` - rows
+    that were never written, as opposed to the blank/zero rows
+    scan_for_corrupted_tickers() finds. The normal daily update only appends
+    after a ticker's last date, so a day skipped mid-series (e.g. 2026-09-22,
+    absent from ~90% of files) is never filled in and silently breaks every
+    rolling indicator (50/200-day SMAs etc.) computed downstream.
+
+    Expected sessions come from the NYSE calendar (period_calendar.
+    nyse_trading_days), not from "dates most files have": a day missing
+    from most files is exactly the case this has to catch. If
+    pandas_market_calendars isn't installed, falls back to weekdays present
+    in at least 1% of files (misses a day absent from *every* file).
+
+    A day only counts as missing for a ticker if it falls inside that
+    ticker's own span - from `since_date` (or its first row, if it has none
+    earlier) to its last row - so recent listings and delisted/stale
+    tickers aren't flagged for days they never traded. Only the current-year
+    tier is read (same reasoning as scan_for_corrupted_tickers).
+
+    Returns {ticker: [missing ISO dates]}.
+    """
+    since_str = pd.to_datetime(since_date).strftime('%Y-%m-%d')
+    until = until_date or period_calendar.last_closed_us_trading_date()
+    until_str = pd.to_datetime(until).strftime('%Y-%m-%d')
+
+    # Per ticker: (dates on/after since, has a row before since)
+    per_ticker = {}
+    current_folder = os.path.join(folder, 'current')
+    for entry in os.scandir(current_folder):
+        if not entry.name.endswith('.csv'):
+            continue
+        try:
+            with open(entry.path, 'r', encoding='utf-8', errors='ignore') as fh:
+                next(fh, None)  # header
+                dates, has_earlier = set(), False
+                for line in fh:
+                    d = line[:10]
+                    if len(d) != 10 or d[4] != '-':
+                        continue
+                    if d < since_str:
+                        has_earlier = True
+                    elif d <= until_str:
+                        dates.add(d)
+        except Exception:
+            continue
+        if dates:
+            per_ticker[entry.name[:-4]] = (dates, has_earlier)
+
+    sessions = period_calendar.nyse_trading_days(since_str, until_str)
+    if sessions is None:
+        counts = {}
+        for dates, _ in per_ticker.values():
+            for d in dates:
+                counts[d] = counts.get(d, 0) + 1
+        min_files = max(1, len(per_ticker) // 100)
+        sessions = sorted(d for d, n in counts.items()
+                          if n >= min_files and dt.date.fromisoformat(d).weekday() < 5)
+
+    missing = {}
+    for ticker, (dates, has_earlier) in per_ticker.items():
+        first = since_str if has_earlier else min(dates)
+        last = max(dates)
+        gaps = [d for d in sessions if first <= d <= last and d not in dates]
+        if gaps:
+            missing[ticker] = gaps
+    return missing
+
+
+# A session missing from a fresh incremental fetch is held back (not
+# written past) for this long, so the next run retries it; after that it's
+# accepted as permanent (halt / Yahoo never serves it) so the ticker can't
+# stall forever - fill_missing_days() then records it as unfillable.
+GAP_HOLD_DAYS = 7
+
+
+def hold_back_at_gap(new_data, start_date, today=None):
+    """
+    Trim an incremental fetch to the rows before its first missing NYSE
+    session, if that session is recent (< GAP_HOLD_DAYS old).
+
+    Root cause of 2026-09-22 being absent from ~90% of files: the 09-24 run
+    asked for 09-22..09-23 and Yahoo returned only 09-23. Appending it moved
+    each file's last date past 09-22, and the update only ever fetches after
+    the last date, so the hole was permanent. Stopping short of the gap
+    makes the next run ask for it again.
+
+    Returns (rows_to_write, missing_sessions). Daily only; callers skip
+    this for weekly/monthly.
+    """
+    if new_data.empty:
+        return new_data, []
+    got = sorted(set(market_data_io.safe_row_years_to_dates(new_data)))
+    sessions = period_calendar.nyse_trading_days(start_date, got[-1])
+    if sessions is None:
+        return new_data, []
+    got_iso = {d.isoformat() for d in got}
+    missing = [d for d in sessions if d not in got_iso]
+    if not missing:
+        return new_data, []
+    today = today or dt.date.today()
+    if (today - dt.date.fromisoformat(missing[0])).days >= GAP_HOLD_DAYS:
+        return new_data, missing
+    row_dates = market_data_io.safe_row_years_to_dates(new_data)
+    return new_data[[d.isoformat() < missing[0] for d in row_dates]], missing
+
+
+# Gaps yfinance itself has no bar for (e.g. every ^YH index on 2026-09-17/18)
+# - recorded after a fill attempt so the daily check doesn't re-download the
+# same tickers every run for a day that will never come back.
+UNFILLABLE_GAPS_FILE = 'missing_days_unfillable.json'
+GAP_CHECK_LOOKBACK_DAYS = 30
+
+
+def _load_unfillable(folder):
+    path = os.path.join(folder, UNFILLABLE_GAPS_FILE)
+    try:
+        with open(path) as fh:
+            return {t: set(ds) for t, ds in json.load(fh).items()}
+    except (FileNotFoundError, ValueError):
+        return {}
+
+
+def _save_unfillable(folder, unfillable, since_str):
+    # Prune dates that have dropped out of the lookback window.
+    pruned = {t: sorted(d for d in ds if d >= since_str) for t, ds in unfillable.items()}
+    pruned = {t: ds for t, ds in sorted(pruned.items()) if ds}
+    with open(os.path.join(folder, UNFILLABLE_GAPS_FILE), 'w') as fh:
+        json.dump(pruned, fh, indent=1)
+
+
+def fill_missing_days(folder, since_date=None):
+    """
+    Daily-update gap check: find trading days missing mid-series
+    (scan_for_missing_days) over the last GAP_CHECK_LOOKBACK_DAYS and
+    re-download them via repair_from_date(). Gaps still missing after the
+    attempt are recorded in UNFILLABLE_GAPS_FILE and skipped on later runs.
+
+    Returns the repair summary dict, or {} if there was nothing to fill.
+    """
+    since_date = since_date or (dt.date.today() - timedelta(days=GAP_CHECK_LOOKBACK_DAYS)).isoformat()
+    since_str = pd.to_datetime(since_date).strftime('%Y-%m-%d')
+    unfillable = _load_unfillable(folder)
+
+    t0 = time.time()
+    gaps = scan_for_missing_days(folder, since_str)
+    gaps = {t: [d for d in ds if d not in unfillable.get(t, ())] for t, ds in gaps.items()}
+    gaps = {t: ds for t, ds in gaps.items() if ds}
+    print(f"🔍 Scanned for missing trading days since {since_str} in {time.time() - t0:.1f}s")
+
+    if not gaps:
+        print("✅ No missing days found.")
+        _save_unfillable(folder, unfillable, since_str)
+        return {}
+
+    by_day = {}
+    for ds in gaps.values():
+        for d in ds:
+            by_day[d] = by_day.get(d, 0) + 1
+    print(f"   {len(gaps)} ticker(s) missing days: "
+          + ", ".join(f"{d} ({n})" for d, n in sorted(by_day.items())))
+
+    result = repair_from_date(folder, min(min(ds) for ds in gaps.values()), tickers=sorted(gaps))
+
+    still = scan_for_missing_days(folder, since_str)
+    for t, ds in gaps.items():
+        left = set(ds) & set(still.get(t, ()))
+        if left:
+            unfillable.setdefault(t, set()).update(left)
+    n_left = sum(len(v) for v in unfillable.values())
+    if n_left:
+        print(f"   {n_left} gap(s) yfinance has no data for - recorded in {UNFILLABLE_GAPS_FILE}, skipped next run")
+    _save_unfillable(folder, unfillable, since_str)
+    return result
+
+
 def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='1d'):
     """
     Force-redownload OHLCV data on/after `since_date` and overwrite whatever is
@@ -115,7 +293,8 @@ def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='
         since_date (str or date): repair rows on/after this date (YYYY-MM-DD)
         end_date (str, optional): defaults to today
         tickers (list[str], optional): restrict repair to these tickers; if None, auto-detect
-            corrupted tickers in `folder` via scan_for_corrupted_tickers()
+            tickers in `folder` with corrupted rows (scan_for_corrupted_tickers) or
+            missing trading days (scan_for_missing_days)
         interval (str): yfinance interval, default '1d'
 
     Returns:
@@ -125,14 +304,19 @@ def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='
     end_date = end_date or dt.datetime.now().strftime('%Y-%m-%d')
 
     if tickers is None:
-        print(f"🔍 Scanning {folder} for tickers with corrupted OHLC on/after {since_date_d}...")
+        print(f"🔍 Scanning {folder} for tickers with corrupted OHLC or missing days on/after {since_date_d}...")
         t0 = time.time()
-        tickers = scan_for_corrupted_tickers(folder, since_date_d)
-        print(f"   Scan completed in {time.time() - t0:.2f}s — {len(tickers)} corrupted ticker(s) found")
+        corrupted = scan_for_corrupted_tickers(folder, since_date_d)
+        missing = scan_for_missing_days(folder, since_date_d)
+        tickers = sorted(set(corrupted) | set(missing))
+        print(f"   Scan completed in {time.time() - t0:.2f}s — {len(corrupted)} corrupted, "
+              f"{len(missing)} with missing days ({len(tickers)} ticker(s) total)")
 
     if not tickers:
         print("✅ No corrupted tickers found. Nothing to repair.")
         return {'fixed': [], 'still_broken': [], 'no_data': []}
+
+    market_data_io.backup_current(folder, f"pre-repair-{since_date_d}")
 
     fixed, still_broken, no_data = [], [], []
     ohlc_cols = ['Open', 'High', 'Low', 'Close']
@@ -140,20 +324,45 @@ def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='
     for ticker in tickers:
         try:
             existing_data = market_data_io.load_ohlcv(folder, ticker)
-            # Drop rows on/after since_date in memory - only written back to
-            # disk if the redownload below actually returns data (see the
-            # new_data.empty check), so a failed/empty API response leaves
-            # the on-disk tiers (corrupted row included) untouched.
-            if not existing_data.empty:
-                row_dates = market_data_io.safe_row_years_to_dates(existing_data)
-                existing_data = existing_data[[d < since_date_d for d in row_dates]]
-
             new_data = fetch_ohlcv(ticker, since_date_d.isoformat(), end_date, interval=interval)
 
             if new_data.empty:
                 print(f"⚠️  {ticker}: no data returned for {since_date_d}..{end_date} (API may still be degraded)")
                 no_data.append(ticker)
                 continue
+
+            # A split inside the repaired range means every older row on disk
+            # is on the pre-split scale - merging adjusted new rows onto it
+            # would mix scales (MNST 2026-08-11: the split day was itself a
+            # missing day, so the daily update never saw it). Full-history
+            # rebuild instead, from the ticker's own first date on disk.
+            if 'Stock Splits' in new_data.columns and not existing_data.empty:
+                split_rows = new_data[new_data['Stock Splits'].fillna(0) != 0]
+                if not split_rows.empty:
+                    first = market_data_io.safe_row_years_to_dates(existing_data)[0]
+                    res = market_data_io.check_and_handle_split(
+                        folder, ticker, interval, split_rows, fetch_ohlcv,
+                        first.isoformat(), end_date,
+                        os.path.join(PARAMS_DIR["DATA_DIR"], "market_data", "split_events.csv"),
+                        splits_folder=PARAMS_DIR.get("MARKET_DATA_SPLITS_DIR") if interval == '1d' else None)
+                    if res['status'] != 'already_rebuilt':
+                        print(f"   {ticker}: split in repaired range -> full rebuild from {first}: {res['status']}")
+                        (fixed if res['status'] == 'rebuilt_ok' else still_broken).append(ticker)
+                        continue
+
+            # Merge, don't replace: an existing row on/after since_date is
+            # dropped only if the redownload has that date, or the row itself
+            # is blank/zero. Yahoo keeps just a few days of history for
+            # delisted/acquired tickers (CRNX: 9 rows), so replacing the whole
+            # range wiped good on-disk rows it can no longer serve (2026-09-28).
+            if not existing_data.empty:
+                row_dates = market_data_io.safe_row_years_to_dates(existing_data)
+                new_dates = set(market_data_io.safe_row_years_to_dates(new_data))
+                ex_ohlc = existing_data[ohlc_cols].apply(pd.to_numeric, errors='coerce')
+                ex_bad = (ex_ohlc.isna().any(axis=1) | (ex_ohlc == 0).all(axis=1)).tolist()
+                keep = [d < since_date_d or (d not in new_dates and not bad)
+                        for d, bad in zip(row_dates, ex_bad)]
+                existing_data = existing_data[keep]
 
             bad_mask = new_data[ohlc_cols].isna().any(axis=1) | (new_data[ohlc_cols] == 0).all(axis=1)
             if bad_mask.any():
@@ -201,6 +410,7 @@ class MarketDataRetriever:
         self.successful_tickers = []
         self.split_rebuilds = []
         self.split_pending = []
+        self.gap_held = []   # tickers whose fetch stopped short of a missing session (see hold_back_at_gap)
         
     def load_tickers(self):
         ticker_data = pd.read_csv(self.config['ticker_file'])
@@ -318,12 +528,26 @@ class MarketDataRetriever:
                         split_rows, market_data_io.fetch_ohlcv,
                         self.config['start_date'], self.config['end_date'],
                         audit_log_path, splits_folder=self.config.get('splits_folder'))
-                    if result['status'] == 'rebuilt_ok':
-                        self.split_rebuilds.append(ticker)
-                    else:
-                        self.split_pending.append(ticker)
-                    self.successful_tickers.append(ticker)
-                    return
+                    # already_rebuilt: nothing to redo - fall through to the
+                    # normal incremental write of the (already adjusted) new rows.
+                    if result['status'] != 'already_rebuilt':
+                        if result['status'] == 'rebuilt_ok':
+                            self.split_rebuilds.append(ticker)
+                        else:
+                            self.split_pending.append(ticker)
+                        self.successful_tickers.append(ticker)
+                        return
+
+            if had_existing_data and self.config['interval'] == '1d' and not new_data.empty:
+                n_fetched = len(new_data)
+                new_data, gap = hold_back_at_gap(new_data, start_date)
+                if len(new_data) < n_fetched:
+                    self.logger.warning(f"{ticker}: fetch from {start_date} is missing session(s) {gap} "
+                                        f"- wrote only rows before {gap[0]}, next run retries it")
+                    self.gap_held.append(ticker)
+                elif gap:
+                    self.logger.warning(f"{ticker}: session(s) {gap} missing for over {GAP_HOLD_DAYS} "
+                                        f"days - accepted as a permanent gap")
 
             if not new_data.empty:
                 market_data_io.write_incremental(self.config['folder'], ticker, new_data,
@@ -546,6 +770,10 @@ class MarketDataRetriever:
             print(f"🔀 Rebuilt: {len(self.split_rebuilds)} — {self.split_rebuilds}")
             if self.split_pending:
                 print(f"⚠️  Pending (rebuild failed / will retry next run): {len(self.split_pending)} — {self.split_pending}")
+
+        if self.gap_held:
+            print(f"\n⏸️  Held back at a missing session (Yahoo skipped a day; retried next run): "
+                  f"{len(self.gap_held)} ticker(s) — {self.gap_held[:20]}{' ...' if len(self.gap_held) > 20 else ''}")
 
         interval = self.config.get("interval", "").lower()
         write_file_info = self.config.get("write_file_info", False)

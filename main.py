@@ -4,7 +4,8 @@ import sys
 import pandas as pd
 import argparse
 from datetime import datetime, timedelta
-from src.get_marketData import run_market_data_retrieval, repair_from_date
+from src.get_marketData import run_market_data_retrieval, repair_from_date, fill_missing_days
+from src.market_data_io import backup_current
 from src.get_financial_data import run_financial_data_retrieval
 from src.get_batchData import (run_batch_data_retrieval, _parse_interval_cfg,
                                 compute_batch_gap_start_date, run_batch_gap_fill_interval)
@@ -152,7 +153,7 @@ Examples:
   # Full CANSLIM analysis
   python main.py --preset full_canslim
 
-  # Repair daily data corrupted since 2026-07-24 (auto-detects affected tickers)
+  # Repair daily data corrupted/missing since 2026-07-24 (auto-detects affected tickers)
   python main.py --repair-from 2026-07-24
 
   # Repair specific tickers only
@@ -271,12 +272,13 @@ Ticker choice values:
     # parser's args are consumed, see main())
     parser.add_argument('--repair-from', type=str, dest='repair_from_date',
                        help='Standalone repair mode: force-redownload daily OHLCV on/after this date '
-                            '(YYYY-MM-DD) and overwrite corrupted rows. Auto-detects affected tickers '
+                            '(YYYY-MM-DD) and overwrite corrupted rows / fill missing trading days. '
+                            'Auto-detects affected tickers '
                             'unless --repair-tickers is given. Exits after repair; does not run the '
                             'normal pipeline.')
     parser.add_argument('--repair-tickers', type=str, dest='repair_tickers',
                        help='Comma-separated tickers to repair (used with --repair-from). '
-                            'If omitted, corrupted tickers are auto-detected.')
+                            'If omitted, tickers with corrupted rows or missing days are auto-detected.')
 
     args = parser.parse_args()
 
@@ -1138,6 +1140,25 @@ def main(config_override=None, preset=None):
         print("="*60)
         print("  To enable: Set YF_batch_data = TRUE in user_input/user_data.csv")
         print("  Or use CLI: python main.py --batch-data --batch-daily")
+
+    # ============ DAILY DATA GAP CHECK / AUTO-FILL ============
+    # The daily update only appends after each ticker's last row, so a
+    # trading day skipped mid-series (2026-09-22: missing from ~90% of files)
+    # is never filled and breaks rolling indicators downstream. Scans the
+    # last GAP_CHECK_LOOKBACK_DAYS against the NYSE calendar and re-downloads
+    # the affected tickers; gaps yfinance has no bar for are remembered and
+    # skipped (see fill_missing_days).
+    if config.yf_hist_data and config.yf_daily_data:
+        print("\n" + "="*60)
+        print("DAILY DATA GAP CHECK")
+        print("="*60)
+        try:
+            # Weekly safety-net snapshot of daily/current (repairs also
+            # snapshot right before they write - see repair_from_date).
+            backup_current(PARAMS_DIR["MARKET_DATA_DIR_1d"], "weekly", max_age_days=7)
+            fill_missing_days(PARAMS_DIR["MARKET_DATA_DIR_1d"])
+        except Exception as e:
+            print(f"❌ Error checking daily data for missing days: {e}")
 
     # ============ ^YH INDEX TICKER VERIFICATION / AUTO-REPAIR ============
     # Runs after historical market data retrieval so it sees today's rows.

@@ -239,10 +239,19 @@ consume the list in a confirmed market uptrend for M. See
 
 Standalone mode — runs instead of the normal pipeline and exits immediately after (no CBOE update, ticker generation, or historical download). Only daily (`1d`) data is supported. It force-redownloads and overwrites rows on/after the given date; if yfinance still returns nothing/bad data for that window, the on-disk file is left untouched and the ticker is reported as still broken.
 
-Ticker scope is resolved in this priority order: `--repair-tickers` (explicit list) > `--ticker-choice` (same universe resolution as the normal download) > neither given (auto-detect by scanning every daily CSV for blank/zero OHLC on/after the date — a few hundred ms even across ~4,700 tickers).
+Ticker scope is resolved in this priority order: `--repair-tickers` (explicit list) > `--ticker-choice` (same universe resolution as the normal download) > neither given (auto-detect by scanning every daily CSV for blank/zero OHLC **or whole trading days missing mid-series** (NYSE calendar) on/after the date — about a second across ~4,700 tickers).
+
+Repair merges: an existing row is replaced only if yfinance returns that date (or the row is blank/zero), so rows Yahoo no longer serves (delisted tickers) are kept.
+
+**Automatic gap check:** every run with daily data enabled ends with a `DAILY DATA GAP CHECK` step that fills trading days missing in the last 30 days (a day skipped mid-series is otherwise never filled, since the daily update only appends). Gaps yfinance has no bar for are recorded in `data/market_data/daily/missing_days_unfillable.json` and skipped on later runs.
+
+**Safeguards (2026-09-28):**
+- *Hold-back:* the daily update checks each fetch against the NYSE calendar; if Yahoo skipped a session (e.g. asked 09-22..09-23, got only 09-23), only rows before the gap are written so the next run asks again. Gaps older than 7 days are accepted so a halted ticker can't stall.
+- *Shrink guard:* `rebuild_archive_current()` (repair + split rebuild) refuses to write if any date already on disk would be dropped.
+- *Backups:* `data/backups/daily_current_<stamp>_<label>.tar.gz` (~23 MB) — taken before every repair and weekly during the daily run; newest 8 kept. Restore: `tar -xzf <file> -C data/market_data/daily/`.
 
 ```bash
-# Auto-detect every corrupted ticker across the whole daily folder, from a date
+# Auto-detect every corrupted / gappy ticker across the whole daily folder, from a date
 python main.py --repair-from 2026-07-24
 
 # Restrict to a known universe (NASDAQ 100) instead of the whole folder
