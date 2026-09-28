@@ -134,3 +134,22 @@ def test_hold_back_accepts_old_gap_and_complete_fetch():
     # gap older than GAP_HOLD_DAYS -> written anyway so the ticker can't stall
     out, gap = gm.hold_back_at_gap(_bars(["2026-09-23"]), "2026-09-22", today=pd.Timestamp("2026-10-05").date())
     assert gap == ["2026-09-22"] and len(out) == 1
+
+
+def test_repair_with_split_in_range_does_full_rebuild(tmp_path, monkeypatch):
+    # MNST 2026-08-11: split landed on a missing day -> repair must rebuild
+    # the whole history, not merge adjusted rows onto pre-split ones.
+    _write(tmp_path, "AAA", SESSIONS)
+    fresh = _bars(["2026-09-22", "2026-09-23"])
+    fresh["Stock Splits"] = [2.0, 0.0]
+    monkeypatch.setattr(gm, "fetch_ohlcv", lambda *a, **k: fresh)
+    monkeypatch.setattr(gm.market_data_io.backup_current, "__defaults__",
+                        (None, str(tmp_path / "backups"), gm.market_data_io.BACKUP_KEEP))
+    calls = []
+    monkeypatch.setattr(gm.market_data_io, "check_and_handle_split",
+                        lambda folder, t, iv, rows, fn, start, end, audit, splits_folder=None:
+                        calls.append((t, start)) or {"status": "rebuilt_ok", "ticker": t})
+
+    res = gm.repair_from_date(str(tmp_path), "2026-09-22", tickers=["AAA"])
+    assert calls == [("AAA", SESSIONS[0])]
+    assert res["fixed"] == ["AAA"]

@@ -331,6 +331,24 @@ def repair_from_date(folder, since_date, end_date=None, tickers=None, interval='
                 no_data.append(ticker)
                 continue
 
+            # A split inside the repaired range means every older row on disk
+            # is on the pre-split scale - merging adjusted new rows onto it
+            # would mix scales (MNST 2026-08-11: the split day was itself a
+            # missing day, so the daily update never saw it). Full-history
+            # rebuild instead, from the ticker's own first date on disk.
+            if 'Stock Splits' in new_data.columns and not existing_data.empty:
+                split_rows = new_data[new_data['Stock Splits'].fillna(0) != 0]
+                if not split_rows.empty:
+                    first = market_data_io.safe_row_years_to_dates(existing_data)[0]
+                    res = market_data_io.check_and_handle_split(
+                        folder, ticker, interval, split_rows, fetch_ohlcv,
+                        first.isoformat(), end_date,
+                        os.path.join(PARAMS_DIR["DATA_DIR"], "market_data", "split_events.csv"),
+                        splits_folder=PARAMS_DIR.get("MARKET_DATA_SPLITS_DIR") if interval == '1d' else None)
+                    print(f"   {ticker}: split in repaired range -> full rebuild from {first}: {res['status']}")
+                    (fixed if res['status'] == 'rebuilt_ok' else still_broken).append(ticker)
+                    continue
+
             # Merge, don't replace: an existing row on/after since_date is
             # dropped only if the redownload has that date, or the row itself
             # is blank/zero. Yahoo keeps just a few days of history for
