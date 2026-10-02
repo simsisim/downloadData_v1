@@ -21,6 +21,18 @@ from src import ticker_manifest, period_calendar
 # the same reason (fundamentals also change slowly).
 SHARES_REFRESH_DAYS = 30
 
+# Network-outage circuit breaker for the slow per-ticker loop. yfinance
+# reports a dropped connection as "possibly delisted; no price data found",
+# so an outage looks like a run of bad tickers. After OUTAGE_STREAK failures
+# in a row, probe a ticker that is always live; if that fails too, wait for
+# the network (probing every OUTAGE_PROBE_SECS, up to OUTAGE_MAX_WAIT_SECS),
+# then retry the streak. On 2026-10-02 a ~17 min drop otherwise cost ~60
+# tickers their day's bar plus a false delisting strike each.
+OUTAGE_STREAK = 8
+OUTAGE_PROBE_TICKER = 'SPY'
+OUTAGE_PROBE_SECS = 60
+OUTAGE_MAX_WAIT_SECS = 30 * 60
+
 
 def _read_header(file_path):
     """Read just the first line of a CSV - O(1) regardless of file size."""
@@ -411,6 +423,7 @@ class MarketDataRetriever:
         self.split_rebuilds = []
         self.split_pending = []
         self.gap_held = []   # tickers whose fetch stopped short of a missing session (see hold_back_at_gap)
+        self.outage_skipped = []   # never fetched because the network stayed down - not a ticker failure
         
     def load_tickers(self):
         ticker_data = pd.read_csv(self.config['ticker_file'])
@@ -750,16 +763,41 @@ class MarketDataRetriever:
     
         ticker_count = 0
         batch_size = 100
-    
-        for ticker in self.tickers_list:
+        streak = []   # consecutive failed tickers, retried if they turn out to be an outage
+
+        i = 0
+        while i < len(self.tickers_list):
+            ticker = self.tickers_list[i]
+            n_failed = len(self.problematic_tickers)
             self.update_individual_stock_data(ticker)
+            streak = streak + [ticker] if len(self.problematic_tickers) > n_failed else []
             ticker_count += 1
+            i += 1
             time.sleep(0.2)
-    
-            if ticker_count % batch_size == 0:
+
+            if len(streak) >= OUTAGE_STREAK and not _network_ok():
+                print(f"\n🌐 {len(streak)} failures in a row and {OUTAGE_PROBE_TICKER} unreachable "
+                      f"- network outage, waiting for it to come back...")
+                if not _wait_for_network():
+                    self.outage_skipped = streak + self.tickers_list[i:]
+                    self.problematic_tickers = [p for p in self.problematic_tickers
+                                                if p['ticker'] not in set(streak)]
+                    print(f"❌ Network still down after {OUTAGE_MAX_WAIT_SECS // 60} min - stopping. "
+                          f"{len(self.outage_skipped)} ticker(s) not fetched; rerun the same command.")
+                    break
+                print(f"✅ Network back - retrying {len(streak)} ticker(s) from {streak[0]}")
+                self.problematic_tickers = [p for p in self.problematic_tickers
+                                            if p['ticker'] not in set(streak)]
+                i -= len(streak)
+                ticker_count -= len(streak)
+                streak = []
+            elif len(streak) >= OUTAGE_STREAK:
+                streak = []   # network fine: genuine failures, keep them
+
+            if ticker_count and ticker_count % batch_size == 0:
                 print(f"Processed {ticker_count} tickers. Taking a longer break...")
                 time.sleep(30)
-    
+
         self.save_problematic_tickers()
         print(f"Total problematic tickers: {len(self.problematic_tickers)}")
 
@@ -803,6 +841,26 @@ class MarketDataRetriever:
                 print("No successful_tickers found — combined_tickers_clean_<x>.csv not generated.")
 
 
+def _network_ok():
+    """True if Yahoo serves a ticker that is always live (outage probe)."""
+    try:
+        return not yf.Ticker(OUTAGE_PROBE_TICKER).history(period="5d").empty
+    except Exception:
+        return False
+
+
+def _wait_for_network():
+    """Probe every OUTAGE_PROBE_SECS until Yahoo answers; False after OUTAGE_MAX_WAIT_SECS."""
+    waited = 0
+    while waited < OUTAGE_MAX_WAIT_SECS:
+        time.sleep(OUTAGE_PROBE_SECS)
+        waited += OUTAGE_PROBE_SECS
+        if _network_ok():
+            return True
+        print(f"   still down after {waited // 60} min...")
+    return False
+
+
 def run_market_data_retrieval(config):
     """
     Main function to run historical market data retrieval
@@ -840,9 +898,13 @@ def _update_manifest_after_run(config, retriever):
     date_col = ticker_manifest.slow_date_col(interval)
     failed = {p['ticker'] for p in retriever.problematic_tickers}
 
+    skipped = set(retriever.outage_skipped)
+
     for ticker in retriever.tickers_list:
         latest_date = market_data_io.get_latest_date(folder, ticker)
         ticker_manifest.set_date(manifest, ticker, date_col, latest_date)
+        if ticker in skipped:
+            continue   # not attempted (network outage) - no strike on the delisting clock
         ticker_manifest.record_outcome(manifest, ticker, is_success=(ticker not in failed), today=today)
 
     ticker_manifest.save_manifest(manifest)
