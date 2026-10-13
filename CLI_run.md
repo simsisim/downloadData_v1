@@ -356,6 +356,21 @@ nohup python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choic
 disown
 ```
 
+**Daily routine — download, then the dashboard-screener screeners** (they read
+these files and save the day's Confluence / Top Movers / screen hits to
+`dashboard-screener/results/history.db`). After days off, the screeners also
+fill the missed sessions (up to the last 20, ~40 s each). `--fin-data` refreshes
+`financial_data_0_5.csv` (earnings dates/results, CANSLIM inputs) — only tickers
+within 3 days of their earnings date are re-fetched, so it takes minutes; the
+screeners read that file. The screeners start
+only if the download exits without error; both write to the same log:
+
+```bash
+cd /home/imagda/_invest2024/python/downloadData_v1 && \
+nohup bash -c 'python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 0-5 --fin-data --no-fin-process && cd /home/imagda/_invest2024/python/dashboard-screener && python run_screeners.py' > logs/nohup_$(date +%Y%m%d_%H%M%S).out 2>&1 &
+disown
+```
+
 - **`cd <absolute path> && ...`** — always start from the project root, chained
   with `&&` so a failed `cd` aborts before `nohup` runs. A relative `cd` that
   silently fails (wrong starting directory) will otherwise launch `python
