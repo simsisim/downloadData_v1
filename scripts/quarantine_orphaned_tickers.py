@@ -32,7 +32,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config import PARAMS_DIR
 
-DEFAULT_UNIVERSE = os.path.join(PARAMS_DIR["TICKERS_DIR"], "combined_tickers_0-5.csv")
+DEFAULT_UNIVERSE = os.path.join(PARAMS_DIR["TICKERS_DIR"], "combined_tickers_5-0.csv")
 QUARANTINE_ROOT = os.path.join("data", "market_data_orphaned")
 MANIFEST_PATH = os.path.join(PARAMS_DIR["TICKERS_DIR"], "orphaned_tickers_removed.csv")
 

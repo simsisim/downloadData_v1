@@ -48,7 +48,7 @@ from src import market_data_io
 from src import get_marketData
 from src import ticker_manifest
 
-DEFAULT_UNIVERSE = os.path.join(PARAMS_DIR["TICKERS_DIR"], "combined_tickers_0-5.csv")
+DEFAULT_UNIVERSE = os.path.join(PARAMS_DIR["TICKERS_DIR"], "combined_tickers_5-0.csv")
 
 # interval -> (PARAMS_DIR key, backfill start_date used for brand-new tickers,
 # mirrors the start dates main.py's normal daily/weekly/monthly params use)
