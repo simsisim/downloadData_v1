@@ -9,6 +9,14 @@ import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.config import user_choice, PARAMS_DIR
 
+# ETFs (XLF, SPY, IBIT, ...) and ^ indexes have no earnings or statements -
+# yfinance answers them with "No earnings dates found" / 404 "No fundamentals
+# data found". They only enter the universe via this file, so the fin-data
+# fetch skips every ticker listed in it.
+NO_FUNDAMENTALS_FILE = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    'user_input', 'indexes_tickers.csv')
+
 
 class FinancialDataRetriever:
     """
@@ -410,7 +418,20 @@ class FinancialDataRetriever:
         except Exception as e:
             self.logger.error(f"Error loading tickers from {ticker_file_path}: {str(e)}")
             return []
-    
+
+    def _drop_no_fundamentals(self, tickers_list):
+        """Remove ETFs / ^ indexes (NO_FUNDAMENTALS_FILE) from the fetch list."""
+        try:
+            excluded = set(pd.read_csv(NO_FUNDAMENTALS_FILE)['ticker'].dropna().astype(str).str.strip())
+        except Exception as e:
+            self.logger.warning(f"Could not read {NO_FUNDAMENTALS_FILE}, no ETF/index skip: {e}")
+            return tickers_list
+        kept = [t for t in tickers_list if t not in excluded]
+        if len(kept) < len(tickers_list):
+            print(f"⏭️  Skipping {len(tickers_list) - len(kept)} ETF/index ticker(s) "
+                  f"(no fundamentals; listed in {os.path.basename(NO_FUNDAMENTALS_FILE)})")
+        return kept
+
     def get_comprehensive_financial_data(self, ticker):
         """
         Extract comprehensive financial data needed for CANSLIM analysis.
@@ -1181,7 +1202,7 @@ class FinancialDataRetriever:
         print("Generating comprehensive financial data for CANSLIM analysis...")
 
         # Load tickers
-        tickers_list = self.load_tickers_from_file(ticker_file_path)
+        tickers_list = self._drop_no_fundamentals(self.load_tickers_from_file(ticker_file_path))
         if not tickers_list:
             print("No tickers found to process.")
             return
