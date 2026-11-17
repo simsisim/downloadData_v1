@@ -523,6 +523,16 @@ def fetch_shares_and_splits(ticker, start_date, end_date):
     """
     import yfinance as yf
 
+    if ticker.startswith('^'):
+        # Indexes have no shares outstanding or splits. Some (e.g. ^IBD50)
+        # only allow period 1d/5d, so yf.Ticker.splits (period='max') logs
+        # "Period 'max' is invalid" and returns None - skip the calls.
+        shares = pd.Series(dtype='float64', name='SharesOutstanding')
+        shares.index.name = 'Date'
+        splits = pd.Series(dtype='float64', name='SplitRatio')
+        splits.index.name = 'Date'
+        return shares, splits
+
     ticker_obj = yf.Ticker(ticker)
 
     shares = ticker_obj.get_shares_full(start=start_date, end=end_date)
