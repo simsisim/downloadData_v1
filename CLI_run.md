@@ -367,8 +367,27 @@ only if the download exits without error; both write to the same log:
 
 ```bash
 cd /home/imagda/_invest2024/python/downloadData_v1 && \
-nohup bash -c 'python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 0-5 --fin-data --no-fin-process && cd /home/imagda/_invest2024/python/dashboard-screener && python run_screeners.py' > logs/nohup_$(date +%Y%m%d_%H%M%S).out 2>&1 &
+nohup systemd-run --user --scope -q -p CPUQuota=50% nice -n 19 env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 bash -c 'python main.py --hist-data --daily --no-weekly --no-monthly --ticker-choice 5-0 --fin-data --no-fin-process && cd /home/imagda/_invest2024/python/dashboard-screener && python run_screeners.py' > logs/nohup_$(date +%Y%m%d_%H%M%S).out 2>&1 &
 disown
+```
+
+**Gentle on the CPU** (no rush, e.g. a catch-up after days off) — the prefix
+before `bash -c` keeps the job from straining the machine:
+
+- **`systemd-run --user --scope -p CPUQuota=50%`** — hard cap: the whole job
+  (download + screeners, all child processes) gets at most half of one core.
+  `25%` = quieter and slower, `100%` = one full core, `200%` = two cores.
+  Remove the prefix entirely for full speed.
+- **`nice -n 19`** — lowest priority: anything you're doing interactively
+  always wins the CPU first.
+- **`OMP/OPENBLAS/MKL_NUM_THREADS=1`** — stops numpy/pandas math libraries
+  from spreading over all cores.
+
+To throttle a job that is **already running**, without restarting it:
+
+```bash
+renice -n 19 -p <PID>                       # lowest priority
+cpulimit -p <PID> -l 50 &                   # cap at 50% (sudo apt install cpulimit)
 ```
 
 - **`cd <absolute path> && ...`** — always start from the project root, chained
